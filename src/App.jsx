@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 
-// Todos os 54 jogadores do Premio Mangabeira (Craque)
+// Todos os 54 jogadores do Prêmio Mangabeira (Craque)
 const rankingMangabeira = [
   { pos: 1, nome: "Adriano", pontos: 65 },
   { pos: 2, nome: "Rodrigo", pontos: 56 },
@@ -59,7 +59,7 @@ const rankingMangabeira = [
   { pos: 54, nome: "Jefinho", pontos: 3 }
 ];
 
-// Todos os 52 jogadores do Premio Brocador (Artilharia)
+// Todos os 52 jogadores do Prêmio Brocador (Artilharia)
 const rankingBrocador = [
   { pos: 1, nome: "Remi", gols: 50 },
   { pos: 2, nome: "Rodrigo", gols: 45 },
@@ -115,6 +115,7 @@ const rankingBrocador = [
   { pos: 52, nome: "Beradeiro", gols: 1 }
 ];
 
+// Dados dos Goleiros (Prêmio César)
 const rankingCesar = [
   { pos: 1, nome: 'Tellê', pontos: 79, golsSofridos: 106 },
   { pos: 2, nome: 'Baianinho', pontos: 54, golsSofridos: 177 },
@@ -125,36 +126,46 @@ const rankingCesar = [
 export default function App() {
   const [aba, setAba] = useState('geral');
 
+  // Função auxiliar para renderizar badges do pódio
+  const getPodioBadge = (pos) => {
+    if (pos === 1) return <span className="text-amber-400 font-bold">🥇 1º</span>;
+    if (pos === 2) return <span className="text-slate-300 font-bold">🥈 2º</span>;
+    if (pos === 3) return <span className="text-amber-600 font-bold">🥉 3º</span>;
+    return <span className="text-slate-500 font-semibold">#{pos}</span>;
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8 font-sans">
-      {/* Header com Navegação */}
+      {/* Header */}
       <header className="mb-8 border-b border-slate-800 pb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-amber-400 tracking-wide">🏆 Prêmios 2026</h1>
+          <h1 className="text-3xl font-extrabold text-amber-400 tracking-wide flex items-center gap-2">
+            🏆 Prêmios 2026
+          </h1>
           <p className="text-slate-400 text-sm mt-1">Painel Oficial de Desempenho e Classificação</p>
         </div>
         <div className="flex flex-wrap gap-2 bg-slate-900 p-1.5 rounded-xl border border-slate-800">
           <button 
             onClick={() => setAba('geral')}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${aba === 'geral' ? 'bg-amber-500 text-slate-950 shadow-md' : 'text-slate-400 hover:text-white'}`}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${aba === 'geral' ? 'bg-amber-500 text-slate-950 shadow-md font-bold' : 'text-slate-400 hover:text-white'}`}
           >
             Visão Geral
           </button>
           <button 
             onClick={() => setAba('mangabeira')}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${aba === 'mangabeira' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${aba === 'mangabeira' ? 'bg-indigo-600 text-white shadow-md font-bold' : 'text-slate-400 hover:text-white'}`}
           >
             Craque (Mangabeira)
           </button>
           <button 
             onClick={() => setAba('brocador')}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${aba === 'brocador' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${aba === 'brocador' ? 'bg-emerald-600 text-white shadow-md font-bold' : 'text-slate-400 hover:text-white'}`}
           >
             Artilharia (Brocador)
           </button>
           <button 
             onClick={() => setAba('cesar')}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${aba === 'cesar' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${aba === 'cesar' ? 'bg-blue-600 text-white shadow-md font-bold' : 'text-slate-400 hover:text-white'}`}
           >
             Goleiros (César)
           </button>
@@ -166,21 +177,21 @@ export default function App() {
         <>
           {/* Cards Principais */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-slate-900/80 p-6 rounded-2xl border border-amber-500/30 shadow-lg relative overflow-hidden">
+            <div className="bg-slate-900/90 p-6 rounded-2xl border border-amber-500/30 shadow-lg relative overflow-hidden">
               <span className="text-xs font-bold uppercase tracking-wider text-amber-400 bg-amber-400/10 px-2.5 py-1 rounded-md">Prêmio Mangabeira</span>
               <p className="text-slate-400 text-sm mt-3">Líder do Ranking</p>
               <p className="text-3xl font-black text-white mt-1">Adriano</p>
               <p className="text-amber-400 font-bold text-lg mt-1">65 <span className="text-sm font-normal text-slate-400">pontos</span></p>
             </div>
 
-            <div className="bg-slate-900/80 p-6 rounded-2xl border border-emerald-500/30 shadow-lg relative overflow-hidden">
+            <div className="bg-slate-900/90 p-6 rounded-2xl border border-emerald-500/30 shadow-lg relative overflow-hidden">
               <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 bg-emerald-400/10 px-2.5 py-1 rounded-md">Prêmio Brocador</span>
               <p className="text-slate-400 text-sm mt-3">Artilheiro Máximo</p>
               <p className="text-3xl font-black text-white mt-1">Remi</p>
               <p className="text-emerald-400 font-bold text-lg mt-1">50 <span className="text-sm font-normal text-slate-400">gols</span></p>
             </div>
 
-            <div className="bg-slate-900/80 p-6 rounded-2xl border border-blue-500/30 shadow-lg relative overflow-hidden">
+            <div className="bg-slate-900/90 p-6 rounded-2xl border border-blue-500/30 shadow-lg relative overflow-hidden">
               <span className="text-xs font-bold uppercase tracking-wider text-blue-400 bg-blue-400/10 px-2.5 py-1 rounded-md">Prêmio César</span>
               <p className="text-slate-400 text-sm mt-3">Melhor Goleiro</p>
               <p className="text-3xl font-black text-white mt-1">Tellê</p>
@@ -188,8 +199,8 @@ export default function App() {
             </div>
           </div>
 
-          {/* Gráficos mostrando os 14 primeiros */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Gráficos Mangabeira e Brocador */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
               <h2 className="text-xl font-bold text-white mb-1">Top 14 - Prêmio Mangabeira (Craque)</h2>
               <p className="text-slate-400 text-xs mb-4">Primeiros 14 colocados na classificação geral</p>
@@ -222,10 +233,29 @@ export default function App() {
               </div>
             </div>
           </div>
+
+          {/* Gráfico do Prêmio César (Goleiros) */}
+          <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
+            <h2 className="text-xl font-bold text-white mb-1">Prêmio César - Desempenho dos Goleiros</h2>
+            <p className="text-slate-400 text-xs mb-4">Comparativo de Pontos obtidos vs. Gols Sofridos</p>
+            <div className="h-72 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={rankingCesar}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                  <XAxis dataKey="nome" stroke="#94a3b8" />
+                  <YAxis stroke="#94a3b8" />
+                  <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px' }} />
+                  <Legend />
+                  <Bar dataKey="pontos" name="Pontos" fill="#3b82f6" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="golsSofridos" name="Gols Sofridos" fill="#ef4444" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
         </>
       )}
 
-      {/* ABA CRAQUE (MANGABEIRA) - TODOS OS 54 JOGADORES */}
+      {/* ABA CRAQUE (MANGABEIRA) */}
       {aba === 'mangabeira' && (
         <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
           <div className="flex justify-between items-center mb-6">
@@ -248,7 +278,7 @@ export default function App() {
               <tbody>
                 {rankingMangabeira.map((item) => (
                   <tr key={item.pos} className="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors">
-                    <td className="py-3 px-4 font-bold text-indigo-400">#{item.pos}</td>
+                    <td className="py-3 px-4">{getPodioBadge(item.pos)}</td>
                     <td className="py-3 px-4 font-medium text-white">{item.nome}</td>
                     <td className="py-3 px-4 text-right font-bold text-amber-400">{item.pontos} pts</td>
                   </tr>
@@ -259,7 +289,7 @@ export default function App() {
         </div>
       )}
 
-      {/* ABA ARTILHARIA (BROCADOR) - TODOS OS 52 JOGADORES */}
+      {/* ABA ARTILHARIA (BROCADOR) */}
       {aba === 'brocador' && (
         <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
           <div className="flex justify-between items-center mb-6">
@@ -282,7 +312,7 @@ export default function App() {
               <tbody>
                 {rankingBrocador.map((item) => (
                   <tr key={item.pos} className="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors">
-                    <td className="py-3 px-4 font-bold text-emerald-400">#{item.pos}</td>
+                    <td className="py-3 px-4">{getPodioBadge(item.pos)}</td>
                     <td className="py-3 px-4 font-medium text-white">{item.nome}</td>
                     <td className="py-3 px-4 text-right font-bold text-emerald-400">{item.gols} gols</td>
                   </tr>
@@ -295,31 +325,49 @@ export default function App() {
 
       {/* ABA GOLEIROS (CÉSAR) */}
       {aba === 'cesar' && (
-        <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
-          <h2 className="text-2xl font-bold text-blue-400 mb-2">Classificação Geral - Prêmio César</h2>
-          <p className="text-slate-400 text-sm mb-6">Desempenho Geral dos Goleiros</p>
-          
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-slate-800 text-slate-400 text-sm">
-                  <th className="py-3 px-4">Posição</th>
-                  <th className="py-3 px-4">Goleiro</th>
-                  <th className="py-3 px-4 text-center">Pontos</th>
-                  <th className="py-3 px-4 text-right">Gols Sofridos</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rankingCesar.map((item) => (
-                  <tr key={item.pos} className="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors">
-                    <td className="py-3 px-4 font-bold text-blue-400">#{item.pos}</td>
-                    <td className="py-3 px-4 font-medium text-white">{item.nome}</td>
-                    <td className="py-3 px-4 text-center font-bold text-amber-400">{item.pontos} pts</td>
-                    <td className="py-3 px-4 text-right font-bold text-red-400">{item.golsSofridos} GS</td>
+        <div className="space-y-8">
+          <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
+            <h2 className="text-2xl font-bold text-blue-400 mb-2">Prêmio César - Gráfico dos Goleiros</h2>
+            <p className="text-slate-400 text-sm mb-6">Comparação entre Pontuação obtida e Gols Sofridos</p>
+            <div className="h-80 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={rankingCesar}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                  <XAxis dataKey="nome" stroke="#94a3b8" />
+                  <YAxis stroke="#94a3b8" />
+                  <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px' }} />
+                  <Legend />
+                  <Bar dataKey="pontos" name="Pontos" fill="#3b82f6" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="golsSofridos" name="Gols Sofridos" fill="#ef4444" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
+            <h2 className="text-xl font-bold text-white mb-4">Tabela de Classificação dos Goleiros</h2>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-800 text-slate-400 text-sm">
+                    <th className="py-3 px-4">Posição</th>
+                    <th className="py-3 px-4">Goleiro</th>
+                    <th className="py-3 px-4 text-center">Pontos</th>
+                    <th className="py-3 px-4 text-right">Gols Sofridos</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {rankingCesar.map((item) => (
+                    <tr key={item.pos} className="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors">
+                      <td className="py-3 px-4">{getPodioBadge(item.pos)}</td>
+                      <td className="py-3 px-4 font-medium text-white">{item.nome}</td>
+                      <td className="py-3 px-4 text-center font-bold text-amber-400">{item.pontos} pts</td>
+                      <td className="py-3 px-4 text-right font-bold text-red-400">{item.golsSofridos} GS</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}
