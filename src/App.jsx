@@ -1,61 +1,118 @@
 import React, { useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 
-// Dados completos extraídos da planilha Prêmios 2026
+// Todos os 54 jogadores do Premio Mangabeira (Craque)
 const rankingMangabeira = [
-  { pos: 1, nome: 'Adriano', pontos: 65 },
-  { pos: 2, nome: 'Rodrigo', pontos: 56 },
-  { pos: 3, nome: 'Jandir', pontos: 56 },
-  { pos: 4, nome: 'Ballet', pontos: 55 },
-  { pos: 5, nome: 'Robério', pontos: 54 },
-  { pos: 6, nome: 'Lucas', pontos: 51 },
-  { pos: 7, nome: 'Talisca', pontos: 51 },
-  { pos: 8, nome: 'Rafa', pontos: 50 },
-  { pos: 9, nome: 'Ricardo', pontos: 47 },
-  { pos: 10, nome: 'Raul', pontos: 47 },
-  { pos: 11, nome: 'Canário', pontos: 46 },
-  { pos: 12, nome: 'Reinaldo', pontos: 46 },
-  { pos: 13, nome: 'Remi', pontos: 45 },
-  { pos: 14, nome: 'Minuano', pontos: 45 },
-  { pos: 15, nome: 'Rafael Santana', pontos: 44 },
-  { pos: 16, nome: 'PJ', pontos: 44 },
-  { pos: 17, nome: 'Albino', pontos: 44 },
-  { pos: 18, nome: 'Amaury', pontos: 43 },
-  { pos: 19, nome: 'Capela', pontos: 42 },
-  { pos: 20, nome: 'Vini HC', pontos: 41 },
-  { pos: 21, nome: 'M. Yuri', pontos: 40 },
-  { pos: 22, nome: 'Oliveira', pontos: 40 },
-  { pos: 23, nome: 'Rapha Diniz', pontos: 40 },
-  { pos: 24, nome: 'I. Galvão', pontos: 38 },
-  { pos: 25, nome: 'Gamarra', pontos: 37 },
-  { pos: 26, nome: 'Morais', pontos: 37 },
-  { pos: 27, nome: 'Vanderson', pontos: 36 },
-  { pos: 28, nome: 'R. Mateus', pontos: 34 },
-  { pos: 29, nome: 'André', pontos: 34 },
-  { pos: 30, nome: 'Michel', pontos: 31 },
+  { pos: 1, nome: "Adriano", pontos: 65 },
+  { pos: 2, nome: "Rodrigo", pontos: 56 },
+  { pos: 3, nome: "Jandir", pontos: 56 },
+  { pos: 4, nome: "Ballet", pontos: 55 },
+  { pos: 5, nome: "Robério", pontos: 54 },
+  { pos: 6, nome: "Lucas", pontos: 51 },
+  { pos: 7, nome: "Talisca", pontos: 51 },
+  { pos: 8, nome: "Rafa", pontos: 50 },
+  { pos: 9, nome: "Ricardo", pontos: 47 },
+  { pos: 10, nome: "Raul", pontos: 47 },
+  { pos: 11, nome: "Canário", pontos: 46 },
+  { pos: 12, nome: "Reinaldo", pontos: 46 },
+  { pos: 13, nome: "Remi", pontos: 45 },
+  { pos: 14, nome: "Minuano", pontos: 45 },
+  { pos: 15, nome: "Rafael Santana", pontos: 44 },
+  { pos: 16, nome: "PJ", pontos: 44 },
+  { pos: 17, nome: "Albino", pontos: 44 },
+  { pos: 18, nome: "Amaury", pontos: 43 },
+  { pos: 19, nome: "Capela", pontos: 42 },
+  { pos: 20, nome: "Vini HC", pontos: 41 },
+  { pos: 21, nome: "M. Yuri", pontos: 40 },
+  { pos: 22, nome: "Oliveira", pontos: 40 },
+  { pos: 23, nome: "Rapha Diniz", pontos: 40 },
+  { pos: 24, nome: "I. Galvão", pontos: 38 },
+  { pos: 25, nome: "Gamarra", pontos: 37 },
+  { pos: 26, nome: "Morais", pontos: 37 },
+  { pos: 27, nome: "Vanderson", pontos: 36 },
+  { pos: 28, nome: "R. Mateus", pontos: 34 },
+  { pos: 29, nome: "André", pontos: 34 },
+  { pos: 30, nome: "Michel", pontos: 31 },
+  { pos: 31, nome: "Garcia", pontos: 31 },
+  { pos: 32, nome: "Marcelinho", pontos: 30 },
+  { pos: 33, nome: "Harley", pontos: 30 },
+  { pos: 34, nome: "M. Galvão", pontos: 28 },
+  { pos: 35, nome: "Filipinho", pontos: 28 },
+  { pos: 36, nome: "Nando", pontos: 27 },
+  { pos: 37, nome: "Otaner", pontos: 26 },
+  { pos: 38, nome: "Gusta", pontos: 26 },
+  { pos: 39, nome: "Murilo", pontos: 25 },
+  { pos: 40, nome: "Gutto", pontos: 25 },
+  { pos: 41, nome: "Diniz", pontos: 23 },
+  { pos: 42, nome: "Dyeggo", pontos: 20 },
+  { pos: 43, nome: "Carioca", pontos: 18 },
+  { pos: 44, nome: "Zé Paulo", pontos: 16 },
+  { pos: 45, nome: "Juracy", pontos: 13 },
+  { pos: 46, nome: "Kiko", pontos: 13 },
+  { pos: 47, nome: "PH", pontos: 11 },
+  { pos: 48, nome: "Babinha", pontos: 8 },
+  { pos: 49, nome: "Marcola", pontos: 8 },
+  { pos: 50, nome: "Guga", pontos: 7 },
+  { pos: 51, nome: "Miskinis", pontos: 6 },
+  { pos: 52, nome: "Dai", pontos: 4 },
+  { pos: 53, nome: "Gilberto", pontos: 3 },
+  { pos: 54, nome: "Jefinho", pontos: 3 }
 ];
 
+// Todos os 52 jogadores do Premio Brocador (Artilharia)
 const rankingBrocador = [
-  { pos: 1, nome: 'Remi', gols: 50 },
-  { pos: 2, nome: 'Rodrigo', gols: 45 },
-  { pos: 3, nome: 'Raul', gols: 44 },
-  { pos: 4, nome: 'Rafa', gols: 36 },
-  { pos: 5, nome: 'Lucas', gols: 29 },
-  { pos: 6, nome: 'Ricardo', gols: 29 },
-  { pos: 7, nome: 'Jandir', gols: 25 },
-  { pos: 8, nome: 'M. Yuri', gols: 23 },
-  { pos: 9, nome: 'Gutto', gols: 22 },
-  { pos: 10, nome: 'Murilo', gols: 19 },
-  { pos: 11, nome: 'Nando', gols: 18 },
-  { pos: 12, nome: 'Adriano', gols: 15 },
-  { pos: 13, nome: 'Diniz', gols: 12 },
-  { pos: 14, nome: 'André', gols: 12 },
-  { pos: 15, nome: 'PH', gols: 11 },
-  { pos: 16, nome: 'Canário', gols: 11 },
-  { pos: 17, nome: 'Vini HC', gols: 11 },
-  { pos: 18, nome: 'Gamarra', gols: 10 },
-  { pos: 19, nome: 'Vanderson', gols: 10 },
-  { pos: 20, nome: 'R. Mateus', gols: 10 },
+  { pos: 1, nome: "Remi", gols: 50 },
+  { pos: 2, nome: "Rodrigo", gols: 45 },
+  { pos: 3, nome: "Raul", gols: 44 },
+  { pos: 4, nome: "Rafa", gols: 36 },
+  { pos: 5, nome: "Lucas", gols: 29 },
+  { pos: 6, nome: "Ricardo", gols: 29 },
+  { pos: 7, nome: "Jandir", gols: 25 },
+  { pos: 8, nome: "M. Yuri", gols: 23 },
+  { pos: 9, nome: "Gutto", gols: 22 },
+  { pos: 10, nome: "Murilo", gols: 19 },
+  { pos: 11, nome: "Nando", gols: 18 },
+  { pos: 12, nome: "Adriano", gols: 15 },
+  { pos: 13, nome: "Diniz", gols: 12 },
+  { pos: 14, nome: "André", gols: 12 },
+  { pos: 15, nome: "PH", gols: 11 },
+  { pos: 16, nome: "Canário", gols: 11 },
+  { pos: 17, nome: "Vini HC", gols: 11 },
+  { pos: 18, nome: "Gamarra", gols: 10 },
+  { pos: 19, nome: "Vanderson", gols: 10 },
+  { pos: 20, nome: "R. Mateus", gols: 10 },
+  { pos: 21, nome: "Gusta", gols: 9 },
+  { pos: 22, nome: "Morais", gols: 8 },
+  { pos: 23, nome: "Robério", gols: 7 },
+  { pos: 24, nome: "Talisca", gols: 7 },
+  { pos: 25, nome: "Filipinho", gols: 7 },
+  { pos: 26, nome: "Ballet", gols: 6 },
+  { pos: 27, nome: "Carioca", gols: 6 },
+  { pos: 28, nome: "Michel", gols: 5 },
+  { pos: 29, nome: "Minuano", gols: 5 },
+  { pos: 30, nome: "PJ", gols: 4 },
+  { pos: 31, nome: "Otaner", gols: 4 },
+  { pos: 32, nome: "Reinaldo", gols: 4 },
+  { pos: 33, nome: "Jefinho", gols: 3 },
+  { pos: 34, nome: "Juracy", gols: 3 },
+  { pos: 35, nome: "Marcelinho", gols: 3 },
+  { pos: 36, nome: "Capela", gols: 3 },
+  { pos: 37, nome: "Guga", gols: 3 },
+  { pos: 38, nome: "Dai", gols: 2 },
+  { pos: 39, nome: "Telle", gols: 2 },
+  { pos: 40, nome: "Rapha Diniz", gols: 2 },
+  { pos: 41, nome: "Albino", gols: 2 },
+  { pos: 42, nome: "Zé Paulo", gols: 2 },
+  { pos: 43, nome: "Dyeggo", gols: 1 },
+  { pos: 44, nome: "Babinha", gols: 1 },
+  { pos: 45, nome: "Garcia", gols: 1 },
+  { pos: 46, nome: "M. Galvão", gols: 1 },
+  { pos: 47, nome: "Amaury", gols: 1 },
+  { pos: 48, nome: "Ivamário", gols: 1 },
+  { pos: 49, nome: "Rafha Santana", gols: 1 },
+  { pos: 50, nome: "Oliveira", gols: 1 },
+  { pos: 51, nome: "Marcola", gols: 1 },
+  { pos: 52, nome: "Beradeiro", gols: 1 }
 ];
 
 const rankingCesar = [
@@ -70,7 +127,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8 font-sans">
-      {/* Header */}
+      {/* Header com Navegação */}
       <header className="mb-8 border-b border-slate-800 pb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-amber-400 tracking-wide">🏆 Prêmios 2026</h1>
@@ -104,7 +161,7 @@ export default function App() {
         </div>
       </header>
 
-      {/* CONTEÚDO DA ABA VISÃO GERAL */}
+      {/* ABA VISÃO GERAL */}
       {aba === 'geral' && (
         <>
           {/* Cards Principais */}
@@ -131,33 +188,35 @@ export default function App() {
             </div>
           </div>
 
-          {/* Gráficos Resumidos */}
+          {/* Gráficos mostrando os 14 primeiros */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
-              <h2 className="text-xl font-bold text-white mb-1">Top 10 - Prêmio Mangabeira (Craque)</h2>
-              <div className="h-72 w-full mt-4">
+              <h2 className="text-xl font-bold text-white mb-1">Top 14 - Prêmio Mangabeira (Craque)</h2>
+              <p className="text-slate-400 text-xs mb-4">Primeiros 14 colocados na classificação geral</p>
+              <div className="h-80 w-full mt-2">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={rankingMangabeira.slice(0, 10)}>
+                  <BarChart data={rankingMangabeira.slice(0, 14)}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                    <XAxis dataKey="nome" stroke="#94a3b8" tick={{ fontSize: 11 }} />
+                    <XAxis dataKey="nome" stroke="#94a3b8" tick={{ fontSize: 10 }} interval={0} angle={-30} textAnchor="end" height={60} />
                     <YAxis stroke="#94a3b8" />
-                    <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155' }} />
-                    <Bar dataKey="pontos" fill="#6366f1" radius={[6, 6, 0, 0]} />
+                    <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px' }} />
+                    <Bar dataKey="pontos" name="Pontos" fill="#6366f1" radius={[6, 6, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
             </div>
 
             <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
-              <h2 className="text-xl font-bold text-white mb-1">Top 10 - Prêmio Brocador (Artilharia)</h2>
-              <div className="h-72 w-full mt-4">
+              <h2 className="text-xl font-bold text-white mb-1">Top 14 - Prêmio Brocador (Artilharia)</h2>
+              <p className="text-slate-400 text-xs mb-4">Primeiros 14 colocados em número de gols</p>
+              <div className="h-80 w-full mt-2">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={rankingBrocador.slice(0, 10)}>
+                  <BarChart data={rankingBrocador.slice(0, 14)}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                    <XAxis dataKey="nome" stroke="#94a3b8" tick={{ fontSize: 11 }} />
+                    <XAxis dataKey="nome" stroke="#94a3b8" tick={{ fontSize: 10 }} interval={0} angle={-30} textAnchor="end" height={60} />
                     <YAxis stroke="#94a3b8" />
-                    <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155' }} />
-                    <Bar dataKey="gols" fill="#10b981" radius={[6, 6, 0, 0]} />
+                    <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px' }} />
+                    <Bar dataKey="gols" name="Gols" fill="#10b981" radius={[6, 6, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -166,11 +225,16 @@ export default function App() {
         </>
       )}
 
-      {/* CONTEÚDO DA ABA CRAQUE (MANGABEIRA) */}
+      {/* ABA CRAQUE (MANGABEIRA) - TODOS OS 54 JOGADORES */}
       {aba === 'mangabeira' && (
         <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
-          <h2 className="text-2xl font-bold text-indigo-400 mb-2">Classificação Geral - Prêmio Mangabeira</h2>
-          <p className="text-slate-400 text-sm mb-6">Pontuação acumulada de todos os jogadores</p>
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <h2 className="text-2xl font-bold text-indigo-400">Classificação Geral - Prêmio Mangabeira</h2>
+              <p className="text-slate-400 text-sm mt-1">Listagem de todos os 54 atletas pontuados</p>
+            </div>
+            <span className="bg-indigo-500/10 text-indigo-400 px-3 py-1 rounded-full text-xs font-semibold">54 Jogadores</span>
+          </div>
           
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
@@ -195,11 +259,16 @@ export default function App() {
         </div>
       )}
 
-      {/* CONTEÚDO DA ABA ARTILHARIA (BROCADOR) */}
+      {/* ABA ARTILHARIA (BROCADOR) - TODOS OS 52 JOGADORES */}
       {aba === 'brocador' && (
         <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
-          <h2 className="text-2xl font-bold text-emerald-400 mb-2">Classificação Geral - Prêmio Brocador</h2>
-          <p className="text-slate-400 text-sm mb-6">Ranking de Artilharia do Campeonato</p>
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <h2 className="text-2xl font-bold text-emerald-400">Classificação Geral - Prêmio Brocador</h2>
+              <p className="text-slate-400 text-sm mt-1">Ranking de artilharia completo com todos os 52 marcadores</p>
+            </div>
+            <span className="bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full text-xs font-semibold">52 Jogadores</span>
+          </div>
           
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
@@ -224,7 +293,7 @@ export default function App() {
         </div>
       )}
 
-      {/* CONTEÚDO DA ABA GOLEIROS (CÉSAR) */}
+      {/* ABA GOLEIROS (CÉSAR) */}
       {aba === 'cesar' && (
         <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
           <h2 className="text-2xl font-bold text-blue-400 mb-2">Classificação Geral - Prêmio César</h2>
