@@ -126,12 +126,13 @@ const rankingCesar = [
 export default function App() {
   const [aba, setAba] = useState('geral');
 
-  // Função auxiliar para renderizar badges do pódio
-  const getPodioBadge = (pos) => {
-    if (pos === 1) return <span className="text-amber-400 font-bold">🥇 1º</span>;
-    if (pos === 2) return <span className="text-slate-300 font-bold">🥈 2º</span>;
-    if (pos === 3) return <span className="text-amber-600 font-bold">🥉 3º</span>;
-    return <span className="text-slate-500 font-semibold">#{pos}</span>;
+  // Função para renderizar selos dos 7 primeiros
+  const getPodioBadgeG7 = (pos) => {
+    if (pos === 1) return <span className="bg-amber-500/20 text-amber-400 border border-amber-500/40 px-2.5 py-1 rounded-lg font-extrabold text-sm flex items-center gap-1 w-fit">🥇 1º Lugar</span>;
+    if (pos === 2) return <span className="bg-slate-300/20 text-slate-200 border border-slate-300/40 px-2.5 py-1 rounded-lg font-extrabold text-sm flex items-center gap-1 w-fit">🥈 2º Lugar</span>;
+    if (pos === 3) return <span className="bg-amber-700/20 text-amber-500 border border-amber-700/40 px-2.5 py-1 rounded-lg font-extrabold text-sm flex items-center gap-1 w-fit">🥉 3º Lugar</span>;
+    if (pos <= 7) return <span className="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 px-2.5 py-1 rounded-lg font-bold text-sm flex items-center gap-1 w-fit">⭐ #{pos} G7</span>;
+    return <span className="text-slate-500 font-semibold px-2">#{pos}</span>;
   };
 
   return (
@@ -147,25 +148,25 @@ export default function App() {
         <div className="flex flex-wrap gap-2 bg-slate-900 p-1.5 rounded-xl border border-slate-800">
           <button 
             onClick={() => setAba('geral')}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${aba === 'geral' ? 'bg-amber-500 text-slate-950 shadow-md font-bold' : 'text-slate-400 hover:text-white'}`}
+            className={`px-4 py-2 rounded-lg text-sm transition-all ${aba === 'geral' ? 'bg-amber-500 text-slate-950 shadow-md font-bold' : 'text-slate-400 hover:text-white'}`}
           >
             Visão Geral
           </button>
           <button 
             onClick={() => setAba('mangabeira')}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${aba === 'mangabeira' ? 'bg-indigo-600 text-white shadow-md font-bold' : 'text-slate-400 hover:text-white'}`}
+            className={`px-4 py-2 rounded-lg text-sm transition-all ${aba === 'mangabeira' ? 'bg-indigo-600 text-white shadow-md font-bold' : 'text-slate-400 hover:text-white'}`}
           >
             Craque (Mangabeira)
           </button>
           <button 
             onClick={() => setAba('brocador')}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${aba === 'brocador' ? 'bg-emerald-600 text-white shadow-md font-bold' : 'text-slate-400 hover:text-white'}`}
+            className={`px-4 py-2 rounded-lg text-sm transition-all ${aba === 'brocador' ? 'bg-emerald-600 text-white shadow-md font-bold' : 'text-slate-400 hover:text-white'}`}
           >
             Artilharia (Brocador)
           </button>
           <button 
             onClick={() => setAba('cesar')}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${aba === 'cesar' ? 'bg-blue-600 text-white shadow-md font-bold' : 'text-slate-400 hover:text-white'}`}
+            className={`px-4 py-2 rounded-lg text-sm transition-all ${aba === 'cesar' ? 'bg-blue-600 text-white shadow-md font-bold' : 'text-slate-400 hover:text-white'}`}
           >
             Goleiros (César)
           </button>
@@ -255,34 +256,51 @@ export default function App() {
         </>
       )}
 
-      {/* ABA CRAQUE (MANGABEIRA) */}
+      {/* ABA CRAQUE (MANGABEIRA) - COM DESTAQUE PARA OS 7 PRIMEIROS */}
       {aba === 'mangabeira' && (
         <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6">
             <div>
               <h2 className="text-2xl font-bold text-indigo-400">Classificação Geral - Prêmio Mangabeira</h2>
-              <p className="text-slate-400 text-sm mt-1">Listagem de todos os 54 atletas pontuados</p>
+              <p className="text-slate-400 text-sm mt-1">Destaque especial para a zona de elite (Top 7)</p>
             </div>
-            <span className="bg-indigo-500/10 text-indigo-400 px-3 py-1 rounded-full text-xs font-semibold">54 Jogadores</span>
+            <div className="flex gap-2">
+              <span className="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-3 py-1 rounded-full text-xs font-semibold">G7 Destacado</span>
+              <span className="bg-slate-800 text-slate-400 px-3 py-1 rounded-full text-xs font-semibold">54 Jogadores</span>
+            </div>
           </div>
           
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-slate-800 text-slate-400 text-sm">
-                  <th className="py-3 px-4">Posição</th>
-                  <th className="py-3 px-4">Jogador</th>
-                  <th className="py-3 px-4 text-right">Pontuação Geral</th>
+                <tr className="border-b border-slate-800 text-slate-400 text-xs font-bold uppercase tracking-wider">
+                  <th className="py-3.5 px-4">Classificação</th>
+                  <th className="py-3.5 px-4">Jogador</th>
+                  <th className="py-3.5 px-4 text-right">Pontuação Geral</th>
                 </tr>
               </thead>
               <tbody>
-                {rankingMangabeira.map((item) => (
-                  <tr key={item.pos} className="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors">
-                    <td className="py-3 px-4">{getPodioBadge(item.pos)}</td>
-                    <td className="py-3 px-4 font-medium text-white">{item.nome}</td>
-                    <td className="py-3 px-4 text-right font-bold text-amber-400">{item.pontos} pts</td>
-                  </tr>
-                ))}
+                {rankingMangabeira.map((item) => {
+                  const isTop7 = item.pos <= 7;
+                  return (
+                    <tr 
+                      key={item.pos} 
+                      className={`border-b transition-all ${
+                        isTop7 
+                          ? 'bg-gradient-to-r from-indigo-950/60 via-slate-900 to-slate-900 border-indigo-500/30 font-semibold' 
+                          : 'border-slate-800/40 hover:bg-slate-800/30 text-slate-300'
+                      }`}
+                    >
+                      <td className="py-3.5 px-4">{getPodioBadgeG7(item.pos)}</td>
+                      <td className={`py-3.5 px-4 ${isTop7 ? 'text-white font-bold text-base' : 'font-medium'}`}>
+                        {item.nome}
+                      </td>
+                      <td className="py-3.5 px-4 text-right font-black text-amber-400 text-base">
+                        {item.pontos} <span className="text-xs text-slate-400 font-normal">pts</span>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -312,7 +330,7 @@ export default function App() {
               <tbody>
                 {rankingBrocador.map((item) => (
                   <tr key={item.pos} className="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors">
-                    <td className="py-3 px-4">{getPodioBadge(item.pos)}</td>
+                    <td className="py-3 px-4">{getPodioBadgeG7(item.pos)}</td>
                     <td className="py-3 px-4 font-medium text-white">{item.nome}</td>
                     <td className="py-3 px-4 text-right font-bold text-emerald-400">{item.gols} gols</td>
                   </tr>
@@ -359,7 +377,7 @@ export default function App() {
                 <tbody>
                   {rankingCesar.map((item) => (
                     <tr key={item.pos} className="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors">
-                      <td className="py-3 px-4">{getPodioBadge(item.pos)}</td>
+                      <td className="py-3 px-4">{getPodioBadgeG7(item.pos)}</td>
                       <td className="py-3 px-4 font-medium text-white">{item.nome}</td>
                       <td className="py-3 px-4 text-center font-bold text-amber-400">{item.pontos} pts</td>
                       <td className="py-3 px-4 text-right font-bold text-red-400">{item.golsSofridos} GS</td>
