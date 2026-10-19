@@ -144,7 +144,7 @@ export default function App() {
       <header className="mb-8 border-b border-slate-800 pb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-amber-400 tracking-wide flex items-center gap-2">
-            🏆 Prêmios 2026
+            🏆 ARENA SINPROVENFS 2026 - PRÊMIO 2026
           </h1>
           <p className="text-slate-400 text-sm mt-1">Painel Oficial de Desempenho e Classificação</p>
         </div>
@@ -203,16 +203,16 @@ export default function App() {
             </div>
           </div>
 
-          {/* Gráficos Mangabeira e Brocador */}
+          {/* Gráficos Mangabeira e Brocador (Top 10) */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
-              <h2 className="text-xl font-bold text-white mb-1">Top 14 - Prêmio Mangabeira (Craque)</h2>
-              <p className="text-slate-400 text-xs mb-4">Primeiros 14 colocados na classificação geral</p>
+              <h2 className="text-xl font-bold text-white mb-1">Top 10 - Prêmio Mangabeira (Craque)</h2>
+              <p className="text-slate-400 text-xs mb-4">Primeiros 10 colocados na classificação geral</p>
               <div className="h-80 w-full mt-2">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={rankingMangabeira.slice(0, 14)}>
+                  <BarChart data={rankingMangabeira.slice(0, 10)}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                    <XAxis dataKey="nome" stroke="#94a3b8" tick={{ fontSize: 10 }} interval={0} angle={-30} textAnchor="end" height={60} />
+                    <XAxis dataKey="nome" stroke="#94a3b8" tick={{ fontSize: 11 }} interval={0} angle={-30} textAnchor="end" height={60} />
                     <YAxis stroke="#94a3b8" />
                     <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px' }} />
                     <Bar dataKey="pontos" name="Pontos" fill="#6366f1" radius={[6, 6, 0, 0]} />
@@ -222,13 +222,13 @@ export default function App() {
             </div>
 
             <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
-              <h2 className="text-xl font-bold text-white mb-1">Top 14 - Prêmio Brocador (Artilharia)</h2>
-              <p className="text-slate-400 text-xs mb-4">Primeiros 14 colocados em número de gols</p>
+              <h2 className="text-xl font-bold text-white mb-1">Top 10 - Prêmio Brocador (Artilharia)</h2>
+              <p className="text-slate-400 text-xs mb-4">Primeiros 10 colocados em número de gols</p>
               <div className="h-80 w-full mt-2">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={rankingBrocador.slice(0, 14)}>
+                  <BarChart data={rankingBrocador.slice(0, 10)}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                    <XAxis dataKey="nome" stroke="#94a3b8" tick={{ fontSize: 10 }} interval={0} angle={-30} textAnchor="end" height={60} />
+                    <XAxis dataKey="nome" stroke="#94a3b8" tick={{ fontSize: 11 }} interval={0} angle={-30} textAnchor="end" height={60} />
                     <YAxis stroke="#94a3b8" />
                     <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px' }} />
                     <Bar dataKey="gols" name="Gols" fill="#10b981" radius={[6, 6, 0, 0]} />
