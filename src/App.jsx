@@ -77,18 +77,17 @@ export default function App() {
 
   const [dataSelecionada, setDataSelecionada] = useState('');
 
-  // Sincronizar data selecionada quando o histórico muda
   useEffect(() => {
     if (historico.length > 0 && !dataSelecionada) {
       setDataSelecionada(historico[0].data);
     }
   }, [historico, dataSelecionada]);
 
-  // Modais / Login Admin
+  // Admin Login
   const [senhaInput, setSenhaInput] = useState('');
   const [autenticado, setAutenticado] = useState(false);
 
-  // Form de Cadastro
+  // Form Cadastro
   const [dataJogo, setDataJogo] = useState('2026-10-25');
   const [goleiroA, setGoleiroA] = useState(GOLEIROS_OPCOES[0]);
   const [goleiroB, setGoleiroB] = useState(GOLEIROS_OPCOES[1]);
@@ -98,13 +97,11 @@ export default function App() {
   const [golsB, setGolsB] = useState(0);
   const [golsDetalhados, setGolsDetalhados] = useState({});
 
-  // Salvar histórico no LocalStorage
   const salvarHistoricoLocal = (novoHistorico) => {
     setHistorico(novoHistorico);
     localStorage.setItem('arena_historico_jogos', JSON.stringify(novoHistorico));
   };
 
-  // Limpar formulário de cadastro
   const resetForm = () => {
     setJogadoresA([]);
     setJogadoresB([]);
@@ -113,7 +110,6 @@ export default function App() {
     setGolsDetalhados({});
   };
 
-  // Login Handler
   const handleLogin = (e) => {
     e.preventDefault();
     if (senhaInput === 'sinprovenfs2026') {
@@ -123,7 +119,6 @@ export default function App() {
     }
   };
 
-  // Toggle Jogador na Escalação
   const toggleJogador = (time, nome) => {
     if (time === 'A') {
       setJogadoresA(prev => prev.includes(nome) ? prev.filter(x => x !== nome) : [...prev, nome]);
@@ -132,7 +127,6 @@ export default function App() {
     }
   };
 
-  // Alterar quantidade de gols do jogador
   const handleGolsJogador = (nome, delta) => {
     setGolsDetalhados(prev => {
       const atual = prev[nome] || 0;
@@ -141,13 +135,11 @@ export default function App() {
     });
   };
 
-  // Salvar Novo Jogo
   const handleSalvarJogo = (e) => {
     e.preventDefault();
 
     const dataFormatada = dataJogo.split('-').reverse().join('/');
     
-    // Gols marcados
     const golsMarcadosArray = Object.entries(golsDetalhados)
       .filter(([_, q]) => q > 0)
       .map(([jogador, quantidade]) => ({ jogador, quantidade }));
@@ -186,7 +178,6 @@ export default function App() {
     setAba('jogos');
   };
 
-  // Limpar todo o histórico salvo localmente
   const handleZerarHistoricoLocal = () => {
     if (window.confirm('Tem certeza que deseja zerar e apagar todas as rodadas cadastradas?')) {
       salvarHistoricoLocal([]);
@@ -195,7 +186,6 @@ export default function App() {
     }
   };
 
-  // RECALCULAR RANKINGS COM BASE NO HISTÓRICO DEMAIS JOGOS
   const calcularRankings = () => {
     let mangabeira = JSON.parse(JSON.stringify(dadosMangabeiraBase));
     let brocador = JSON.parse(JSON.stringify(dadosBrocadorBase));
@@ -392,6 +382,25 @@ export default function App() {
               </div>
             </div>
           </div>
+
+          {/* GRÁFICO DOS GOLEIROS RESTAURADO NA VISÃO GERAL */}
+          <div className="bg-emerald-900/40 p-6 rounded-2xl border border-emerald-800/80 mb-8">
+            <h2 className="text-xl font-bold text-white mb-1">Prêmio César - Desempenho dos Goleiros</h2>
+            <p className="text-emerald-200/60 text-xs mb-4">Comparativo entre Pontos obtidos vs. Gols Sofridos</p>
+            <div className="h-72 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={rankingCesar}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#065f46" />
+                  <XAxis dataKey="nome" stroke="#a7f3d0" />
+                  <YAxis stroke="#a7f3d0" />
+                  <Tooltip contentStyle={{ backgroundColor: '#064e3b', borderColor: '#065f46', borderRadius: '8px', color: '#fff' }} />
+                  <Legend />
+                  <Bar dataKey="pontos" name="Pontos" fill="#f59e0b" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="golsSofridos" name="Gols Sofridos" fill="#ef4444" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
         </>
       )}
 
@@ -406,7 +415,6 @@ export default function App() {
               <p className="text-emerald-200/60 text-sm mt-1">Histórico completo de partidas</p>
             </div>
 
-            {/* Filtro de Seleção por Data */}
             {historico.length > 0 && (
               <div className="flex items-center gap-2 bg-emerald-950 p-2 rounded-xl border border-emerald-700">
                 <span className="text-xs font-bold text-emerald-400 uppercase">📅 Data da Rodada:</span>
@@ -441,7 +449,6 @@ export default function App() {
                     </span>
                   </div>
 
-                  {/* Placar Principal */}
                   <div className="flex justify-between items-center my-4">
                     <div className="w-2/5 text-right">
                       <p className="font-extrabold text-white text-lg">{j.timeA}</p>
@@ -458,7 +465,6 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Escalação dos Times */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 pt-4 border-t border-emerald-900">
                     <div className="bg-emerald-900/30 p-3 rounded-xl border border-emerald-800/40">
                       <p className="text-xs font-bold text-emerald-300 mb-2 uppercase">Escalação {j.timeA}:</p>
@@ -483,7 +489,6 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Autores dos Gols */}
                   {j.golsMarcados.length > 0 && (
                     <div className="mt-4 bg-emerald-900/40 p-3 rounded-xl border border-emerald-800/60">
                       <p className="text-xs font-bold text-amber-300 mb-1">⚽ Autores dos Gols:</p>
@@ -503,7 +508,7 @@ export default function App() {
         </div>
       )}
 
-      {/* ABA CADASTRAR (ADMIN CELULAR) */}
+      {/* ABA CADASTRAR */}
       {aba === 'cadastrar' && (
         <div className="bg-emerald-900/40 p-6 rounded-2xl border border-emerald-800/80 max-w-3xl mx-auto">
           {!autenticado ? (
@@ -543,7 +548,6 @@ export default function App() {
               </div>
 
               <form onSubmit={handleSalvarJogo} className="space-y-6">
-                {/* Data */}
                 <div>
                   <label className="block text-xs font-bold text-emerald-300 mb-1 uppercase">📅 Data da Partida:</label>
                   <input 
@@ -555,7 +559,6 @@ export default function App() {
                   />
                 </div>
 
-                {/* Seleção dos Goleiros */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="bg-emerald-950/80 p-4 rounded-xl border border-emerald-800">
                     <label className="block text-xs font-bold text-amber-300 mb-1 uppercase">🧤 Goleiro Time A:</label>
@@ -584,7 +587,6 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Placar */}
                 <div className="bg-emerald-950 p-4 rounded-xl border border-emerald-800 flex justify-around items-center">
                   <div className="text-center">
                     <p className="text-xs font-bold text-emerald-300 uppercase mb-1">Gols Time A</p>
@@ -609,9 +611,7 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Seleção e Escalação de Jogadores */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Time A */}
                   <div className="bg-emerald-950/80 p-4 rounded-xl border border-emerald-800">
                     <p className="text-xs font-bold text-emerald-300 mb-2 uppercase">Escalar Jogadores (Time A):</p>
                     <div className="max-h-48 overflow-y-auto space-y-1.5 pr-2">
@@ -629,7 +629,6 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Time B */}
                   <div className="bg-emerald-950/80 p-4 rounded-xl border border-emerald-800">
                     <p className="text-xs font-bold text-emerald-300 mb-2 uppercase">Escalar Jogadores (Time B):</p>
                     <div className="max-h-48 overflow-y-auto space-y-1.5 pr-2">
@@ -648,7 +647,6 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Lançamento de Gols Individuais */}
                 {(jogadoresA.length > 0 || jogadoresB.length > 0) && (
                   <div className="bg-emerald-950/80 p-4 rounded-xl border border-emerald-800">
                     <p className="text-xs font-bold text-amber-300 mb-3 uppercase">⚽ Atribuir Gols aos Jogadores Escalação:</p>
@@ -679,7 +677,6 @@ export default function App() {
                   </div>
                 )}
 
-                {/* Botão Salvar */}
                 <button 
                   type="submit"
                   className="w-full bg-emerald-500 text-slate-950 font-black py-3.5 rounded-xl text-base shadow-xl hover:bg-emerald-400 transition-all border border-emerald-400"
