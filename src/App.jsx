@@ -9,7 +9,7 @@ const dadosMangabeira = [
   { nome: "Ballet", pontos: 55 },
   { nome: "Robério", pontos: 54 },
   { nome: "Lucas", pontos: 51 },
-  { nome: "Talisca", pontos: 51 },
+  { nome: "Talisca", pontos: 80 },
   { nome: "Rafa", pontos: 50 },
   { nome: "Ricardo", pontos: 47 },
   { nome: "Raul", pontos: 47 },
