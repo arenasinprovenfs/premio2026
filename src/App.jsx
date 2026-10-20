@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 
-// Dados do Prêmio Mangabeira (Craque) - Apenas o nome e os pontos
+// Dados do Prêmio Mangabeira (Craque)
 const dadosMangabeira = [
   { nome: "Adriano", pontos: 65 },
   { nome: "Rodrigo", pontos: 56 },
@@ -47,7 +47,7 @@ const dadosMangabeira = [
   { nome: "Dyeggo", pontos: 20 },
   { nome: "Carioca", pontos: 18 },
   { nome: "Zé Paulo", pontos: 16 },
-  { pos: 45, nome: "Juracy", pontos: 13 },
+  { nome: "Juracy", pontos: 13 },
   { nome: "Kiko", pontos: 13 },
   { nome: "PH", pontos: 11 },
   { nome: "Babinha", pontos: 8 },
@@ -126,7 +126,7 @@ const dadosCesar = [
 export default function App() {
   const [aba, setAba] = useState('geral');
 
-  // Ordenação AUTOMÁTICA do maior para o menor com calculo de posição
+  // Ordenação automática
   const rankingMangabeira = [...dadosMangabeira]
     .sort((a, b) => b.pontos - a.pontos)
     .map((item, index) => ({ ...item, pos: index + 1 }));
@@ -139,11 +139,11 @@ export default function App() {
     .sort((a, b) => b.pontos - a.pontos)
     .map((item, index) => ({ ...item, pos: index + 1 }));
 
-  // Selos G7 (Apenas no Prêmio Mangabeira - Top 7)
+  // Selos G7 (Craque)
   const getPodioBadgeG7 = (pos) => {
     if (pos <= 7) {
       return (
-        <span className="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 px-2.5 py-1 rounded-lg font-bold text-sm flex items-center gap-1 w-fit">
+        <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2.5 py-1 rounded-lg font-bold text-sm flex items-center gap-1 w-fit">
           ⭐ #{pos} G7
         </span>
       );
@@ -151,12 +151,12 @@ export default function App() {
     return <span className="text-slate-500 font-semibold px-2">#{pos}</span>;
   };
 
-  // Selos para 1º Colocado
+  // Selos 1º Colocado
   const getPodioApenasPrimeiro = (pos, corBadge = 'emerald') => {
     if (pos === 1) {
-      if (corBadge === 'blue') {
+      if (corBadge === 'red') {
         return (
-          <span className="bg-blue-500/20 text-blue-300 border border-blue-500/40 px-2.5 py-1 rounded-lg font-extrabold text-sm flex items-center gap-1 w-fit">
+          <span className="bg-red-500/20 text-red-300 border border-red-500/40 px-2.5 py-1 rounded-lg font-extrabold text-sm flex items-center gap-1 w-fit">
             🏆 #1º Lugar
           </span>
         );
@@ -172,36 +172,47 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8 font-sans">
-      {/* Header */}
-      <header className="mb-8 border-b border-slate-800 pb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-amber-400 tracking-wide flex items-center gap-2">
-            🏆 ARENA SINPROVENFS - PRÊMIOS 2026
-          </h1>
-          <p className="text-slate-400 text-sm mt-1">Painel Oficial de Desempenho e Classificação</p>
+      {/* Header com a Logo Oficial da Arena */}
+      <header className="mb-8 border-b border-emerald-900/40 pb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="flex items-center gap-4">
+          <div className="bg-white p-1.5 rounded-2xl shadow-lg border border-emerald-800/40 flex items-center justify-center">
+            <img 
+              src="/logo.png" 
+              alt="Logo Arena Sinprovenfs" 
+              className="h-14 sm:h-16 w-auto object-contain"
+            />
+          </div>
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-wide flex items-center gap-2">
+              ARENA SINPROVENFS
+            </h1>
+            <p className="text-emerald-400 font-bold text-sm tracking-wider uppercase">Painel Oficial de Prêmios 2026</p>
+          </div>
         </div>
+
+        {/* Menu de Navegação Personalizado */}
         <div className="flex flex-wrap gap-2 bg-slate-900 p-1.5 rounded-xl border border-slate-800">
           <button 
             onClick={() => setAba('geral')}
-            className={`px-4 py-2 rounded-lg text-sm transition-all ${aba === 'geral' ? 'bg-amber-500 text-slate-950 shadow-md font-bold' : 'text-slate-400 hover:text-white'}`}
+            className={`px-4 py-2 rounded-lg text-sm transition-all ${aba === 'geral' ? 'bg-emerald-600 text-white shadow-md font-bold' : 'text-slate-400 hover:text-white'}`}
           >
             Visão Geral
           </button>
           <button 
             onClick={() => setAba('mangabeira')}
-            className={`px-4 py-2 rounded-lg text-sm transition-all ${aba === 'mangabeira' ? 'bg-indigo-600 text-white shadow-md font-bold' : 'text-slate-400 hover:text-white'}`}
+            className={`px-4 py-2 rounded-lg text-sm transition-all ${aba === 'mangabeira' ? 'bg-emerald-700 text-white shadow-md font-bold' : 'text-slate-400 hover:text-white'}`}
           >
             Craque (Mangabeira)
           </button>
           <button 
             onClick={() => setAba('brocador')}
-            className={`px-4 py-2 rounded-lg text-sm transition-all ${aba === 'brocador' ? 'bg-emerald-600 text-white shadow-md font-bold' : 'text-slate-400 hover:text-white'}`}
+            className={`px-4 py-2 rounded-lg text-sm transition-all ${aba === 'brocador' ? 'bg-red-600 text-white shadow-md font-bold' : 'text-slate-400 hover:text-white'}`}
           >
             Artilharia (Brocador)
           </button>
           <button 
             onClick={() => setAba('cesar')}
-            className={`px-4 py-2 rounded-lg text-sm transition-all ${aba === 'cesar' ? 'bg-blue-600 text-white shadow-md font-bold' : 'text-slate-400 hover:text-white'}`}
+            className={`px-4 py-2 rounded-lg text-sm transition-all ${aba === 'cesar' ? 'bg-amber-500 text-slate-950 shadow-md font-bold' : 'text-slate-400 hover:text-white'}`}
           >
             Goleiros (César)
           </button>
@@ -212,25 +223,25 @@ export default function App() {
       {aba === 'geral' && (
         <>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-slate-900/90 p-6 rounded-2xl border border-amber-500/30 shadow-lg relative overflow-hidden">
-              <span className="text-xs font-bold uppercase tracking-wider text-amber-400 bg-amber-400/10 px-2.5 py-1 rounded-md">Prêmio Mangabeira</span>
+            <div className="bg-slate-900/90 p-6 rounded-2xl border border-emerald-500/30 shadow-lg relative overflow-hidden">
+              <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-md">Prêmio Mangabeira</span>
               <p className="text-slate-400 text-sm mt-3">Líder do Ranking</p>
               <p className="text-3xl font-black text-white mt-1">{rankingMangabeira[0]?.nome}</p>
-              <p className="text-amber-400 font-bold text-lg mt-1">{rankingMangabeira[0]?.pontos} <span className="text-sm font-normal text-slate-400">pontos</span></p>
+              <p className="text-emerald-400 font-bold text-lg mt-1">{rankingMangabeira[0]?.pontos} <span className="text-sm font-normal text-slate-400">pontos</span></p>
             </div>
 
-            <div className="bg-slate-900/90 p-6 rounded-2xl border border-emerald-500/30 shadow-lg relative overflow-hidden">
-              <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 bg-emerald-400/10 px-2.5 py-1 rounded-md">Prêmio Brocador</span>
+            <div className="bg-slate-900/90 p-6 rounded-2xl border border-red-500/30 shadow-lg relative overflow-hidden">
+              <span className="text-xs font-bold uppercase tracking-wider text-red-400 bg-red-500/10 px-2.5 py-1 rounded-md">Prêmio Brocador</span>
               <p className="text-slate-400 text-sm mt-3">Artilheiro Máximo</p>
               <p className="text-3xl font-black text-white mt-1">{rankingBrocador[0]?.nome}</p>
-              <p className="text-emerald-400 font-bold text-lg mt-1">{rankingBrocador[0]?.gols} <span className="text-sm font-normal text-slate-400">gols</span></p>
+              <p className="text-red-400 font-bold text-lg mt-1">{rankingBrocador[0]?.gols} <span className="text-sm font-normal text-slate-400">gols</span></p>
             </div>
 
-            <div className="bg-slate-900/90 p-6 rounded-2xl border border-blue-500/30 shadow-lg relative overflow-hidden">
-              <span className="text-xs font-bold uppercase tracking-wider text-blue-400 bg-blue-400/10 px-2.5 py-1 rounded-md">Prêmio César</span>
+            <div className="bg-slate-900/90 p-6 rounded-2xl border border-amber-500/30 shadow-lg relative overflow-hidden">
+              <span className="text-xs font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-md">Prêmio César</span>
               <p className="text-slate-400 text-sm mt-3">Melhor Goleiro</p>
               <p className="text-3xl font-black text-white mt-1">{rankingCesar[0]?.nome}</p>
-              <p className="text-blue-400 font-bold text-lg mt-1">{rankingCesar[0]?.pontos} <span className="text-sm font-normal text-slate-400">pts ({rankingCesar[0]?.golsSofridos} GS)</span></p>
+              <p className="text-amber-400 font-bold text-lg mt-1">{rankingCesar[0]?.pontos} <span className="text-sm font-normal text-slate-400">pts ({rankingCesar[0]?.golsSofridos} GS)</span></p>
             </div>
           </div>
 
@@ -241,11 +252,11 @@ export default function App() {
               <div className="h-80 w-full mt-2">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={rankingMangabeira.slice(0, 10)}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
                     <XAxis dataKey="nome" stroke="#94a3b8" tick={{ fontSize: 11 }} interval={0} angle={-30} textAnchor="end" height={60} />
                     <YAxis stroke="#94a3b8" />
                     <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px' }} />
-                    <Bar dataKey="pontos" name="Pontos" fill="#6366f1" radius={[6, 6, 0, 0]} />
+                    <Bar dataKey="pontos" name="Pontos" fill="#10b981" radius={[6, 6, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -257,11 +268,11 @@ export default function App() {
               <div className="h-80 w-full mt-2">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={rankingBrocador.slice(0, 10)}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
                     <XAxis dataKey="nome" stroke="#94a3b8" tick={{ fontSize: 11 }} interval={0} angle={-30} textAnchor="end" height={60} />
                     <YAxis stroke="#94a3b8" />
                     <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px' }} />
-                    <Bar dataKey="gols" name="Gols" fill="#10b981" radius={[6, 6, 0, 0]} />
+                    <Bar dataKey="gols" name="Gols" fill="#ef4444" radius={[6, 6, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -274,12 +285,12 @@ export default function App() {
             <div className="h-72 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={rankingCesar}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
                   <XAxis dataKey="nome" stroke="#94a3b8" />
                   <YAxis stroke="#94a3b8" />
                   <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px' }} />
                   <Legend />
-                  <Bar dataKey="pontos" name="Pontos" fill="#3b82f6" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="pontos" name="Pontos" fill="#f59e0b" radius={[6, 6, 0, 0]} />
                   <Bar dataKey="golsSofridos" name="Gols Sofridos" fill="#ef4444" radius={[6, 6, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
@@ -293,11 +304,11 @@ export default function App() {
         <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6">
             <div>
-              <h2 className="text-2xl font-bold text-indigo-400">Classificação Geral - Prêmio Mangabeira</h2>
+              <h2 className="text-2xl font-bold text-emerald-400">Classificação Geral - Prêmio Mangabeira</h2>
               <p className="text-slate-400 text-sm mt-1">Destaque especial para a zona de elite (Top 7 G7)</p>
             </div>
             <div className="flex gap-2">
-              <span className="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-3 py-1 rounded-full text-xs font-semibold">G7 Destacado</span>
+              <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3 py-1 rounded-full text-xs font-semibold">G7 Destacado</span>
               <span className="bg-slate-800 text-slate-400 px-3 py-1 rounded-full text-xs font-semibold">{rankingMangabeira.length} Jogadores</span>
             </div>
           </div>
@@ -319,7 +330,7 @@ export default function App() {
                       key={item.nome} 
                       className={`border-b transition-all ${
                         isTop7 
-                          ? 'bg-gradient-to-r from-indigo-950/60 via-slate-900 to-slate-900 border-indigo-500/30 font-semibold' 
+                          ? 'bg-gradient-to-r from-emerald-950/60 via-slate-900 to-slate-900 border-emerald-500/30 font-semibold' 
                           : 'border-slate-800/40 hover:bg-slate-800/30 text-slate-300'
                       }`}
                     >
@@ -327,7 +338,7 @@ export default function App() {
                       <td className={`py-3.5 px-4 ${isTop7 ? 'text-white font-bold text-base' : 'font-medium'}`}>
                         {item.nome}
                       </td>
-                      <td className="py-3.5 px-4 text-right font-black text-amber-400 text-base">
+                      <td className="py-3.5 px-4 text-right font-black text-emerald-400 text-base">
                         {item.pontos} <span className="text-xs text-slate-400 font-normal">pts</span>
                       </td>
                     </tr>
@@ -344,10 +355,10 @@ export default function App() {
         <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h2 className="text-2xl font-bold text-emerald-400">Classificação Geral - Prêmio Brocador</h2>
+              <h2 className="text-2xl font-bold text-red-400">Classificação Geral - Prêmio Brocador</h2>
               <p className="text-slate-400 text-sm mt-1">Ranking de artilharia completo com destaque para o Líder</p>
             </div>
-            <span className="bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full text-xs font-semibold">{rankingBrocador.length} Jogadores</span>
+            <span className="bg-red-500/10 text-red-400 px-3 py-1 rounded-full text-xs font-semibold">{rankingBrocador.length} Jogadores</span>
           </div>
           
           <div className="overflow-x-auto">
@@ -367,15 +378,15 @@ export default function App() {
                       key={item.nome} 
                       className={`border-b transition-all ${
                         isLider 
-                          ? 'bg-emerald-950/40 border-emerald-500/30 font-semibold' 
+                          ? 'bg-red-950/40 border-red-500/30 font-semibold' 
                           : 'border-slate-800/50 hover:bg-slate-800/30'
                       }`}
                     >
-                      <td className="py-3 px-4">{getPodioApenasPrimeiro(item.pos, 'emerald')}</td>
+                      <td className="py-3 px-4">{getPodioApenasPrimeiro(item.pos, 'red')}</td>
                       <td className={`py-3 px-4 ${isLider ? 'text-white font-bold text-base' : 'font-medium'}`}>
                         {item.nome}
                       </td>
-                      <td className="py-3 px-4 text-right font-bold text-emerald-400 text-base">
+                      <td className="py-3 px-4 text-right font-bold text-red-400 text-base">
                         {item.gols} gols
                       </td>
                     </tr>
@@ -391,17 +402,17 @@ export default function App() {
       {aba === 'cesar' && (
         <div className="space-y-8">
           <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
-            <h2 className="text-2xl font-bold text-blue-400 mb-2">Prêmio César - Gráfico dos Goleiros</h2>
+            <h2 className="text-2xl font-bold text-amber-400 mb-2">Prêmio César - Gráfico dos Goleiros</h2>
             <p className="text-slate-400 text-sm mb-6">Comparação entre Pontuação obtida e Gols Sofridos</p>
             <div className="h-80 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={rankingCesar}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
                   <XAxis dataKey="nome" stroke="#94a3b8" />
                   <YAxis stroke="#94a3b8" />
                   <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px' }} />
                   <Legend />
-                  <Bar dataKey="pontos" name="Pontos" fill="#3b82f6" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="pontos" name="Pontos" fill="#f59e0b" radius={[6, 6, 0, 0]} />
                   <Bar dataKey="golsSofridos" name="Gols Sofridos" fill="#ef4444" radius={[6, 6, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
@@ -428,11 +439,11 @@ export default function App() {
                         key={item.nome} 
                         className={`border-b transition-all ${
                           isLider 
-                            ? 'bg-blue-950/40 border-blue-500/30 font-semibold' 
+                            ? 'bg-amber-950/30 border-amber-500/30 font-semibold' 
                             : 'border-slate-800/50 hover:bg-slate-800/30'
                         }`}
                       >
-                        <td className="py-3 px-4">{getPodioApenasPrimeiro(item.pos, 'blue')}</td>
+                        <td className="py-3 px-4">{getPodioApenasPrimeiro(item.pos, 'amber')}</td>
                         <td className={`py-3 px-4 ${isLider ? 'text-white font-bold text-base' : 'font-medium'}`}>
                           {item.nome}
                         </td>
