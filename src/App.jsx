@@ -115,19 +115,19 @@ const dadosBrocador = [
   { nome: "Beradeiro", gols: 1 }
 ];
 
-// Dados dos Goleiros (Prêmio César) - Incluindo o Adriel
+// Dados dos Goleiros (Prêmio César) - Incluindo Adriel
 const dadosCesar = [
   { nome: 'Tellê', pontos: 79, golsSofridos: 106 },
   { nome: 'Baianinho', pontos: 54, golsSofridos: 177 },
   { nome: 'Roberto', pontos: 46, golsSofridos: 118 },
   { nome: 'Rogério', pontos: 16, golsSofridos: 52 },
-  { nome: 'Adriel', pontos: 0, golsSofridos: 0 }, // Ajuste os pontos e gols sofridos reais aqui
+  { nome: 'Adriel', pontos: 1, golsSofridos: 2 },
 ];
 
 export default function App() {
   const [aba, setAba] = useState('geral');
 
-  // Ordenação automática do maior para o menor
+  // Ordenação automática
   const rankingMangabeira = [...dadosMangabeira]
     .sort((a, b) => b.pontos - a.pontos)
     .map((item, index) => ({ ...item, pos: index + 1 }));
@@ -173,17 +173,13 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-emerald-950 text-emerald-50 p-4 md:p-8 font-sans">
-      {/* Header com a Logo */}
+      {/* Header com a Logo Oficial */}
       <header className="mb-8 border-b border-emerald-800/60 pb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="flex items-center gap-4">
           <img 
-            src="/logo.png.jpg" 
+            src="/logo.png" 
             alt="Logo Arena Sinprovenfs" 
             className="h-16 sm:h-20 w-auto object-contain rounded-xl bg-white p-1.5 shadow-md border border-emerald-700"
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src = "/logo.jpg";
-            }}
           />
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-white tracking-wide flex items-center gap-2">
