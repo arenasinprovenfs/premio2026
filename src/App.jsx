@@ -1,144 +1,132 @@
 import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 
-// Dados do Prêmio Mangabeira (Craque)
-const dadosMangabeira = [
-  { nome: "Adriano", pontos: 65 },
-  { nome: "Rodrigo", pontos: 56 },
-  { nome: "Jandir", pontos: 56 },
-  { nome: "Ballet", pontos: 55 },
-  { nome: "Robério", pontos: 54 },
-  { nome: "Lucas", pontos: 51 },
-  { nome: "Talisca", pontos: 51 },
-  { nome: "Rafa", pontos: 50 },
-  { nome: "Ricardo", pontos: 47 },
-  { nome: "Raul", pontos: 47 },
-  { nome: "Canário", pontos: 46 },
-  { nome: "Reinaldo", pontos: 46 },
-  { nome: "Remi", pontos: 45 },
-  { nome: "Minuano", pontos: 45 },
-  { nome: "Rafael Santana", pontos: 44 },
-  { nome: "PJ", pontos: 44 },
-  { nome: "Albino", pontos: 44 },
-  { nome: "Amaury", pontos: 43 },
-  { nome: "Capela", pontos: 42 },
-  { nome: "Vini HC", pontos: 41 },
-  { nome: "M. Yuri", pontos: 40 },
-  { nome: "Oliveira", pontos: 40 },
-  { nome: "Rapha Diniz", pontos: 40 },
-  { nome: "I. Galvão", pontos: 38 },
-  { nome: "Gamarra", pontos: 37 },
-  { nome: "Morais", pontos: 37 },
-  { nome: "Vanderson", pontos: 36 },
-  { nome: "R. Mateus", pontos: 34 },
-  { nome: "André", pontos: 34 },
-  { nome: "Michel", pontos: 31 },
-  { nome: "Garcia", pontos: 31 },
-  { nome: "Marcelinho", pontos: 30 },
-  { nome: "Harley", pontos: 30 },
-  { nome: "M. Galvão", pontos: 28 },
-  { nome: "Filipinho", pontos: 28 },
-  { nome: "Nando", pontos: 27 },
-  { nome: "Otaner", pontos: 26 },
-  { nome: "Gusta", pontos: 26 },
-  { nome: "Murilo", pontos: 25 },
-  { nome: "Gutto", pontos: 25 },
-  { nome: "Diniz", pontos: 23 },
-  { nome: "Dyeggo", pontos: 20 },
-  { nome: "Carioca", pontos: 18 },
-  { nome: "Zé Paulo", pontos: 16 },
-  { nome: "Juracy", pontos: 13 },
-  { nome: "Kiko", pontos: 13 },
-  { nome: "PH", pontos: 11 },
-  { nome: "Babinha", pontos: 8 },
-  { nome: "Marcola", pontos: 8 },
-  { nome: "Guga", pontos: 7 },
-  { nome: "Miskinis", pontos: 6 },
-  { nome: "Dai", pontos: 4 },
-  { nome: "Gilberto", pontos: 3 },
-  { nome: "Jefinho", pontos: 3 }
+// Lista Oficial de Associados e Goleiros da Arena para Seleção
+export const ASSOCIADOS_OPCOES = [
+  "Adriano", "Albino", "Amaury", "André", "Babinha", "Ballet", "Beradeiro", "Canário", 
+  "Capela", "Carioca", "Dai", "Diniz", "Dyeggo", "Filipinho", "Gamarra", "Garcia", 
+  "Guga", "Gusta", "Gutto", "Harley", "I. Galvão", "Jandir", "Jefinho", "Juracy", 
+  "Kiko", "Lucas", "M. Galvão", "M. Yuri", "Marcola", "Marcelinho", "Michel", "Minuano", 
+  "Miskinis", "Morais", "Murilo", "Nando", "Oliveira", "Otaner", "PH", "PJ", 
+  "R. Mateus", "Rafa", "Rafael Santana", "Rapha Diniz", "Raul", "Reinaldo", "Remi", 
+  "Ricardo", "Robério", "Rodrigo", "Talisca", "Vanderson", "Vini HC", "Zé Paulo"
 ];
 
-// Dados do Prêmio Brocador (Artilharia)
-const dadosBrocador = [
-  { nome: "Remi", gols: 50 },
-  { nome: "Rodrigo", gols: 45 },
-  { nome: "Raul", gols: 44 },
-  { nome: "Rafa", gols: 36 },
-  { nome: "Lucas", gols: 29 },
-  { nome: "Ricardo", gols: 29 },
-  { nome: "Jandir", gols: 25 },
-  { nome: "M. Yuri", gols: 23 },
-  { nome: "Gutto", gols: 22 },
-  { nome: "Murilo", gols: 19 },
-  { nome: "Nando", gols: 18 },
-  { nome: "Adriano", gols: 15 },
-  { nome: "Diniz", gols: 12 },
-  { nome: "André", gols: 12 },
-  { nome: "PH", gols: 11 },
-  { nome: "Canário", gols: 11 },
-  { nome: "Vini HC", gols: 11 },
-  { nome: "Gamarra", gols: 10 },
-  { nome: "Vanderson", gols: 10 },
-  { nome: "R. Mateus", gols: 10 },
-  { nome: "Gusta", gols: 9 },
-  { nome: "Morais", gols: 8 },
-  { nome: "Robério", gols: 7 },
-  { nome: "Talisca", gols: 7 },
-  { nome: "Filipinho", gols: 7 },
-  { nome: "Ballet", gols: 6 },
-  { nome: "Carioca", gols: 6 },
-  { nome: "Michel", gols: 5 },
-  { nome: "Minuano", gols: 5 },
-  { nome: "PJ", gols: 4 },
-  { nome: "Otaner", gols: 4 },
-  { nome: "Reinaldo", gols: 4 },
-  { nome: "Jefinho", gols: 3 },
-  { nome: "Juracy", gols: 3 },
-  { nome: "Marcelinho", gols: 3 },
-  { nome: "Capela", gols: 3 },
-  { nome: "Guga", gols: 3 },
-  { nome: "Dai", gols: 2 },
-  { nome: "Telle", gols: 2 },
-  { nome: "Rapha Diniz", gols: 2 },
-  { nome: "Albino", gols: 2 },
-  { nome: "Zé Paulo", gols: 2 },
-  { nome: "Dyeggo", gols: 1 },
-  { nome: "Babinha", gols: 1 },
-  { nome: "Garcia", gols: 1 },
-  { nome: "M. Galvão", gols: 1 },
-  { nome: "Amaury", gols: 1 },
-  { nome: "Ivamário", gols: 1 },
-  { nome: "Rafha Santana", gols: 1 },
-  { nome: "Oliveira", gols: 1 },
-  { nome: "Marcola", gols: 1 },
+export const GOLEIROS_OPCOES = ["Tellê", "Baianinho", "Roberto", "Rogério", "Adriel"];
+
+// HISTÓRICO DE RODADAS POR DATA
+const historicoRodadas = [
+  {
+    data: "18/10/2026",
+    rodada: "Rodada 1",
+    jogos: [
+      {
+        id: "r1_j1",
+        partida: "PARTIDA 1",
+        timeA: "Time Adriel",
+        timeB: "Time Tellê",
+        golsA: 2,
+        golsB: 2,
+        goleiroA: "Adriel",
+        goleiroB: "Tellê",
+        jogadoresA: ["I. Galvão", "Capela", "Vini HC", "Marcola", "Minuano", "Rodrigo", "Remi"],
+        jogadoresB: ["Robério", "Amaury", "Rafael Santana", "Adriano", "Canário", "Morais", "Gutto"],
+        golsMarcados: [
+          { jogador: "Remi", quantidade: 2 },
+          { jogador: "Gutto", quantidade: 1 }
+        ]
+      },
+      {
+        id: "r1_j2",
+        partida: "PARTIDA 2",
+        timeA: "Time Baianinho",
+        timeB: "Time Roberto",
+        golsA: 9,
+        golsB: 3,
+        goleiroA: "Baianinho",
+        goleiroB: "Roberto",
+        jogadoresA: ["Rapha Diniz", "Reinaldo", "M. Galvão", "Nando", "Raul"],
+        jogadoresB: ["Ballet", "Oliveira", "R. Mateus", "PJ", "Talisca", "Diniz", "Ricardo"],
+        golsMarcados: [
+          { jogador: "Nando", quantidade: 3 },
+          { jogador: "Raul", quantidade: 5 },
+          { jogador: "R. Mateus", quantidade: 1 },
+          { jogador: "Diniz", quantidade: 2 }
+        ]
+      }
+    ]
+  }
+];
+
+// Dados Base Globais (Acumulado)
+const dadosMangabeiraBase = [
+  { nome: "Adriano", pontos: 65 }, { nome: "Rodrigo", pontos: 56 }, { nome: "Jandir", pontos: 56 },
+  { nome: "Ballet", pontos: 55 }, { nome: "Robério", pontos: 54 }, { nome: "Lucas", pontos: 51 },
+  { nome: "Talisca", pontos: 51 }, { nome: "Rafa", pontos: 50 }, { nome: "Ricardo", pontos: 47 },
+  { nome: "Raul", pontos: 47 }, { nome: "Canário", pontos: 46 }, { nome: "Reinaldo", pontos: 46 },
+  { nome: "Remi", pontos: 45 }, { nome: "Minuano", pontos: 45 }, { nome: "Rafael Santana", pontos: 44 },
+  { nome: "PJ", pontos: 44 }, { nome: "Albino", pontos: 44 }, { nome: "Amaury", pontos: 43 },
+  { nome: "Capela", pontos: 42 }, { nome: "Vini HC", pontos: 41 }, { nome: "M. Yuri", pontos: 40 },
+  { nome: "Oliveira", pontos: 40 }, { nome: "Rapha Diniz", pontos: 40 }, { nome: "I. Galvão", pontos: 38 },
+  { nome: "Gamarra", pontos: 37 }, { nome: "Morais", pontos: 37 }, { nome: "Vanderson", pontos: 36 },
+  { nome: "R. Mateus", pontos: 34 }, { nome: "André", pontos: 34 }, { nome: "Michel", pontos: 31 },
+  { nome: "Garcia", pontos: 31 }, { nome: "Marcelinho", pontos: 30 }, { nome: "Harley", pontos: 30 },
+  { nome: "M. Galvão", pontos: 28 }, { nome: "Filipinho", pontos: 28 }, { nome: "Nando", pontos: 27 },
+  { nome: "Otaner", pontos: 26 }, { nome: "Gusta", pontos: 26 }, { nome: "Murilo", pontos: 25 },
+  { nome: "Gutto", pontos: 25 }, { nome: "Diniz", pontos: 23 }, { nome: "Dyeggo", pontos: 20 },
+  { nome: "Carioca", pontos: 18 }, { nome: "Zé Paulo", pontos: 16 }, { nome: "Juracy", pontos: 13 },
+  { nome: "Kiko", pontos: 13 }, { nome: "PH", pontos: 11 }, { nome: "Babinha", pontos: 8 },
+  { nome: "Marcola", pontos: 8 }, { nome: "Guga", pontos: 7 }, { nome: "Miskinis", pontos: 6 },
+  { nome: "Dai", pontos: 4 }, { nome: "Gilberto", pontos: 3 }, { nome: "Jefinho", pontos: 3 }
+];
+
+const dadosBrocadorBase = [
+  { nome: "Remi", gols: 50 }, { nome: "Rodrigo", gols: 45 }, { nome: "Raul", gols: 44 },
+  { nome: "Rafa", gols: 36 }, { nome: "Lucas", gols: 29 }, { nome: "Ricardo", gols: 29 },
+  { nome: "Jandir", gols: 25 }, { nome: "M. Yuri", gols: 23 }, { nome: "Gutto", gols: 22 },
+  { nome: "Murilo", gols: 19 }, { nome: "Nando", gols: 18 }, { nome: "Adriano", gols: 15 },
+  { nome: "Diniz", gols: 12 }, { nome: "André", gols: 12 }, { nome: "PH", gols: 11 },
+  { nome: "Canário", gols: 11 }, { nome: "Vini HC", gols: 11 }, { nome: "Gamarra", gols: 10 },
+  { nome: "Vanderson", gols: 10 }, { nome: "R. Mateus", gols: 10 }, { nome: "Gusta", gols: 9 },
+  { nome: "Morais", gols: 8 }, { nome: "Robério", gols: 7 }, { nome: "Talisca", gols: 7 },
+  { nome: "Filipinho", gols: 7 }, { nome: "Ballet", gols: 6 }, { nome: "Carioca", gols: 6 },
+  { nome: "Michel", gols: 5 }, { nome: "Minuano", gols: 5 }, { nome: "PJ", gols: 4 },
+  { nome: "Otaner", gols: 4 }, { nome: "Reinaldo", gols: 4 }, { nome: "Jefinho", gols: 3 },
+  { nome: "Juracy", gols: 3 }, { nome: "Marcelinho", gols: 3 }, { nome: "Capela", gols: 3 },
+  { nome: "Guga", gols: 3 }, { nome: "Dai", gols: 2 }, { nome: "Telle", gols: 2 },
+  { nome: "Rapha Diniz", gols: 2 }, { nome: "Albino", gols: 2 }, { nome: "Zé Paulo", gols: 2 },
+  { nome: "Dyeggo", gols: 1 }, { nome: "Babinha", gols: 1 }, { nome: "Garcia", gols: 1 },
+  { nome: "M. Galvão", gols: 1 }, { nome: "Amaury", gols: 1 }, { nome: "Ivamário", gols: 1 },
+  { nome: "Rafha Santana", gols: 1 }, { nome: "Oliveira", gols: 1 }, { nome: "Marcola", gols: 1 },
   { nome: "Beradeiro", gols: 1 }
 ];
 
-// Dados dos Goleiros (Prêmio César) - Incluindo Adriel
-const dadosCesar = [
+const dadosCesarBase = [
   { nome: 'Tellê', pontos: 79, golsSofridos: 106 },
   { nome: 'Baianinho', pontos: 54, golsSofridos: 177 },
   { nome: 'Roberto', pontos: 46, golsSofridos: 118 },
   { nome: 'Rogério', pontos: 16, golsSofridos: 52 },
-  { nome: 'Adriel', pontos: 1, golsSofridos: 2 },
+  { nome: 'Adriel', pontos: 1, golsSofridos: 2 }
 ];
 
 export default function App() {
   const [aba, setAba] = useState('geral');
+  const [dataSelecionada, setDataSelecionada] = useState(historicoRodadas[0]?.data || '');
 
   // Ordenação automática
-  const rankingMangabeira = [...dadosMangabeira]
+  const rankingMangabeira = [...dadosMangabeiraBase]
     .sort((a, b) => b.pontos - a.pontos)
     .map((item, index) => ({ ...item, pos: index + 1 }));
 
-  const rankingBrocador = [...dadosBrocador]
+  const rankingBrocador = [...dadosBrocadorBase]
     .sort((a, b) => b.gols - a.gols)
     .map((item, index) => ({ ...item, pos: index + 1 }));
 
-  const rankingCesar = [...dadosCesar]
+  const rankingCesar = [...dadosCesarBase]
     .sort((a, b) => b.pontos - a.pontos)
     .map((item, index) => ({ ...item, pos: index + 1 }));
+
+  const rodadaAtual = historicoRodadas.find(r => r.data === dataSelecionada) || historicoRodadas[0];
 
   // Selos G7 (Craque)
   const getPodioBadgeG7 = (pos) => {
@@ -173,7 +161,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-emerald-950 text-emerald-50 p-4 md:p-8 font-sans">
-      {/* Header com a Logo Oficial */}
+      {/* Header com a Logo */}
       <header className="mb-8 border-b border-emerald-800/60 pb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="flex items-center gap-4">
           <img 
@@ -196,6 +184,12 @@ export default function App() {
             className={`px-4 py-2 rounded-lg text-sm transition-all ${aba === 'geral' ? 'bg-emerald-500 text-slate-950 shadow-md font-bold' : 'text-emerald-200/70 hover:text-white'}`}
           >
             Visão Geral
+          </button>
+          <button 
+            onClick={() => setAba('jogos')}
+            className={`px-4 py-2 rounded-lg text-sm transition-all ${aba === 'jogos' ? 'bg-teal-500 text-slate-950 shadow-md font-bold' : 'text-emerald-200/70 hover:text-white'}`}
+          >
+            ⚽ Jogos da Rodada
           </button>
           <button 
             onClick={() => setAba('mangabeira')}
@@ -296,6 +290,105 @@ export default function App() {
             </div>
           </div>
         </>
+      )}
+
+      {/* ABA JOGOS DA RODADA COM FILTRO DE DATA */}
+      {aba === 'jogos' && (
+        <div className="bg-emerald-900/40 p-6 rounded-2xl border border-emerald-800/80">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 border-b border-emerald-800/60 pb-4">
+            <div>
+              <h2 className="text-2xl font-bold text-teal-300 flex items-center gap-2">
+                ⚽ Súmula e Resultados das Partidas
+              </h2>
+              <p className="text-emerald-200/60 text-sm mt-1">Histórico completo de partidas com seleção por data</p>
+            </div>
+
+            {/* Filtro de Seleção por Data */}
+            <div className="flex items-center gap-2 bg-emerald-950 p-2 rounded-xl border border-emerald-700">
+              <span className="text-xs font-bold text-emerald-400 uppercase">📅 Data da Rodada:</span>
+              <select 
+                value={dataSelecionada} 
+                onChange={(e) => setDataSelecionada(e.target.value)}
+                className="bg-emerald-900 text-white font-bold text-sm px-3 py-1.5 rounded-lg border border-emerald-600 focus:outline-none"
+              >
+                {historicoRodadas.map(r => (
+                  <option key={r.data} value={r.data}>
+                    {r.data} ({r.rodada})
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            {rodadaAtual?.jogos.map((j) => (
+              <div key={j.id} className="bg-emerald-950/90 p-5 rounded-2xl border border-emerald-800/80 shadow-lg">
+                <div className="flex justify-between items-center mb-4 border-b border-emerald-800/60 pb-2">
+                  <span className="text-xs font-black uppercase text-emerald-400 tracking-wider">{j.partida}</span>
+                  <span className="text-xs bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full font-bold border border-emerald-500/30">
+                    Súmula Finalizada
+                  </span>
+                </div>
+
+                {/* Placar Principal */}
+                <div className="flex justify-between items-center my-4">
+                  <div className="w-2/5 text-right">
+                    <p className="font-extrabold text-white text-lg">{j.timeA}</p>
+                    <p className="text-xs text-amber-300 font-semibold mt-1">🧤 Goleiro: {j.goleiroA}</p>
+                  </div>
+
+                  <div className="bg-emerald-900 px-5 py-2.5 rounded-xl font-black text-amber-300 text-2xl border-2 border-emerald-600 shadow-inner">
+                    {j.golsA} x {j.golsB}
+                  </div>
+
+                  <div className="w-2/5 text-left">
+                    <p className="font-extrabold text-white text-lg">{j.timeB}</p>
+                    <p className="text-xs text-amber-300 font-semibold mt-1">🧤 Goleiro: {j.goleiroB}</p>
+                  </div>
+                </div>
+
+                {/* Escalação dos Times */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 pt-4 border-t border-emerald-900">
+                  <div className="bg-emerald-900/30 p-3 rounded-xl border border-emerald-800/40">
+                    <p className="text-xs font-bold text-emerald-300 mb-2 uppercase">Escalação {j.timeA}:</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {j.jogadoresA.map(nome => (
+                        <span key={nome} className="bg-emerald-950 text-emerald-200 text-xs px-2 py-1 rounded-md border border-emerald-800">
+                          {nome}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="bg-emerald-900/30 p-3 rounded-xl border border-emerald-800/40">
+                    <p className="text-xs font-bold text-emerald-300 mb-2 uppercase">Escalação {j.timeB}:</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {j.jogadoresB.map(nome => (
+                        <span key={nome} className="bg-emerald-950 text-emerald-200 text-xs px-2 py-1 rounded-md border border-emerald-800">
+                          {nome}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Autores dos Gols */}
+                {j.golsMarcados.length > 0 && (
+                  <div className="mt-4 bg-emerald-900/40 p-3 rounded-xl border border-emerald-800/60">
+                    <p className="text-xs font-bold text-amber-300 mb-1">⚽ Autores dos Gols:</p>
+                    <div className="flex flex-wrap gap-2 text-xs text-emerald-100">
+                      {j.golsMarcados.map((g, idx) => (
+                        <span key={idx} className="bg-amber-500/10 text-amber-300 px-2.5 py-1 rounded-lg border border-amber-500/20 font-medium">
+                          {g.jogador} ({g.quantidade} {g.quantidade > 1 ? 'gols' : 'gol'})
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
       )}
 
       {/* ABA MANGABEIRA */}
