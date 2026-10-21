@@ -71,9 +71,9 @@ const dadosCesarBase = [
 export default function App() {
   const [aba, setAba] = useState('geral');
   
-  // Utilizando versão v4 para renovar o cache do navegador de todos os usuários
+  // Utilizando versão v5 para forçar atualização do cache local
   const [historico, setHistorico] = useState(() => {
-    const salvos = localStorage.getItem('arena_historico_jogos_v4');
+    const salvos = localStorage.getItem('arena_historico_jogos_v5');
     return salvos ? JSON.parse(salvos) : historicoRodadasInicial;
   });
 
@@ -104,7 +104,7 @@ export default function App() {
 
   const salvarHistoricoLocal = (novoHistorico) => {
     setHistorico(novoHistorico);
-    localStorage.setItem('arena_historico_jogos_v4', JSON.stringify(novoHistorico));
+    localStorage.setItem('arena_historico_jogos_v5', JSON.stringify(novoHistorico));
   };
 
   const resetForm = () => {
@@ -294,7 +294,7 @@ export default function App() {
 
         // SOMENTE JOGADORES REAIS SOMAM GOLS NO BROCADOR (GOL CONTRA É IGNORADO)
         j.golsMarcados.forEach(g => {
-          if (g.jogador !== "⚠️ Gol Contra") {
+          if (!g.jogador.includes("Gol Contra")) {
             let p = brocador.find(x => x.nome === g.jogador);
             if (p) p.gols += g.quantidade;
           }
@@ -353,13 +353,14 @@ export default function App() {
     return <span className="text-emerald-300/40 font-semibold px-2">#{pos}</span>;
   };
 
-  // Lista unificada para registrar gols (Inclui a opção de Gol Contra)
+  // Lista unificada para registrar gols (Inclui opções de Gol Contra para os dois times)
   const todosEscaladosEsubstitutos = [
     ...jogadoresA, 
     ...jogadoresB, 
     ...(substitutosA || []), 
     ...(substitutosB || []),
-    "⚠️ Gol Contra"
+    `⚠️ Gol Contra (Time ${goleiroA})`,
+    `⚠️ Gol Contra (Time ${goleiroB})`
   ];
 
   return (
@@ -628,7 +629,7 @@ export default function App() {
                         <p className="text-xs font-bold text-amber-300 mb-1">⚽ Autores dos Gols:</p>
                         <div className="flex flex-wrap gap-2 text-xs text-emerald-100">
                           {j.golsMarcados.map((g, idx) => (
-                            <span key={idx} className={`px-2.5 py-1 rounded-lg border font-medium ${g.jogador === '⚠️ Gol Contra' ? 'bg-red-500/20 text-red-300 border-red-500/40' : 'bg-amber-500/10 text-amber-300 border-amber-500/20'}`}>
+                            <span key={idx} className={`px-2.5 py-1 rounded-lg border font-medium ${g.jogador.includes('Gol Contra') ? 'bg-red-500/20 text-red-300 border-red-500/40' : 'bg-amber-500/10 text-amber-300 border-amber-500/20'}`}>
                               {g.jogador} ({g.quantidade} {g.quantidade > 1 ? 'gols' : 'gol'})
                             </span>
                           ))}
@@ -838,14 +839,14 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Detalhamento de Gols (Titulares + Substitutos + Gol Contra) */}
+                  {/* Detalhamento de Gols (Titulares + Substitutos + Gol Contra para ambos) */}
                   {todosEscaladosEsubstitutos.length > 0 && (
                     <div className="bg-emerald-950/80 p-4 rounded-xl border border-emerald-800">
                       <p className="text-xs font-bold text-amber-300 mb-3 uppercase">⚽ Atribuir Gols (Titulares, Substitutos e Gol Contra):</p>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-60 overflow-y-auto pr-2">
                         {todosEscaladosEsubstitutos.map(nome => {
                           const isSub = substitutosA.includes(nome) || substitutosB.includes(nome);
-                          const isGolContra = nome === "⚠️ Gol Contra";
+                          const isGolContra = nome.includes("Gol Contra");
                           return (
                             <div key={nome} className={`flex justify-between items-center p-2 rounded-lg border text-xs ${isGolContra ? 'bg-red-950/60 border-red-800' : 'bg-emerald-900/60 border-emerald-800'}`}>
                               <span className="font-semibold text-emerald-100 flex items-center gap-1">
