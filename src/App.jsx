@@ -71,9 +71,9 @@ const dadosCesarBase = [
 export default function App() {
   const [aba, setAba] = useState('geral');
   
-  // Utilizando versão v5 para forçar atualização do cache local
+  // Utilizando versão v6 para garantir a limpeza do cache de todos os usuários
   const [historico, setHistorico] = useState(() => {
-    const salvos = localStorage.getItem('arena_historico_jogos_v5');
+    const salvos = localStorage.getItem('arena_historico_jogos_v6');
     return salvos ? JSON.parse(salvos) : historicoRodadasInicial;
   });
 
@@ -104,7 +104,7 @@ export default function App() {
 
   const salvarHistoricoLocal = (novoHistorico) => {
     setHistorico(novoHistorico);
-    localStorage.setItem('arena_historico_jogos_v5', JSON.stringify(novoHistorico));
+    localStorage.setItem('arena_historico_jogos_v6', JSON.stringify(novoHistorico));
   };
 
   const resetForm = () => {
@@ -353,13 +353,16 @@ export default function App() {
     return <span className="text-emerald-300/40 font-semibold px-2">#{pos}</span>;
   };
 
-  // Lista unificada para registrar gols (Inclui opções de Gol Contra para os dois times)
-  const todosEscaladosEsubstitutos = [
+  // Listas separadas para os gols por time
+  const opcoesGolsTimeA = [
     ...jogadoresA, 
-    ...jogadoresB, 
     ...(substitutosA || []), 
-    ...(substitutosB || []),
-    `⚠️ Gol Contra (Time ${goleiroA})`,
+    `⚠️ Gol Contra (Time ${goleiroA})`
+  ];
+
+  const opcoesGolsTimeB = [
+    ...jogadoresB, 
+    ...(substitutosB || []), 
     `⚠️ Gol Contra (Time ${goleiroB})`
   ];
 
@@ -839,39 +842,85 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Detalhamento de Gols (Titulares + Substitutos + Gol Contra para ambos) */}
-                  {todosEscaladosEsubstitutos.length > 0 && (
+                  {/* ATRIBUIÇÃO DE GOLS DIVIDIDA POR TIME */}
+                  {(opcoesGolsTimeA.length > 1 || opcoesGolsTimeB.length > 1) && (
                     <div className="bg-emerald-950/80 p-4 rounded-xl border border-emerald-800">
-                      <p className="text-xs font-bold text-amber-300 mb-3 uppercase">⚽ Atribuir Gols (Titulares, Substitutos e Gol Contra):</p>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-60 overflow-y-auto pr-2">
-                        {todosEscaladosEsubstitutos.map(nome => {
-                          const isSub = substitutosA.includes(nome) || substitutosB.includes(nome);
-                          const isGolContra = nome.includes("Gol Contra");
-                          return (
-                            <div key={nome} className={`flex justify-between items-center p-2 rounded-lg border text-xs ${isGolContra ? 'bg-red-950/60 border-red-800' : 'bg-emerald-900/60 border-emerald-800'}`}>
-                              <span className="font-semibold text-emerald-100 flex items-center gap-1">
-                                {nome} {isSub && <span className="text-[10px] text-amber-400 font-normal">(Sub)</span>}
-                              </span>
-                              <div className="flex items-center gap-2">
-                                <button 
-                                  type="button" 
-                                  onClick={() => handleGolsJogador(nome, -1)}
-                                  className="w-6 h-6 bg-emerald-950 text-emerald-300 font-bold rounded flex items-center justify-center border border-emerald-700"
-                                >
-                                  -
-                                </button>
-                                <span className="font-bold text-amber-300 min-w-[12px] text-center">{golsDetalhados[nome] || 0}</span>
-                                <button 
-                                  type="button" 
-                                  onClick={() => handleGolsJogador(nome, 1)}
-                                  className="w-6 h-6 bg-emerald-700 text-white font-bold rounded flex items-center justify-center border border-emerald-600"
-                                >
-                                  +
-                                </button>
-                              </div>
-                            </div>
-                          );
-                        })}
+                      <p className="text-xs font-bold text-amber-300 mb-3 uppercase">⚽ Atribuir Gols aos Autores:</p>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* GOLS TIME A */}
+                        <div className="bg-emerald-900/40 p-3 rounded-xl border border-emerald-800">
+                          <p className="text-xs font-bold text-emerald-300 mb-2 border-b border-emerald-800 pb-1">
+                            Gols do Time {goleiroA} (Time A):
+                          </p>
+                          <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+                            {opcoesGolsTimeA.map(nome => {
+                              const isSub = substitutosA.includes(nome);
+                              const isGolContra = nome.includes("Gol Contra");
+                              return (
+                                <div key={nome} className={`flex justify-between items-center p-2 rounded-lg border text-xs ${isGolContra ? 'bg-red-950/60 border-red-800' : 'bg-emerald-950/80 border-emerald-800'}`}>
+                                  <span className="font-semibold text-emerald-100 flex items-center gap-1">
+                                    {nome} {isSub && <span className="text-[10px] text-amber-400 font-normal">(Sub)</span>}
+                                  </span>
+                                  <div className="flex items-center gap-2">
+                                    <button 
+                                      type="button" 
+                                      onClick={() => handleGolsJogador(nome, -1)}
+                                      className="w-6 h-6 bg-emerald-900 text-emerald-300 font-bold rounded flex items-center justify-center border border-emerald-700"
+                                    >
+                                      -
+                                    </button>
+                                    <span className="font-bold text-amber-300 min-w-[12px] text-center">{golsDetalhados[nome] || 0}</span>
+                                    <button 
+                                      type="button" 
+                                      onClick={() => handleGolsJogador(nome, 1)}
+                                      className="w-6 h-6 bg-emerald-700 text-white font-bold rounded flex items-center justify-center border border-emerald-600"
+                                    >
+                                      +
+                                    </button>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        {/* GOLS TIME B */}
+                        <div className="bg-emerald-900/40 p-3 rounded-xl border border-emerald-800">
+                          <p className="text-xs font-bold text-emerald-300 mb-2 border-b border-emerald-800 pb-1">
+                            Gols do Time {goleiroB} (Time B):
+                          </p>
+                          <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+                            {opcoesGolsTimeB.map(nome => {
+                              const isSub = substitutosB.includes(nome);
+                              const isGolContra = nome.includes("Gol Contra");
+                              return (
+                                <div key={nome} className={`flex justify-between items-center p-2 rounded-lg border text-xs ${isGolContra ? 'bg-red-950/60 border-red-800' : 'bg-emerald-950/80 border-emerald-800'}`}>
+                                  <span className="font-semibold text-emerald-100 flex items-center gap-1">
+                                    {nome} {isSub && <span className="text-[10px] text-amber-400 font-normal">(Sub)</span>}
+                                  </span>
+                                  <div className="flex items-center gap-2">
+                                    <button 
+                                      type="button" 
+                                      onClick={() => handleGolsJogador(nome, -1)}
+                                      className="w-6 h-6 bg-emerald-900 text-emerald-300 font-bold rounded flex items-center justify-center border border-emerald-700"
+                                    >
+                                      -
+                                    </button>
+                                    <span className="font-bold text-amber-300 min-w-[12px] text-center">{golsDetalhados[nome] || 0}</span>
+                                    <button 
+                                      type="button" 
+                                      onClick={() => handleGolsJogador(nome, 1)}
+                                      className="w-6 h-6 bg-emerald-700 text-white font-bold rounded flex items-center justify-center border border-emerald-600"
+                                    >
+                                      +
+                                    </button>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )}
