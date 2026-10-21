@@ -71,9 +71,9 @@ const dadosCesarBase = [
 export default function App() {
   const [aba, setAba] = useState('geral');
   
-  // Utilizando versão v6 para garantir a limpeza do cache de todos os usuários
+  // Utilizando versão v7 para renovação automática de cache
   const [historico, setHistorico] = useState(() => {
-    const salvos = localStorage.getItem('arena_historico_jogos_v6');
+    const salvos = localStorage.getItem('arena_historico_jogos_v7');
     return salvos ? JSON.parse(salvos) : historicoRodadasInicial;
   });
 
@@ -102,9 +102,29 @@ export default function App() {
   const [golsB, setGolsB] = useState(0);
   const [golsDetalhados, setGolsDetalhados] = useState({});
 
+  // CÁLCULO AUTOMÁTICO DO PLACAR A PARTIR DOS GOLS DETALHADOS
+  useEffect(() => {
+    const listaTimeA = [...jogadoresA, ...(substitutosA || []), `⚠️ Gol Contra (Time ${goleiroA})`];
+    const listaTimeB = [...jogadoresB, ...(substitutosB || []), `⚠️ Gol Contra (Time ${goleiroB})`];
+
+    let totalA = 0;
+    let totalB = 0;
+
+    listaTimeA.forEach(nome => {
+      if (golsDetalhados[nome]) totalA += golsDetalhados[nome];
+    });
+
+    listaTimeB.forEach(nome => {
+      if (golsDetalhados[nome]) totalB += golsDetalhados[nome];
+    });
+
+    setGolsA(totalA);
+    setGolsB(totalB);
+  }, [golsDetalhados, jogadoresA, jogadoresB, substitutosA, substitutosB, goleiroA, goleiroB]);
+
   const salvarHistoricoLocal = (novoHistorico) => {
     setHistorico(novoHistorico);
-    localStorage.setItem('arena_historico_jogos_v6', JSON.stringify(novoHistorico));
+    localStorage.setItem('arena_historico_jogos_v7', JSON.stringify(novoHistorico));
   };
 
   const resetForm = () => {
@@ -743,7 +763,7 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Placar */}
+                  {/* Placar (Calculado automaticamente de acordo com a atribuição de gols) */}
                   <div className="bg-emerald-950 p-4 rounded-xl border border-emerald-800 flex justify-around items-center">
                     <div className="text-center">
                       <p className="text-xs font-bold text-emerald-300 uppercase mb-1">Gols Time A</p>
@@ -751,7 +771,7 @@ export default function App() {
                         type="number" 
                         min="0"
                         value={golsA}
-                        onChange={(e) => setGolsA(e.target.value)}
+                        onChange={(e) => setGolsA(Number(e.target.value))}
                         className="w-20 bg-emerald-900 text-center font-black text-2xl text-amber-300 border border-emerald-600 rounded-xl py-2"
                       />
                     </div>
@@ -762,7 +782,7 @@ export default function App() {
                         type="number" 
                         min="0"
                         value={golsB}
-                        onChange={(e) => setGolsB(e.target.value)}
+                        onChange={(e) => setGolsB(Number(e.target.value))}
                         className="w-20 bg-emerald-900 text-center font-black text-2xl text-amber-300 border border-emerald-600 rounded-xl py-2"
                       />
                     </div>
@@ -845,7 +865,7 @@ export default function App() {
                   {/* ATRIBUIÇÃO DE GOLS DIVIDIDA POR TIME */}
                   {(opcoesGolsTimeA.length > 1 || opcoesGolsTimeB.length > 1) && (
                     <div className="bg-emerald-950/80 p-4 rounded-xl border border-emerald-800">
-                      <p className="text-xs font-bold text-amber-300 mb-3 uppercase">⚽ Atribuir Gols aos Autores:</p>
+                      <p className="text-xs font-bold text-amber-300 mb-3 uppercase">⚽ Atribuir Gols aos Autores (Atualiza Placar Automático):</p>
                       
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* GOLS TIME A */}
