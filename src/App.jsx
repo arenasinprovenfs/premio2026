@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 
-// CREDITYS DO DESENVOLVEDOR (EXCLUSIVO NO RODAPÉ)
-const NOME_DESENVOLVEDOR = "Ícaro Galvão";
+// CRÉDITOS DO DESENVOLVEDOR (COM TITULAÇÃO)
+const NOME_DESENVOLVEDOR = "Prof. Me. Ícaro Galvão";
 
 export const ASSOCIADOS_OPCOES = [
   "Adriano", "Albino", "Amaury", "André", "Babinha", "Ballet", "Beradeiro", "Canário", 
@@ -264,7 +264,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-emerald-950 text-emerald-50 p-4 md:p-8 font-sans flex flex-col justify-between">
       <div>
-        {/* Cabeçalho Original */}
+        {/* Cabeçalho */}
         <header className="mb-8 border-b border-emerald-800/60 pb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="flex items-center gap-4">
             <img 
@@ -825,9 +825,9 @@ export default function App() {
         )}
       </div>
 
-      {/* RODAPÉ EXCLUSIVO DO DESENVOLVEDOR */}
+      {/* RODAPÉ */}
       <footer className="mt-12 pt-6 border-t border-emerald-800/60 text-center text-xs text-emerald-300/60">
-        <p>© 2026 Arena Sinprovenfs • Todos os direitos reservados</p>
+        <p>© Olho no Lance • Todos os direitos reservados</p>
         <p className="mt-1 font-medium text-emerald-400">
           Desenvolvido com ⚽ por <span className="text-white font-bold">{NOME_DESENVOLVEDOR}</span>
         </p>
