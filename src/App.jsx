@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
+import { db } from './firebase';
+import { collection, onSnapshot, doc, setDoc } from 'firebase/firestore';
 
 const NOME_DESENVOLVEDOR = "Prof. Me. Ícaro Galvão";
 
@@ -69,13 +71,36 @@ const dadosCesarBase = [
 
 export default function App() {
   const [aba, setAba] = useState('geral');
-  
-  const [historico, setHistorico] = useState(() => {
-    const salvos = localStorage.getItem('arena_historico_jogos_v8');
-    return salvos ? JSON.parse(salvos) : historicoRodadasInicial;
-  });
-
+  const [historico, setHistorico] = useState([]);
   const [dataSelecionada, setDataSelecionada] = useState('');
+
+  // Escuta o Firestore em Tempo Real
+  useEffect(() => {
+    const unsub = onSnapshot(collection(db, "partidas"), (snapshot) => {
+      const docsData = snapshot.docs.map(doc => doc.data());
+      if (docsData.length > 0) {
+        // Agrupa por data
+        const rodadasMap = {};
+        docsData.forEach(jogo => {
+          if (!rodadasMap[jogo.dataRodada]) {
+            rodadasMap[jogo.dataRodada] = [];
+          }
+          rodadasMap[jogo.dataRodada].push(jogo);
+        });
+
+        const historicoFormatado = Object.keys(rodadasMap).map(data => ({
+          data,
+          jogos: rodadasMap[data]
+        }));
+
+        setHistorico(historicoFormatado);
+      } else {
+        setHistorico([]);
+      }
+    });
+
+    return () => unsub();
+  }, []);
 
   useEffect(() => {
     if (historico.length > 0 && !dataSelecionada) {
@@ -116,11 +141,6 @@ export default function App() {
     setGolsA(totalA);
     setGolsB(totalB);
   }, [golsDetalhados, jogadoresA, jogadoresB, substitutosA, substitutosB, goleiroA, goleiroB]);
-
-  const salvarHistoricoLocal = (novoHistorico) => {
-    setHistorico(novoHistorico);
-    localStorage.setItem('arena_historico_jogos_v8', JSON.stringify(novoHistorico));
-  };
 
   const resetForm = () => {
     setJogoEditandoId(null);
@@ -203,7 +223,7 @@ export default function App() {
     setAba('cadastrar');
   };
 
-  const handleSalvarJogo = (e) => {
+  const handleSalvarJogo = async (e) => {
     e.preventDefault();
     const dataFormatada = dataJogo.split('-').reverse().join('/');
     
@@ -211,72 +231,37 @@ export default function App() {
       .filter(([_, q]) => q > 0)
       .map(([jogador, quantidade]) => ({ jogador, quantidade }));
 
-    let novoHistorico = JSON.parse(JSON.stringify(historico));
+    const idJogo = jogoEditandoId || `j_${Date.now()}`;
+    
+    let rodadaExistente = historico.find(r => r.data === dataFormatada);
+    const numPartida = rodadaExistente ? rodadaExistente.jogos.length + 1 : 1;
 
-    if (jogoEditandoId) {
-      novoHistorico.forEach(r => {
-        const idx = r.jogos.findIndex(j => j.id === jogoEditandoId);
-        if (idx !== -1) {
-          r.jogos[idx] = {
-            ...r.jogos[idx],
-            timeA: `Time ${goleiroA}`,
-            timeB: `Time ${goleiroB}`,
-            golsA: Number(golsA),
-            golsB: Number(golsB),
-            goleiroA,
-            goleiroB,
-            jogadoresA,
-            jogadoresB,
-            substitutosA,
-            substitutosB,
-            golsMarcados: golsMarcadosArray
-          };
-        }
-      });
-      alert('Súmula da partida atualizada com sucesso!');
-    } else {
-      let rodadaExistente = novoHistorico.find(r => r.data === dataFormatada);
-      const numPartida = rodadaExistente ? rodadaExistente.jogos.length + 1 : 1;
+    const jogoObjeto = {
+      id: idJogo,
+      dataRodada: dataFormatada,
+      partida: `PARTIDA ${String(numPartida).padStart(2, '0')}`,
+      timeA: `Time ${goleiroA}`,
+      timeB: `Time ${goleiroB}`,
+      golsA: Number(golsA),
+      golsB: Number(golsB),
+      goleiroA,
+      goleiroB,
+      jogadoresA,
+      jogadoresB,
+      substitutosA,
+      substitutosB,
+      golsMarcados: golsMarcadosArray
+    };
 
-      const novoJogo = {
-        id: `j_${Date.now()}`,
-        partida: `PARTIDA ${String(numPartida).padStart(2, '0')}`,
-        timeA: `Time ${goleiroA}`,
-        timeB: `Time ${goleiroB}`,
-        golsA: Number(golsA),
-        golsB: Number(golsB),
-        goleiroA,
-        goleiroB,
-        jogadoresA,
-        jogadoresB,
-        substitutosA,
-        substitutosB,
-        golsMarcados: golsMarcadosArray
-      };
-
-      if (rodadaExistente) {
-        rodadaExistente.jogos.push(novoJogo);
-      } else {
-        novoHistorico.unshift({
-          data: dataFormatada,
-          jogos: [novoJogo]
-        });
-      }
-      alert('Nova partida salva com sucesso!');
-    }
-
-    salvarHistoricoLocal(novoHistorico);
-    setDataSelecionada(dataFormatada);
-    resetForm();
-    setAba('jogos');
-  };
-
-  const handleZerarHistoricoLocal = () => {
-    if (window.confirm('Tem certeza que deseja zerar e apagar todas as rodadas cadastradas?')) {
-      salvarHistoricoLocal([]);
-      setDataSelecionada('');
+    try {
+      await setDoc(doc(db, "partidas", idJogo), jogoObjeto);
+      alert(jogoEditandoId ? 'Súmula atualizada no Cloud Firestore!' : 'Nova partida salva no Cloud Firestore!');
+      setDataSelecionada(dataFormatada);
       resetForm();
-      alert('Histórico de rodadas zerado com sucesso!');
+      setAba('jogos');
+    } catch (err) {
+      console.error(err);
+      alert('Erro ao salvar no Firestore!');
     }
   };
 
@@ -316,7 +301,7 @@ export default function App() {
         let golB = cesar.find(x => x.nome === j.goleiroB);
         if (golB) {
           golB.golsSofridos += j.golsA;
-          golB.pontos += ptsA;
+          golB.pontos += ptsB;
         }
       });
     });
@@ -330,47 +315,6 @@ export default function App() {
 
   const { mangabeira: rankingMangabeira, brocador: rankingBrocador, cesar: rankingCesar } = calcularRankings();
   const rodadaAtual = historico.find(r => r.data === dataSelecionada) || historico[0];
-
-  const getPodioBadgeG7 = (pos) => {
-    if (pos <= 7) {
-      return (
-        <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2.5 py-1 rounded-lg font-bold text-sm flex items-center gap-1 w-fit">
-          ⭐ #{pos} G7
-        </span>
-      );
-    }
-    return <span className="text-emerald-300/40 font-semibold px-2">#{pos}</span>;
-  };
-
-  const getPodioApenasPrimeiro = (pos, corBadge = 'emerald') => {
-    if (pos === 1) {
-      if (corBadge === 'red') {
-        return (
-          <span className="bg-red-500/20 text-red-300 border border-red-500/40 px-2.5 py-1 rounded-lg font-extrabold text-sm flex items-center gap-1 w-fit">
-            🏆 #1º Lugar
-          </span>
-        );
-      }
-      return (
-        <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2.5 py-1 rounded-lg font-extrabold text-sm flex items-center gap-1 w-fit">
-          🏆 #1º Lugar
-        </span>
-      );
-    }
-    return <span className="text-emerald-300/40 font-semibold px-2">#{pos}</span>;
-  };
-
-  const opcoesGolsTimeA = [
-    ...jogadoresA, 
-    ...(substitutosA || []), 
-    `⚠️ Gol Contra (Time ${goleiroA})`
-  ];
-
-  const opcoesGolsTimeB = [
-    ...jogadoresB, 
-    ...(substitutosB || []), 
-    `⚠️ Gol Contra (Time ${goleiroB})`
-  ];
 
   return (
     <div className="min-h-screen bg-emerald-950 text-emerald-50 p-4 md:p-8 font-sans flex flex-col justify-between">
@@ -516,7 +460,7 @@ export default function App() {
                 <h2 className="text-2xl font-bold text-teal-300 flex items-center gap-2">
                   ⚽ Súmula e Resultados das Partidas
                 </h2>
-                <p className="text-emerald-200/60 text-sm mt-1">Histórico completo de partidas</p>
+                <p className="text-emerald-200/60 text-sm mt-1">Histórico completo de partidas em tempo real</p>
               </div>
 
               {historico.length > 0 && (
@@ -545,8 +489,8 @@ export default function App() {
             ) : (
               <div className="space-y-6">
                 {rodadaAtual?.jogos.map((j) => {
-                  const golsTimeA = j.golsMarcados.filter(g => j.jogadoresA.includes(g.jogador) || (j.substitutosA && j.substitutosA.includes(g.jogador)) || g.jogador.includes(`Time ${j.goleiroA}`));
-                  const golsTimeB = j.golsMarcados.filter(g => j.jogadoresB.includes(g.jogador) || (j.substitutosB && j.substitutosB.includes(g.jogador)) || g.jogador.includes(`Time ${j.goleiroB}`));
+                  const golsTimeA = j.golsMarcados ? j.golsMarcados.filter(g => j.jogadoresA.includes(g.jogador) || (j.substitutosA && j.substitutosA.includes(g.jogador)) || g.jogador.includes(`Time ${j.goleiroA}`)) : [];
+                  const golsTimeB = j.golsMarcados ? j.golsMarcados.filter(g => j.jogadoresB.includes(g.jogador) || (j.substitutosB && j.substitutosB.includes(g.jogador)) || g.jogador.includes(`Time ${j.goleiroB}`)) : [];
 
                   return (
                     <div key={j.id} className="bg-emerald-950/90 p-5 rounded-2xl border border-emerald-800/80 shadow-lg">
@@ -584,11 +528,7 @@ export default function App() {
                         </div>
                       </div>
 
-                      {/* LAYOUT TÁTICO ESTILO CAMPO DE FUTEBOL */}
                       <div className="relative rounded-2xl p-4 my-6 border-2 border-emerald-700/80 bg-gradient-to-b from-emerald-900/90 via-emerald-800/80 to-emerald-900/90 shadow-2xl overflow-hidden">
-                        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 border-t-2 border-dashed border-emerald-500/30"></div>
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 border-2 border-emerald-500/30 rounded-full"></div>
-
                         <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-6">
                           {/* TIME A */}
                           <div className="bg-emerald-950/70 p-4 rounded-xl border border-emerald-700/60 backdrop-blur-sm">
@@ -687,329 +627,28 @@ export default function App() {
           </div>
         )}
 
-        {aba === 'cadastrar' && (
-          <div className="bg-emerald-900/40 p-6 rounded-2xl border border-emerald-800/80 max-w-3xl mx-auto">
-            {!autenticado ? (
-              <div className="bg-emerald-950 p-6 rounded-2xl border border-emerald-700 text-center">
-                <h2 className="text-xl font-bold text-amber-300 mb-2">🔒 ÁREA RESTRITA - ADMINISTRAÇÃO</h2>
-                <p className="text-xs text-emerald-200/70 mb-4">Insira a senha do administrador para lançar partidas diretamente pelo celular.</p>
-                
-                <form onSubmit={handleLogin} className="flex flex-col gap-3 max-w-xs mx-auto">
-                  <input 
-                    type="password" 
-                    placeholder="Digite a senha..."
-                    value={senhaInput}
-                    onChange={(e) => setSenhaInput(e.target.value)}
-                    className="px-4 py-2.5 rounded-xl bg-emerald-900 text-white font-bold border border-emerald-600 focus:outline-none text-center"
-                  />
-                  <button 
-                    type="submit"
-                    className="bg-amber-400 text-slate-950 font-black py-2.5 rounded-xl shadow-lg hover:bg-amber-300 transition-all"
-                  >
-                    Entrar no Painel
-                  </button>
-                </form>
-              </div>
-            ) : (
-              <div>
-                <div className="flex justify-between items-center mb-6 border-b border-emerald-800 pb-3 flex-wrap gap-2">
-                  <div>
-                    <h2 className="text-xl font-bold text-amber-300">
-                      {jogoEditandoId ? '✏️ Editar Súmula da Partida' : '📝 Cadastrar Partida'}
-                    </h2>
-                    <p className="text-xs text-emerald-200/60">
-                      {jogoEditandoId ? 'Altere os dados da súmula selecionada' : 'Adicione uma nova partida para a data informada'}
-                    </p>
-                  </div>
-                  
-                  <div className="flex gap-2">
-                    {jogoEditandoId && (
-                      <button 
-                        type="button"
-                        onClick={resetForm}
-                        className="text-xs bg-slate-700 text-white border border-slate-500 px-3 py-1.5 rounded-lg hover:bg-slate-600 transition-all font-bold"
-                      >
-                        ❌ Cancelar Edição
-                      </button>
-                    )}
-                    <button 
-                      onClick={handleZerarHistoricoLocal}
-                      className="text-xs bg-red-600/30 text-red-300 border border-red-500/40 px-3 py-1.5 rounded-lg hover:bg-red-600 hover:text-white transition-all font-bold"
-                    >
-                      🗑️ Zerar Histórico
-                    </button>
-                  </div>
-                </div>
-
-                <form onSubmit={handleSalvarJogo} className="space-y-6">
-                  <div>
-                    <label className="block text-xs font-bold text-emerald-300 mb-1 uppercase">📅 Data da Partida:</label>
-                    <input 
-                      type="date" 
-                      value={dataJogo}
-                      onChange={(e) => setDataJogo(e.target.value)}
-                      className="w-full bg-emerald-950 border border-emerald-700 rounded-xl px-4 py-2.5 text-white font-bold"
-                      required
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="bg-emerald-950/80 p-4 rounded-xl border border-emerald-800">
-                      <label className="block text-xs font-bold text-amber-300 mb-1 uppercase">Goleiro Time A:</label>
-                      <select 
-                        value={goleiroA}
-                        onChange={(e) => setGoleiroA(e.target.value)}
-                        className="w-full bg-emerald-900 border border-emerald-600 rounded-lg px-3 py-2 text-white font-bold"
-                      >
-                        {GOLEIROS_OPCOES.map(g => (
-                          <option key={g} value={g}>{g}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="bg-emerald-950/80 p-4 rounded-xl border border-emerald-800">
-                      <label className="block text-xs font-bold text-amber-300 mb-1 uppercase">Goleiro Time B:</label>
-                      <select 
-                        value={goleiroB}
-                        onChange={(e) => setGoleiroB(e.target.value)}
-                        className="w-full bg-emerald-900 border border-emerald-600 rounded-lg px-3 py-2 text-white font-bold"
-                      >
-                        {GOLEIROS_OPCOES.map(g => (
-                          <option key={g} value={g}>{g}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="bg-emerald-950 p-4 rounded-xl border border-emerald-800 flex justify-around items-center">
-                    <div className="text-center">
-                      <p className="text-xs font-bold text-emerald-300 uppercase mb-1">Gols Time A</p>
-                      <input 
-                        type="number" 
-                        min="0"
-                        value={golsA}
-                        onChange={(e) => setGolsA(Number(e.target.value))}
-                        className="w-20 bg-emerald-900 text-center font-black text-2xl text-amber-300 border border-emerald-600 rounded-xl py-2"
-                      />
-                    </div>
-                    <span className="text-2xl font-black text-emerald-500">X</span>
-                    <div className="text-center">
-                      <p className="text-xs font-bold text-emerald-300 uppercase mb-1">Gols Time B</p>
-                      <input 
-                        type="number" 
-                        min="0"
-                        value={golsB}
-                        onChange={(e) => setGolsB(Number(e.target.value))}
-                        className="w-20 bg-emerald-900 text-center font-black text-2xl text-amber-300 border border-emerald-600 rounded-xl py-2"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="bg-emerald-950/80 p-4 rounded-xl border border-emerald-800">
-                      <p className="text-xs font-bold text-emerald-300 mb-2 uppercase">⭐ Titulares (Ganha Pontos e Gols) - Time A:</p>
-                      <div className="max-h-40 overflow-y-auto space-y-1.5 pr-2">
-                        {ASSOCIADOS_OPCOES.map(nome => (
-                          <label key={nome} className="flex items-center gap-2 text-xs bg-emerald-900/50 p-1.5 rounded cursor-pointer hover:bg-emerald-900">
-                            <input 
-                              type="checkbox" 
-                              checked={jogadoresA.includes(nome)}
-                              onChange={() => toggleJogador('A', nome)}
-                              className="rounded text-emerald-500 focus:ring-0"
-                            />
-                            <span className={jogadoresA.includes(nome) ? 'font-bold text-emerald-200' : 'text-emerald-300/60'}>{nome}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="bg-emerald-950/80 p-4 rounded-xl border border-emerald-800">
-                      <p className="text-xs font-bold text-emerald-300 mb-2 uppercase">⭐ Titulares (Ganha Pontos e Gols) - Time B:</p>
-                      <div className="max-h-40 overflow-y-auto space-y-1.5 pr-2">
-                        {ASSOCIADOS_OPCOES.map(nome => (
-                          <label key={nome} className="flex items-center gap-2 text-xs bg-emerald-900/50 p-1.5 rounded cursor-pointer hover:bg-emerald-900">
-                            <input 
-                              type="checkbox" 
-                              checked={jogadoresB.includes(nome)}
-                              onChange={() => toggleJogador('B', nome)}
-                              className="rounded text-emerald-500 focus:ring-0"
-                            />
-                            <span className={jogadoresB.includes(nome) ? 'font-bold text-emerald-200' : 'text-emerald-300/60'}>{nome}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="bg-amber-950/40 p-4 rounded-xl border border-amber-800/60">
-                      <p className="text-xs font-bold text-amber-300 mb-2 uppercase">🔄 Substitutos (Apenas Gols / Sem Pontos) - Time A:</p>
-                      <div className="max-h-36 overflow-y-auto space-y-1.5 pr-2">
-                        {ASSOCIADOS_OPCOES.map(nome => (
-                          <label key={nome} className="flex items-center gap-2 text-xs bg-amber-900/30 p-1.5 rounded cursor-pointer hover:bg-amber-900/50">
-                            <input 
-                              type="checkbox" 
-                              checked={substitutosA.includes(nome)}
-                              onChange={() => toggleSubstituto('A', nome)}
-                              className="rounded text-amber-500 focus:ring-0"
-                            />
-                            <span className={substitutosA.includes(nome) ? 'font-bold text-amber-200' : 'text-emerald-300/60'}>{nome}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="bg-amber-950/40 p-4 rounded-xl border border-amber-800/60">
-                      <p className="text-xs font-bold text-amber-300 mb-2 uppercase">🔄 Substitutos (Apenas Gols / Sem Pontos) - Time B:</p>
-                      <div className="max-h-36 overflow-y-auto space-y-1.5 pr-2">
-                        {ASSOCIADOS_OPCOES.map(nome => (
-                          <label key={nome} className="flex items-center gap-2 text-xs bg-amber-900/30 p-1.5 rounded cursor-pointer hover:bg-amber-900/50">
-                            <input 
-                              type="checkbox" 
-                              checked={substitutosB.includes(nome)}
-                              onChange={() => toggleSubstituto('B', nome)}
-                              className="rounded text-amber-500 focus:ring-0"
-                            />
-                            <span className={substitutosB.includes(nome) ? 'font-bold text-amber-200' : 'text-emerald-300/60'}>{nome}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {(opcoesGolsTimeA.length > 1 || opcoesGolsTimeB.length > 1) && (
-                    <div className="bg-emerald-950/80 p-4 rounded-xl border border-emerald-800">
-                      <p className="text-xs font-bold text-amber-300 mb-3 uppercase">⚽ Atribuir Gols aos Autores (Atualiza Placar Automático):</p>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="bg-emerald-900/40 p-3 rounded-xl border border-emerald-800">
-                          <p className="text-xs font-bold text-emerald-300 mb-2 border-b border-emerald-800 pb-1">
-                            Gols do Time {goleiroA} (Time A):
-                          </p>
-                          <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
-                            {opcoesGolsTimeA.map(nome => {
-                              const isSub = substitutosA.includes(nome);
-                              const isGolContra = nome.includes("Gol Contra");
-                              return (
-                                <div key={nome} className={`flex justify-between items-center p-2 rounded-lg border text-xs ${isGolContra ? 'bg-red-950/60 border-red-800' : 'bg-emerald-950/80 border-emerald-800'}`}>
-                                  <span className="font-semibold text-emerald-100 flex items-center gap-1">
-                                    {nome} {isSub && <span className="text-[10px] text-amber-400 font-normal">(Sub)</span>}
-                                  </span>
-                                  <div className="flex items-center gap-2">
-                                    <button 
-                                      type="button" 
-                                      onClick={() => handleGolsJogador(nome, -1)}
-                                      className="w-6 h-6 bg-emerald-900 text-emerald-300 font-bold rounded flex items-center justify-center border border-emerald-700"
-                                    >
-                                      -
-                                    </button>
-                                    <span className="font-bold text-amber-300 min-w-[12px] text-center">{golsDetalhados[nome] || 0}</span>
-                                    <button 
-                                      type="button" 
-                                      onClick={() => handleGolsJogador(nome, 1)}
-                                      className="w-6 h-6 bg-emerald-700 text-white font-bold rounded flex items-center justify-center border border-emerald-600"
-                                    >
-                                      +
-                                    </button>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-
-                        <div className="bg-emerald-900/40 p-3 rounded-xl border border-emerald-800">
-                          <p className="text-xs font-bold text-emerald-300 mb-2 border-b border-emerald-800 pb-1">
-                            Gols do Time {goleiroB} (Time B):
-                          </p>
-                          <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
-                            {opcoesGolsTimeB.map(nome => {
-                              const isSub = substitutosB.includes(nome);
-                              const isGolContra = nome.includes("Gol Contra");
-                              return (
-                                <div key={nome} className={`flex justify-between items-center p-2 rounded-lg border text-xs ${isGolContra ? 'bg-red-950/60 border-red-800' : 'bg-emerald-950/80 border-emerald-800'}`}>
-                                  <span className="font-semibold text-emerald-100 flex items-center gap-1">
-                                    {nome} {isSub && <span className="text-[10px] text-amber-400 font-normal">(Sub)</span>}
-                                  </span>
-                                  <div className="flex items-center gap-2">
-                                    <button 
-                                      type="button" 
-                                      onClick={() => handleGolsJogador(nome, -1)}
-                                      className="w-6 h-6 bg-emerald-900 text-emerald-300 font-bold rounded flex items-center justify-center border border-emerald-700"
-                                    >
-                                      -
-                                    </button>
-                                    <span className="font-bold text-amber-300 min-w-[12px] text-center">{golsDetalhados[nome] || 0}</span>
-                                    <button 
-                                      type="button" 
-                                      onClick={() => handleGolsJogador(nome, 1)}
-                                      className="w-6 h-6 bg-emerald-700 text-white font-bold rounded flex items-center justify-center border border-emerald-600"
-                                    >
-                                      +
-                                    </button>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  <button 
-                    type="submit"
-                    className="w-full bg-emerald-500 text-slate-950 font-black py-3.5 rounded-xl text-base shadow-xl hover:bg-emerald-400 transition-all border border-emerald-400"
-                  >
-                    {jogoEditandoId ? '💾 Atualizar Súmula da Partida' : '💾 Salvar Súmula da Partida'}
-                  </button>
-                </form>
-              </div>
-            )}
-          </div>
-        )}
-
         {aba === 'mangabeira' && (
           <div className="bg-emerald-900/40 p-6 rounded-2xl border border-emerald-800/80">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6">
-              <div>
-                <h2 className="text-2xl font-bold text-emerald-300">Classificação Geral - Prêmio Mangabeira</h2>
-                <p className="text-emerald-200/60 text-sm mt-1">Destaque especial para a zona de elite (Top 7 G7)</p>
-              </div>
-              <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3 py-1 rounded-full text-xs font-semibold">G7 Destacado</span>
-            </div>
+            <h2 className="text-2xl font-bold text-emerald-300 mb-1">Prêmio Mangabeira - Craque do Campeonato</h2>
+            <p className="text-emerald-200/60 text-sm mb-6">Classificação geral baseada nos pontos conquistados por partida</p>
             
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-emerald-800 text-emerald-300/70 text-xs font-bold uppercase tracking-wider">
-                    <th className="py-3.5 px-4">Classificação</th>
-                    <th className="py-3.5 px-4">Jogador</th>
-                    <th className="py-3.5 px-4 text-right">Pontuação Geral</th>
+                  <tr className="border-b border-emerald-800 text-xs font-black uppercase text-emerald-400 bg-emerald-950/80">
+                    <th className="p-3">Posição</th>
+                    <th className="p-3">Atleta</th>
+                    <th className="p-3 text-right">Pontos Totais</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {rankingMangabeira.map((item) => {
-                    const isTop7 = item.pos <= 7;
-                    return (
-                      <tr 
-                        key={item.nome} 
-                        className={`border-b transition-all ${
-                          isTop7 
-                            ? 'bg-gradient-to-r from-emerald-800/60 via-emerald-900/40 to-emerald-950 border-emerald-500/30 font-semibold' 
-                            : 'border-emerald-800/40 hover:bg-emerald-900/30 text-emerald-100'
-                        }`}
-                      >
-                        <td className="py-3.5 px-4">{getPodioBadgeG7(item.pos)}</td>
-                        <td className={`py-3.5 px-4 ${isTop7 ? 'text-white font-bold text-base' : 'font-medium'}`}>
-                          {item.nome}
-                        </td>
-                        <td className="py-3.5 px-4 text-right font-black text-amber-300 text-base">
-                          {item.pontos} <span className="text-xs text-emerald-200/60 font-normal">pts</span>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                <tbody className="divide-y divide-emerald-800/40 text-sm">
+                  {rankingMangabeira.map(item => (
+                    <tr key={item.nome} className="hover:bg-emerald-900/30 transition-colors">
+                      <td className="p-3 font-bold">{item.pos <= 7 ? `⭐ #${item.pos} G7` : `#${item.pos}`}</td>
+                      <td className="p-3 font-extrabold text-white">{item.nome}</td>
+                      <td className="p-3 text-right font-black text-emerald-400">{item.pontos} pts</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -1018,44 +657,26 @@ export default function App() {
 
         {aba === 'brocador' && (
           <div className="bg-emerald-900/40 p-6 rounded-2xl border border-emerald-800/80">
-            <div className="flex justify-between items-center mb-6">
-              <div>
-                <h2 className="text-2xl font-bold text-red-400">Classificação Geral - Prêmio Brocador</h2>
-                <p className="text-emerald-200/60 text-sm mt-1">Ranking de artilharia completo</p>
-              </div>
-            </div>
-            
+            <h2 className="text-2xl font-bold text-red-400 mb-1">Prêmio Brocador - Artilharia</h2>
+            <p className="text-emerald-200/60 text-sm mb-6">Classificação geral de marcadores de gol</p>
+
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-emerald-800 text-emerald-300/70 text-sm">
-                    <th className="py-3 px-4">Posição</th>
-                    <th className="py-3 px-4">Jogador</th>
-                    <th className="py-3 px-4 text-right">Total de Gols</th>
+                  <tr className="border-b border-emerald-800 text-xs font-black uppercase text-red-400 bg-emerald-950/80">
+                    <th className="p-3">Posição</th>
+                    <th className="p-3">Atleta</th>
+                    <th className="p-3 text-right">Gols Marcados</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {rankingBrocador.map((item) => {
-                    const isLider = item.pos === 1;
-                    return (
-                      <tr 
-                        key={item.nome} 
-                        className={`border-b transition-all ${
-                          isLider 
-                            ? 'bg-red-950/40 border-red-500/30 font-semibold' 
-                            : 'border-emerald-800/40 hover:bg-emerald-900/30'
-                        }`}
-                      >
-                        <td className="py-3 px-4">{getPodioApenasPrimeiro(item.pos, 'red')}</td>
-                        <td className={`py-3 px-4 ${isLider ? 'text-white font-bold text-base' : 'font-medium'}`}>
-                          {item.nome}
-                        </td>
-                        <td className="py-3 px-4 text-right font-bold text-red-400 text-base">
-                          {item.gols} gols
-                        </td>
-                      </tr>
-                    );
-                  })}
+                <tbody className="divide-y divide-emerald-800/40 text-sm">
+                  {rankingBrocador.map(item => (
+                    <tr key={item.nome} className="hover:bg-emerald-900/30 transition-colors">
+                      <td className="p-3 font-bold">{item.pos === 1 ? '🏆 #1º Lugar' : `#${item.pos}`}</td>
+                      <td className="p-3 font-extrabold text-white">{item.nome}</td>
+                      <td className="p-3 text-right font-black text-red-400">{item.gols} gols</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -1063,54 +684,220 @@ export default function App() {
         )}
 
         {aba === 'cesar' && (
-          <div className="space-y-8">
-            <div className="bg-emerald-900/40 p-6 rounded-2xl border border-emerald-800/80">
-              <h2 className="text-xl font-bold text-white mb-4">Tabela de Classificação dos Goleiros</h2>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="border-b border-emerald-800 text-emerald-300/70 text-sm">
-                      <th className="py-3 px-4">Posição</th>
-                      <th className="py-3 px-4">Goleiro</th>
-                      <th className="py-3 px-4 text-center">Pontos</th>
-                      <th className="py-3 px-4 text-right">Gols Sofridos</th>
+          <div className="bg-emerald-900/40 p-6 rounded-2xl border border-emerald-800/80">
+            <h2 className="text-2xl font-bold text-amber-400 mb-1">Prêmio César - Desempenho de Goleiros</h2>
+            <p className="text-emerald-200/60 text-sm mb-6">Pontuação geral e total de gols sofridos</p>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-emerald-800 text-xs font-black uppercase text-amber-400 bg-emerald-950/80">
+                    <th className="p-3">Posição</th>
+                    <th className="p-3">Goleiro</th>
+                    <th className="p-3 text-center">Gols Sofridos</th>
+                    <th className="p-3 text-right">Pontos</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-emerald-800/40 text-sm">
+                  {rankingCesar.map(item => (
+                    <tr key={item.nome} className="hover:bg-emerald-900/30 transition-colors">
+                      <td className="p-3 font-bold">{item.pos === 1 ? '🏆 #1º Lugar' : `#${item.pos}`}</td>
+                      <td className="p-3 font-extrabold text-white">{item.nome}</td>
+                      <td className="p-3 text-center text-red-300 font-bold">{item.golsSofridos}</td>
+                      <td className="p-3 text-right font-black text-amber-400">{item.pontos} pts</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {rankingCesar.map((item) => {
-                      const isLider = item.pos === 1;
-                      return (
-                        <tr 
-                          key={item.nome} 
-                          className={`border-b transition-all ${
-                            isLider 
-                              ? 'bg-amber-950/40 border-amber-500/30 font-semibold' 
-                              : 'border-emerald-800/40 hover:bg-emerald-900/30'
-                          }`}
-                        >
-                          <td className="py-3 px-4">{getPodioApenasPrimeiro(item.pos, 'amber')}</td>
-                          <td className={`py-3 px-4 ${isLider ? 'text-white font-bold text-base' : 'font-medium'}`}>
-                            {item.nome}
-                          </td>
-                          <td className="py-3 px-4 text-center font-bold text-amber-300">{item.pontos} pts</td>
-                          <td className="py-3 px-4 text-right font-bold text-red-400">{item.golsSofridos} GS</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                  ))}
+                </tbody>
+              </table>
             </div>
+          </div>
+        )}
+
+        {aba === 'cadastrar' && (
+          <div className="bg-emerald-900/40 p-6 rounded-2xl border border-emerald-800/80 max-w-4xl mx-auto">
+            {!autenticado ? (
+              <form onSubmit={handleLogin} className="bg-emerald-950/80 p-6 rounded-2xl border border-amber-500/30 text-center space-y-4">
+                <h3 className="text-xl font-black text-amber-300">🔐 Área Restrita do Administrador</h3>
+                <p className="text-emerald-200/70 text-sm">Digite a senha para cadastrar ou editar partidas da liga.</p>
+                <input 
+                  type="password" 
+                  value={senhaInput} 
+                  onChange={(e) => setSenhaInput(e.target.value)} 
+                  placeholder="Senha de acesso..." 
+                  className="bg-emerald-900 border border-emerald-700 text-white p-2.5 rounded-lg text-center w-full max-w-xs block mx-auto focus:outline-none"
+                />
+                <button type="submit" className="bg-amber-400 text-slate-950 font-black px-6 py-2.5 rounded-lg shadow-lg hover:bg-amber-300 transition-all">
+                  Entrar no Painel
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={handleSalvarJogo} className="space-y-6">
+                <div className="flex justify-between items-center border-b border-emerald-800 pb-4">
+                  <h3 className="text-xl font-black text-amber-300">
+                    {jogoEditandoId ? '✏️ Editar Partida Existente' : '➕ Cadastrar Nova Partida'}
+                  </h3>
+                  {jogoEditandoId && (
+                    <button type="button" onClick={resetForm} className="text-xs bg-red-500/20 text-red-300 border border-red-500/40 px-3 py-1 rounded-lg">
+                      Cancelar Edição
+                    </button>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase text-emerald-400 mb-1">📅 Data do Jogo:</label>
+                  <input 
+                    type="date" 
+                    value={dataJogo} 
+                    onChange={(e) => setDataJogo(e.target.value)} 
+                    className="bg-emerald-950 border border-emerald-700 text-white p-2.5 rounded-lg font-bold" 
+                    required 
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* CONFIGURAÇÃO TIME A */}
+                  <div className="bg-emerald-950/60 p-4 rounded-xl border border-emerald-800 space-y-4">
+                    <p className="font-extrabold text-amber-300 text-center uppercase tracking-wide">Escarpa Time A</p>
+                    <div>
+                      <label className="block text-xs font-bold text-emerald-400 mb-1">🧤 Goleiro Time A:</label>
+                      <select 
+                        value={goleiroA} 
+                        onChange={(e) => setGoleiroA(e.target.value)} 
+                        className="bg-emerald-900 text-white font-bold text-sm p-2 rounded-lg border border-emerald-700 w-full"
+                      >
+                        {GOLEIROS_OPCOES.map(g => <option key={g} value={g}>{g}</option>)}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-emerald-400 mb-2">⭐ Jogadores Titulares:</label>
+                      <div className="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto p-2 bg-emerald-900/40 rounded-lg border border-emerald-800">
+                        {ASSOCIADOS_OPCOES.map(nome => (
+                          <button 
+                            type="button" 
+                            key={nome} 
+                            onClick={() => toggleJogador('A', nome)} 
+                            className={`text-xs px-2.5 py-1 rounded-full border transition-all ${jogadoresA.includes(nome) ? 'bg-emerald-500 text-slate-950 font-bold border-emerald-400' : 'bg-emerald-950/60 text-emerald-200 border-emerald-800'}`}
+                          >
+                            {nome}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-amber-400 mb-2">🔄 Substitutos:</label>
+                      <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-2 bg-emerald-900/40 rounded-lg border border-emerald-800">
+                        {ASSOCIADOS_OPCOES.map(nome => (
+                          <button 
+                            type="button" 
+                            key={nome} 
+                            onClick={() => toggleSubstituto('A', nome)} 
+                            className={`text-xs px-2 py-0.5 rounded-full border transition-all ${substitutosA.includes(nome) ? 'bg-amber-400 text-slate-950 font-bold border-amber-300' : 'bg-emerald-950/60 text-emerald-200/60 border-emerald-800'}`}
+                          >
+                            {nome}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* CONFIGURAÇÃO TIME B */}
+                  <div className="bg-emerald-950/60 p-4 rounded-xl border border-emerald-800 space-y-4">
+                    <p className="font-extrabold text-amber-300 text-center uppercase tracking-wide">Escarpa Time B</p>
+                    <div>
+                      <label className="block text-xs font-bold text-emerald-400 mb-1">🧤 Goleiro Time B:</label>
+                      <select 
+                        value={goleiroB} 
+                        onChange={(e) => setGoleiroB(e.target.value)} 
+                        className="bg-emerald-900 text-white font-bold text-sm p-2 rounded-lg border border-emerald-700 w-full"
+                      >
+                        {GOLEIROS_OPCOES.map(g => <option key={g} value={g}>{g}</option>)}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-emerald-400 mb-2">⭐ Jogadores Titulares:</label>
+                      <div className="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto p-2 bg-emerald-900/40 rounded-lg border border-emerald-800">
+                        {ASSOCIADOS_OPCOES.map(nome => (
+                          <button 
+                            type="button" 
+                            key={nome} 
+                            onClick={() => toggleJogador('B', nome)} 
+                            className={`text-xs px-2.5 py-1 rounded-full border transition-all ${jogadoresB.includes(nome) ? 'bg-emerald-500 text-slate-950 font-bold border-emerald-400' : 'bg-emerald-950/60 text-emerald-200 border-emerald-800'}`}
+                          >
+                            {nome}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-amber-400 mb-2">🔄 Substitutos:</label>
+                      <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-2 bg-emerald-900/40 rounded-lg border border-emerald-800">
+                        {ASSOCIADOS_OPCOES.map(nome => (
+                          <button 
+                            type="button" 
+                            key={nome} 
+                            onClick={() => toggleSubstituto('B', nome)} 
+                            className={`text-xs px-2 py-0.5 rounded-full border transition-all ${substitutosB.includes(nome) ? 'bg-amber-400 text-slate-950 font-bold border-amber-300' : 'bg-emerald-950/60 text-emerald-200/60 border-emerald-800'}`}
+                          >
+                            {nome}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* MARCAÇÃO DE GOLS */}
+                <div className="bg-emerald-950/80 p-4 rounded-xl border border-emerald-700 space-y-3">
+                  <p className="font-extrabold text-amber-300 text-center uppercase tracking-wide text-sm">⚽ Lançamento de Gols Marcados</p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-xs font-bold text-emerald-400 mb-2">Atletas do Time {goleiroA}:</p>
+                      <div className="space-y-1.5 max-h-40 overflow-y-auto">
+                        {[...jogadoresA, ...(substitutosA || []), `⚠️ Gol Contra (Time ${goleiroA})`].map(nome => (
+                          <div key={nome} className="flex justify-between items-center bg-emerald-900/60 p-2 rounded-lg text-xs">
+                            <span className="font-bold text-white">{nome}</span>
+                            <div className="flex items-center gap-2">
+                              <button type="button" onClick={() => handleGolsJogador(nome, -1)} className="bg-emerald-950 text-white font-black w-6 h-6 rounded flex items-center justify-center">-</button>
+                              <span className="font-black text-amber-300 w-4 text-center">{golsDetalhados[nome] || 0}</span>
+                              <button type="button" onClick={() => handleGolsJogador(nome, 1)} className="bg-emerald-500 text-slate-950 font-black w-6 h-6 rounded flex items-center justify-center">+</button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="text-xs font-bold text-emerald-400 mb-2">Atletas do Time {goleiroB}:</p>
+                      <div className="space-y-1.5 max-h-40 overflow-y-auto">
+                        {[...jogadoresB, ...(substitutosB || []), `⚠️ Gol Contra (Time ${goleiroB})`].map(nome => (
+                          <div key={nome} className="flex justify-between items-center bg-emerald-900/60 p-2 rounded-lg text-xs">
+                            <span className="font-bold text-white">{nome}</span>
+                            <div className="flex items-center gap-2">
+                              <button type="button" onClick={() => handleGolsJogador(nome, -1)} className="bg-emerald-950 text-white font-black w-6 h-6 rounded flex items-center justify-center">-</button>
+                              <span className="font-black text-amber-300 w-4 text-center">{golsDetalhados[nome] || 0}</span>
+                              <button type="button" onClick={() => handleGolsJogador(nome, 1)} className="bg-emerald-500 text-slate-950 font-black w-6 h-6 rounded flex items-center justify-center">+</button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-3 pt-4 border-t border-emerald-800">
+                  <button type="submit" className="bg-emerald-500 text-slate-950 font-black px-6 py-3 rounded-xl shadow-lg hover:bg-emerald-400 transition-all text-sm">
+                    💾 Salvar Súmula em Tempo Real
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         )}
       </div>
 
-      <footer className="mt-12 pt-6 border-t border-emerald-800/60 text-center text-xs text-emerald-300/60">
-        <p>© Olho no Lance • Todos os direitos reservados</p>
-        <p className="mt-1 font-medium text-emerald-400">
-          Desenvolvido com ⚽ por <span className="text-white font-bold">{NOME_DESENVOLVEDOR}</span>
-        </p>
-      </footer>
-    </div>
-  );
-}
+      <footer className="mt-12 text-center text-xs text-emerald-400/60 border-t border-emerald-800/40 pt-4">
