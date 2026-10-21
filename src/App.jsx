@@ -70,8 +70,10 @@ const dadosCesarBase = [
 
 export default function App() {
   const [aba, setAba] = useState('geral');
+  
+  // Utilizando versão v3 para forçar atualização do cache local
   const [historico, setHistorico] = useState(() => {
-    const salvos = localStorage.getItem('arena_historico_jogos');
+    const salvos = localStorage.getItem('arena_historico_jogos_v3');
     return salvos ? JSON.parse(salvos) : historicoRodadasInicial;
   });
 
@@ -83,26 +85,34 @@ export default function App() {
     }
   }, [historico, dataSelecionada]);
 
+  // Autenticação Admin
   const [senhaInput, setSenhaInput] = useState('');
   const [autenticado, setAutenticado] = useState(false);
 
+  // Estados do Formulário de Cadastro/Edição
+  const [jogoEditandoId, setJogoEditandoId] = useState(null);
   const [dataJogo, setDataJogo] = useState('2026-10-25');
   const [goleiroA, setGoleiroA] = useState(GOLEIROS_OPCOES[0]);
   const [goleiroB, setGoleiroB] = useState(GOLEIROS_OPCOES[1]);
   const [jogadoresA, setJogadoresA] = useState([]);
   const [jogadoresB, setJogadoresB] = useState([]);
+  const [substitutosA, setSubstitutosA] = useState([]);
+  const [substitutosB, setSubstitutosB] = useState([]);
   const [golsA, setGolsA] = useState(0);
   const [golsB, setGolsB] = useState(0);
   const [golsDetalhados, setGolsDetalhados] = useState({});
 
   const salvarHistoricoLocal = (novoHistorico) => {
     setHistorico(novoHistorico);
-    localStorage.setItem('arena_historico_jogos', JSON.stringify(novoHistorico));
+    localStorage.setItem('arena_historico_jogos_v3', JSON.stringify(novoHistorico));
   };
 
   const resetForm = () => {
+    setJogoEditandoId(null);
     setJogadoresA([]);
     setJogadoresB([]);
+    setSubstitutosA([]);
+    setSubstitutosB([]);
     setGolsA(0);
     setGolsB(0);
     setGolsDetalhados({});
@@ -117,11 +127,26 @@ export default function App() {
     }
   };
 
+  // Toggle Titulares
   const toggleJogador = (time, nome) => {
     if (time === 'A') {
       setJogadoresA(prev => prev.includes(nome) ? prev.filter(x => x !== nome) : [...prev, nome]);
+      // Remove do substituto caso seja colocado nos titulares
+      setSubstitutosA(prev => prev.filter(x => x !== nome));
     } else {
       setJogadoresB(prev => prev.includes(nome) ? prev.filter(x => x !== nome) : [...prev, nome]);
+      setSubstitutosB(prev => prev.filter(x => x !== nome));
+    }
+  };
+
+  // Toggle Substitutos
+  const toggleSubstituto = (time, nome) => {
+    if (time === 'A') {
+      setSubstitutosA(prev => prev.includes(nome) ? prev.filter(x => x !== nome) : [...prev, nome]);
+      setJogadoresA(prev => prev.filter(x => x !== nome));
+    } else {
+      setSubstitutosB(prev => prev.includes(nome) ? prev.filter(x => x !== nome) : [...prev, nome]);
+      setJogadoresB(prev => prev.filter(x => x !== nome));
     }
   };
 
@@ -133,6 +158,41 @@ export default function App() {
     });
   };
 
+  // Carregar Jogo para Edição
+  const handleEditarJogo = (dataRodada, jogo) => {
+    if (!autenticado) {
+      setAba('cadastrar');
+      alert('Por favor, faça login como administrador na aba Cadastrar para editar partidas.');
+      return;
+    }
+
+    const partes = dataRodada.split('/');
+    if (partes.length === 3) {
+      setDataJogo(`${partes[2]}-${partes[1]}-${partes[0]}`);
+    }
+
+    setJogoEditandoId(jogo.id);
+    setGoleiroA(jogo.goleiroA);
+    setGoleiroB(jogo.goleiroB);
+    setJogadoresA(jogo.jogadoresA || []);
+    setJogadoresB(jogo.jogadoresB || []);
+    setSubstitutosA(jogo.substitutosA || []);
+    setSubstitutosB(jogo.substitutosB || []);
+    setGolsA(jogo.golsA);
+    setGolsB(jogo.golsB);
+
+    const mapGols = {};
+    if (jogo.golsMarcados) {
+      jogo.golsMarcados.forEach(g => {
+        mapGols[g.jogador] = g.quantidade;
+      });
+    }
+    setGolsDetalhados(mapGols);
+
+    setAba('cadastrar');
+  };
+
+  // Salvar / Atualizar Jogo
   const handleSalvarJogo = (e) => {
     e.preventDefault();
     const dataFormatada = dataJogo.split('-').reverse().join('/');
@@ -141,36 +201,64 @@ export default function App() {
       .filter(([_, q]) => q > 0)
       .map(([jogador, quantidade]) => ({ jogador, quantidade }));
 
-    const novoJogo = {
-      id: `j_${Date.now()}`,
-      partida: `PARTIDA DE ${dataFormatada}`,
-      timeA: `Time ${goleiroA}`,
-      timeB: `Time ${goleiroB}`,
-      golsA: Number(golsA),
-      golsB: Number(golsB),
-      goleiroA,
-      goleiroB,
-      jogadoresA,
-      jogadoresB,
-      golsMarcados: golsMarcadosArray
-    };
+    let novoHistorico = JSON.parse(JSON.stringify(historico));
 
-    let novoHistorico = [...historico];
-    let rodadaExistente = novoHistorico.find(r => r.data === dataFormatada);
-
-    if (rodadaExistente) {
-      rodadaExistente.jogos.push(novoJogo);
-    } else {
-      novoHistorico.unshift({
-        data: dataFormatada,
-        rodada: `Rodada ${dataFormatada}`,
-        jogos: [novoJogo]
+    if (jogoEditandoId) {
+      // MODO EDIÇÃO
+      novoHistorico.forEach(r => {
+        const idx = r.jogos.findIndex(j => j.id === jogoEditandoId);
+        if (idx !== -1) {
+          r.jogos[idx] = {
+            ...r.jogos[idx],
+            timeA: `Time ${goleiroA}`,
+            timeB: `Time ${goleiroB}`,
+            golsA: Number(golsA),
+            golsB: Number(golsB),
+            goleiroA,
+            goleiroB,
+            jogadoresA,
+            jogadoresB,
+            substitutosA,
+            substitutosB,
+            golsMarcados: golsMarcadosArray
+          };
+        }
       });
+      alert('Súmula da partida atualizada com sucesso!');
+    } else {
+      // MODO NOVO CADASTRO
+      let rodadaExistente = novoHistorico.find(r => r.data === dataFormatada);
+      const numPartida = rodadaExistente ? rodadaExistente.jogos.length + 1 : 1;
+
+      const novoJogo = {
+        id: `j_${Date.now()}`,
+        partida: `PARTIDA ${String(numPartida).padStart(2, '0')}`,
+        timeA: `Time ${goleiroA}`,
+        timeB: `Time ${goleiroB}`,
+        golsA: Number(golsA),
+        golsB: Number(golsB),
+        goleiroA,
+        goleiroB,
+        jogadoresA,
+        jogadoresB,
+        substitutosA,
+        substitutosB,
+        golsMarcados: golsMarcadosArray
+      };
+
+      if (rodadaExistente) {
+        rodadaExistente.jogos.push(novoJogo);
+      } else {
+        novoHistorico.unshift({
+          data: dataFormatada,
+          jogos: [novoJogo]
+        });
+      }
+      alert('Nova partida salva com sucesso!');
     }
 
     salvarHistoricoLocal(novoHistorico);
     setDataSelecionada(dataFormatada);
-    alert('Súmula da partida salva com sucesso!');
     resetForm();
     setAba('jogos');
   };
@@ -179,6 +267,7 @@ export default function App() {
     if (window.confirm('Tem certeza que deseja zerar e apagar todas as rodadas cadastradas?')) {
       salvarHistoricoLocal([]);
       setDataSelecionada('');
+      resetForm();
       alert('Histórico de rodadas zerado com sucesso!');
     }
   };
@@ -193,6 +282,7 @@ export default function App() {
         const ptsA = j.golsA > j.golsB ? 3 : (j.golsA === j.golsB ? 1 : 0);
         const ptsB = j.golsB > j.golsA ? 3 : (j.golsA === j.golsB ? 1 : 0);
 
+        // SOMENTE TITULARES GANHAM PONTOS NO MANGABEIRA
         j.jogadoresA.forEach(nome => {
           let p = mangabeira.find(x => x.nome === nome);
           if (p) p.pontos += ptsA;
@@ -203,6 +293,7 @@ export default function App() {
           if (p) p.pontos += ptsB;
         });
 
+        // TODOS OS AUTORES DE GOLS (TITULARES OU SUBSTITUTOS) SOMAM NO BROCADOR
         j.golsMarcados.forEach(g => {
           let p = brocador.find(x => x.nome === g.jogador);
           if (p) p.gols += g.quantidade;
@@ -261,6 +352,14 @@ export default function App() {
     return <span className="text-emerald-300/40 font-semibold px-2">#{pos}</span>;
   };
 
+  // Lista unificada para registrar gols
+  const todosEscaladosEsubstitutos = [
+    ...jogadoresA, 
+    ...jogadoresB, 
+    ...(substitutosA || []), 
+    ...(substitutosB || [])
+  ];
+
   return (
     <div className="min-h-screen bg-emerald-950 text-emerald-50 p-4 md:p-8 font-sans flex flex-col justify-between">
       <div>
@@ -313,7 +412,7 @@ export default function App() {
               Goleiros (César)
             </button>
             <button 
-              onClick={() => setAba('cadastrar')}
+              onClick={() => { resetForm(); setAba('cadastrar'); }}
               className={`px-4 py-2 rounded-lg text-sm transition-all ${aba === 'cadastrar' ? 'bg-amber-400 text-slate-950 shadow-md font-black' : 'bg-emerald-800/80 text-amber-300 hover:text-white border border-amber-500/40'}`}
             >
               ➕ Cadastrar
@@ -422,7 +521,7 @@ export default function App() {
                   >
                     {historico.map(r => (
                       <option key={r.data} value={r.data}>
-                        {r.data} ({r.rodada})
+                        {r.data} ({r.jogos.length} {r.jogos.length > 1 ? 'partidas' : 'partida'})
                       </option>
                     ))}
                   </select>
@@ -439,11 +538,22 @@ export default function App() {
               <div className="space-y-6">
                 {rodadaAtual?.jogos.map((j) => (
                   <div key={j.id} className="bg-emerald-950/90 p-5 rounded-2xl border border-emerald-800/80 shadow-lg">
-                    <div className="flex justify-between items-center mb-4 border-b border-emerald-800/60 pb-2">
-                      <span className="text-xs font-black uppercase text-emerald-400 tracking-wider">{j.partida}</span>
-                      <span className="text-xs bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full font-bold border border-emerald-500/30">
-                        Súmula Finalizada
+                    <div className="flex justify-between items-center mb-4 border-b border-emerald-800/60 pb-2 flex-wrap gap-2">
+                      <span className="text-xs font-black uppercase text-emerald-400 tracking-wider">
+                        {j.partida} • {rodadaAtual.data}
                       </span>
+                      
+                      <div className="flex items-center gap-2">
+                        <button 
+                          onClick={() => handleEditarJogo(rodadaAtual.data, j)}
+                          className="bg-amber-500/20 text-amber-300 border border-amber-500/40 px-3 py-1 rounded-full text-xs font-bold hover:bg-amber-500 hover:text-slate-950 transition-all"
+                        >
+                          ✏️ Editar Súmula
+                        </button>
+                        <span className="text-xs bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full font-bold border border-emerald-500/30">
+                          Súmula Finalizada
+                        </span>
+                      </div>
                     </div>
 
                     <div className="flex justify-between items-center my-4">
@@ -462,27 +572,52 @@ export default function App() {
                       </div>
                     </div>
 
+                    {/* ESCALAÇÕES E SUBSTITUTOS */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 pt-4 border-t border-emerald-900">
                       <div className="bg-emerald-900/30 p-3 rounded-xl border border-emerald-800/40">
-                        <p className="text-xs font-bold text-emerald-300 mb-2 uppercase">Escalação {j.timeA}:</p>
-                        <div className="flex flex-wrap gap-1.5">
+                        <p className="text-xs font-bold text-emerald-300 mb-2 uppercase">Escalação Titular {j.timeA}:</p>
+                        <div className="flex flex-wrap gap-1.5 mb-3">
                           {j.jogadoresA.map(nome => (
                             <span key={nome} className="bg-emerald-950 text-emerald-200 text-xs px-2 py-1 rounded-md border border-emerald-800">
                               {nome}
                             </span>
                           ))}
                         </div>
+                        {j.substitutosA && j.substitutosA.length > 0 && (
+                          <>
+                            <p className="text-[11px] font-bold text-amber-400/80 mb-1 uppercase">🔄 Substitutos (Apenas Gols):</p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {j.substitutosA.map(nome => (
+                                <span key={nome} className="bg-amber-950/40 text-amber-300 text-xs px-2 py-0.5 rounded-md border border-amber-800/50">
+                                  {nome}
+                                </span>
+                              ))}
+                            </div>
+                          </>
+                        )}
                       </div>
 
                       <div className="bg-emerald-900/30 p-3 rounded-xl border border-emerald-800/40">
-                        <p className="text-xs font-bold text-emerald-300 mb-2 uppercase">Escalação {j.timeB}:</p>
-                        <div className="flex flex-wrap gap-1.5">
+                        <p className="text-xs font-bold text-emerald-300 mb-2 uppercase">Escalação Titular {j.timeB}:</p>
+                        <div className="flex flex-wrap gap-1.5 mb-3">
                           {j.jogadoresB.map(nome => (
                             <span key={nome} className="bg-emerald-950 text-emerald-200 text-xs px-2 py-1 rounded-md border border-emerald-800">
                               {nome}
                             </span>
                           ))}
                         </div>
+                        {j.substitutosB && j.substitutosB.length > 0 && (
+                          <>
+                            <p className="text-[11px] font-bold text-amber-400/80 mb-1 uppercase">🔄 Substitutos (Apenas Gols):</p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {j.substitutosB.map(nome => (
+                                <span key={nome} className="bg-amber-950/40 text-amber-300 text-xs px-2 py-0.5 rounded-md border border-amber-800/50">
+                                  {nome}
+                                </span>
+                              ))}
+                            </div>
+                          </>
+                        )}
                       </div>
                     </div>
 
@@ -531,20 +666,37 @@ export default function App() {
               </div>
             ) : (
               <div>
-                <div className="flex justify-between items-center mb-6 border-b border-emerald-800 pb-3">
+                <div className="flex justify-between items-center mb-6 border-b border-emerald-800 pb-3 flex-wrap gap-2">
                   <div>
-                    <h2 className="text-xl font-bold text-amber-300">📝 Cadastrar Súmula do Jogo</h2>
-                    <p className="text-xs text-emerald-200/60">Lançamento direto pelo celular</p>
+                    <h2 className="text-xl font-bold text-amber-300">
+                      {jogoEditandoId ? '✏️ Editar Súmula da Partida' : '📝 Cadastrar Partida'}
+                    </h2>
+                    <p className="text-xs text-emerald-200/60">
+                      {jogoEditandoId ? 'Altere os dados da súmula selecionada' : 'Adicione uma nova partida para a data informada'}
+                    </p>
                   </div>
-                  <button 
-                    onClick={handleZerarHistoricoLocal}
-                    className="text-xs bg-red-600/30 text-red-300 border border-red-500/40 px-3 py-1.5 rounded-lg hover:bg-red-600 hover:text-white transition-all"
-                  >
-                    🗑️ Zerar Histórico
-                  </button>
+                  
+                  <div className="flex gap-2">
+                    {jogoEditandoId && (
+                      <button 
+                        type="button"
+                        onClick={resetForm}
+                        className="text-xs bg-slate-700 text-white border border-slate-500 px-3 py-1.5 rounded-lg hover:bg-slate-600 transition-all font-bold"
+                      >
+                        ❌ Cancelar Edição
+                      </button>
+                    )}
+                    <button 
+                      onClick={handleZerarHistoricoLocal}
+                      className="text-xs bg-red-600/30 text-red-300 border border-red-500/40 px-3 py-1.5 rounded-lg hover:bg-red-600 hover:text-white transition-all font-bold"
+                    >
+                      🗑️ Zerar Histórico
+                    </button>
+                  </div>
                 </div>
 
                 <form onSubmit={handleSalvarJogo} className="space-y-6">
+                  {/* Data */}
                   <div>
                     <label className="block text-xs font-bold text-emerald-300 mb-1 uppercase">📅 Data da Partida:</label>
                     <input 
@@ -556,9 +708,10 @@ export default function App() {
                     />
                   </div>
 
+                  {/* Seleção dos Goleiros */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="bg-emerald-950/80 p-4 rounded-xl border border-emerald-800">
-                      <label className="block text-xs font-bold text-amber-300 mb-1 uppercase">Gloleiro Time A:</label>
+                      <label className="block text-xs font-bold text-amber-300 mb-1 uppercase">Goleiro Time A:</label>
                       <select 
                         value={goleiroA}
                         onChange={(e) => setGoleiroA(e.target.value)}
@@ -571,7 +724,7 @@ export default function App() {
                     </div>
 
                     <div className="bg-emerald-950/80 p-4 rounded-xl border border-emerald-800">
-                      <label className="block text-xs font-bold text-amber-300 mb-1 uppercase">Gloleiro Time B:</label>
+                      <label className="block text-xs font-bold text-amber-300 mb-1 uppercase">Goleiro Time B:</label>
                       <select 
                         value={goleiroB}
                         onChange={(e) => setGoleiroB(e.target.value)}
@@ -584,6 +737,7 @@ export default function App() {
                     </div>
                   </div>
 
+                  {/* Placar */}
                   <div className="bg-emerald-950 p-4 rounded-xl border border-emerald-800 flex justify-around items-center">
                     <div className="text-center">
                       <p className="text-xs font-bold text-emerald-300 uppercase mb-1">Gols Time A</p>
@@ -608,10 +762,11 @@ export default function App() {
                     </div>
                   </div>
 
+                  {/* ESCALAÇÕES TITULARES */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="bg-emerald-950/80 p-4 rounded-xl border border-emerald-800">
-                      <p className="text-xs font-bold text-emerald-300 mb-2 uppercase">Escalar Jogadores (Time A):</p>
-                      <div className="max-h-48 overflow-y-auto space-y-1.5 pr-2">
+                      <p className="text-xs font-bold text-emerald-300 mb-2 uppercase">⭐ Titulares (Ganha Pontos e Gols) - Time A:</p>
+                      <div className="max-h-40 overflow-y-auto space-y-1.5 pr-2">
                         {ASSOCIADOS_OPCOES.map(nome => (
                           <label key={nome} className="flex items-center gap-2 text-xs bg-emerald-900/50 p-1.5 rounded cursor-pointer hover:bg-emerald-900">
                             <input 
@@ -627,8 +782,8 @@ export default function App() {
                     </div>
 
                     <div className="bg-emerald-950/80 p-4 rounded-xl border border-emerald-800">
-                      <p className="text-xs font-bold text-emerald-300 mb-2 uppercase">Escalar Jogadores (Time B):</p>
-                      <div className="max-h-48 overflow-y-auto space-y-1.5 pr-2">
+                      <p className="text-xs font-bold text-emerald-300 mb-2 uppercase">⭐ Titulares (Ganha Pontos e Gols) - Time B:</p>
+                      <div className="max-h-40 overflow-y-auto space-y-1.5 pr-2">
                         {ASSOCIADOS_OPCOES.map(nome => (
                           <label key={nome} className="flex items-center gap-2 text-xs bg-emerald-900/50 p-1.5 rounded cursor-pointer hover:bg-emerald-900">
                             <input 
@@ -644,41 +799,85 @@ export default function App() {
                     </div>
                   </div>
 
-                  {(jogadoresA.length > 0 || jogadoresB.length > 0) && (
-                    <div className="bg-emerald-950/80 p-4 rounded-xl border border-emerald-800">
-                      <p className="text-xs font-bold text-amber-300 mb-3 uppercase">⚽ Atribuir Gols aos Jogadores Escalação:</p>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-60 overflow-y-auto pr-2">
-                        {[...jogadoresA, ...jogadoresB].map(nome => (
-                          <div key={nome} className="flex justify-between items-center bg-emerald-900/60 p-2 rounded-lg border border-emerald-800 text-xs">
-                            <span className="font-semibold text-emerald-100">{nome}</span>
-                            <div className="flex items-center gap-2">
-                              <button 
-                                type="button" 
-                                onClick={() => handleGolsJogador(nome, -1)}
-                                className="w-6 h-6 bg-emerald-950 text-emerald-300 font-bold rounded flex items-center justify-center border border-emerald-700"
-                              >
-                                -
-                              </button>
-                              <span className="font-bold text-amber-300 min-w-[12px] text-center">{golsDetalhados[nome] || 0}</span>
-                              <button 
-                                type="button" 
-                                onClick={() => handleGolsJogador(nome, 1)}
-                                className="w-6 h-6 bg-emerald-700 text-white font-bold rounded flex items-center justify-center border border-emerald-600"
-                              >
-                                +
-                              </button>
-                            </div>
-                          </div>
+                  {/* ESCALAÇÕES SUBSTITUTOS */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-amber-950/40 p-4 rounded-xl border border-amber-800/60">
+                      <p className="text-xs font-bold text-amber-300 mb-2 uppercase">🔄 Substitutos (Apenas Gols / Sem Pontos) - Time A:</p>
+                      <div className="max-h-36 overflow-y-auto space-y-1.5 pr-2">
+                        {ASSOCIADOS_OPCOES.map(nome => (
+                          <label key={nome} className="flex items-center gap-2 text-xs bg-amber-900/30 p-1.5 rounded cursor-pointer hover:bg-amber-900/50">
+                            <input 
+                              type="checkbox" 
+                              checked={substitutosA.includes(nome)}
+                              onChange={() => toggleSubstituto('A', nome)}
+                              className="rounded text-amber-500 focus:ring-0"
+                            />
+                            <span className={substitutosA.includes(nome) ? 'font-bold text-amber-200' : 'text-emerald-300/60'}>{nome}</span>
+                          </label>
                         ))}
+                      </div>
+                    </div>
+
+                    <div className="bg-amber-950/40 p-4 rounded-xl border border-amber-800/60">
+                      <p className="text-xs font-bold text-amber-300 mb-2 uppercase">🔄 Substitutos (Apenas Gols / Sem Pontos) - Time B:</p>
+                      <div className="max-h-36 overflow-y-auto space-y-1.5 pr-2">
+                        {ASSOCIADOS_OPCOES.map(nome => (
+                          <label key={nome} className="flex items-center gap-2 text-xs bg-amber-900/30 p-1.5 rounded cursor-pointer hover:bg-amber-900/50">
+                            <input 
+                              type="checkbox" 
+                              checked={substitutosB.includes(nome)}
+                              onChange={() => toggleSubstituto('B', nome)}
+                              className="rounded text-amber-500 focus:ring-0"
+                            />
+                            <span className={substitutosB.includes(nome) ? 'font-bold text-amber-200' : 'text-emerald-300/60'}>{nome}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Detalhamento de Gols (Titulares + Substitutos) */}
+                  {todosEscaladosEsubstitutos.length > 0 && (
+                    <div className="bg-emerald-950/80 p-4 rounded-xl border border-emerald-800">
+                      <p className="text-xs font-bold text-amber-300 mb-3 uppercase">⚽ Atribuir Gols (Titulares e Substitutos):</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-60 overflow-y-auto pr-2">
+                        {todosEscaladosEsubstitutos.map(nome => {
+                          const isSub = substitutosA.includes(nome) || substitutosB.includes(nome);
+                          return (
+                            <div key={nome} className="flex justify-between items-center bg-emerald-900/60 p-2 rounded-lg border border-emerald-800 text-xs">
+                              <span className="font-semibold text-emerald-100 flex items-center gap-1">
+                                {nome} {isSub && <span className="text-[10px] text-amber-400 font-normal">(Sub)</span>}
+                              </span>
+                              <div className="flex items-center gap-2">
+                                <button 
+                                  type="button" 
+                                  onClick={() => handleGolsJogador(nome, -1)}
+                                  className="w-6 h-6 bg-emerald-950 text-emerald-300 font-bold rounded flex items-center justify-center border border-emerald-700"
+                                >
+                                  -
+                                </button>
+                                <span className="font-bold text-amber-300 min-w-[12px] text-center">{golsDetalhados[nome] || 0}</span>
+                                <button 
+                                  type="button" 
+                                  onClick={() => handleGolsJogador(nome, 1)}
+                                  className="w-6 h-6 bg-emerald-700 text-white font-bold rounded flex items-center justify-center border border-emerald-600"
+                                >
+                                  +
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   )}
 
+                  {/* Botão de Ação */}
                   <button 
                     type="submit"
                     className="w-full bg-emerald-500 text-slate-950 font-black py-3.5 rounded-xl text-base shadow-xl hover:bg-emerald-400 transition-all border border-emerald-400"
                   >
-                    💾 Salvar Súmula da Partida
+                    {jogoEditandoId ? '💾 Atualizar Súmula da Partida' : '💾 Salvar Súmula da Partida'}
                   </button>
                 </form>
               </div>
