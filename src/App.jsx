@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 
-// CRÉDITOS E NOME DA APLICAÇÃO
-const NOME_APP = "Olho no Lance";
-const SUBTITULO_APP = "Painel Oficial de Prêmios 2026 • Arena Sinprovenfs";
+// CREDITYS DO DESENVOLVEDOR (EXCLUSIVO NO RODAPÉ)
 const NOME_DESENVOLVEDOR = "Ícaro Galvão";
 
 export const ASSOCIADOS_OPCOES = [
@@ -266,7 +264,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-emerald-950 text-emerald-50 p-4 md:p-8 font-sans flex flex-col justify-between">
       <div>
-        {/* Cabeçalho */}
+        {/* Cabeçalho Original */}
         <header className="mb-8 border-b border-emerald-800/60 pb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="flex items-center gap-4">
             <img 
@@ -275,10 +273,10 @@ export default function App() {
               className="h-16 sm:h-20 w-auto object-contain rounded-xl bg-white p-1.5 shadow-md border border-emerald-700"
             />
             <div>
-              <h1 className="text-2xl sm:text-3xl font-black text-white tracking-wide">
-                ⚽ {NOME_APP}
+              <h1 className="text-2xl sm:text-3xl font-black text-white tracking-wide flex items-center gap-2">
+                ARENA SINPROVENFS
               </h1>
-              <p className="text-emerald-400 font-bold text-xs sm:text-sm tracking-wider uppercase mt-1">{SUBTITULO_APP}</p>
+              <p className="text-emerald-400 font-bold text-sm tracking-wider uppercase">Painel Oficial de Prêmios 2026</p>
             </div>
           </div>
 
@@ -827,9 +825,9 @@ export default function App() {
         )}
       </div>
 
-      {/* RODAPÉ PROFISSIONAL (OPÇÃO 1) */}
+      {/* RODAPÉ EXCLUSIVO DO DESENVOLVEDOR */}
       <footer className="mt-12 pt-6 border-t border-emerald-800/60 text-center text-xs text-emerald-300/60">
-        <p>© 2026 Olho no Lance • Arena Sinprovenfs</p>
+        <p>© 2026 Arena Sinprovenfs • Todos os direitos reservados</p>
         <p className="mt-1 font-medium text-emerald-400">
           Desenvolvido com ⚽ por <span className="text-white font-bold">{NOME_DESENVOLVEDOR}</span>
         </p>
