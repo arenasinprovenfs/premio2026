@@ -79,7 +79,6 @@ export default function App() {
     const unsub = onSnapshot(collection(db, "partidas"), (snapshot) => {
       const docsData = snapshot.docs.map(doc => doc.data());
       if (docsData.length > 0) {
-        // Agrupa por data
         const rodadasMap = {};
         docsData.forEach(jogo => {
           if (!rodadasMap[jogo.dataRodada]) {
@@ -901,3 +900,8 @@ export default function App() {
       </div>
 
       <footer className="mt-12 text-center text-xs text-emerald-400/60 border-t border-emerald-800/40 pt-4">
+        Desenvolvido por <span className="text-emerald-300 font-bold">{NOME_DESENVOLVEDOR}</span> • Sistema de Sincronização em Tempo Real (Firebase Firestore)
+      </footer>
+    </div>
+  );
+}
