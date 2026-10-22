@@ -17,8 +17,6 @@ export const ASSOCIADOS_OPCOES = [
 
 export const GOLEIROS_OPCOES = ["Tellê", "Baianinho", "Roberto", "Rogério", "Adriel"];
 
-const historicoRodadasInicial = [];
-
 const dadosMangabeiraBase = [
   { nome: "Adriano", pontos: 65 }, { nome: "Rodrigo", pontos: 56 }, { nome: "Jandir", pontos: 56 },
   { nome: "Ballet", pontos: 55 }, { nome: "Robério", pontos: 54 }, { nome: "Lucas", pontos: 51 },
@@ -74,7 +72,6 @@ export default function App() {
   const [historico, setHistorico] = useState([]);
   const [dataSelecionada, setDataSelecionada] = useState('');
 
-  // Escuta o Firestore em Tempo Real
   useEffect(() => {
     const unsub = onSnapshot(collection(db, "partidas"), (snapshot) => {
       const docsData = snapshot.docs.map(doc => doc.data());
@@ -334,57 +331,59 @@ export default function App() {
   const rodadaAtual = historico.find(r => r.data === dataSelecionada) || historico[0];
 
   return (
-    <div className="min-h-screen bg-emerald-950 text-emerald-50 p-4 md:p-8 font-sans flex flex-col justify-between">
-      <div>
-        <header className="mb-8 border-b border-emerald-800/60 pb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div className="min-h-screen bg-[#03140E] text-slate-100 p-3 sm:p-6 lg:p-8 font-sans flex flex-col justify-between antialiased">
+      <div className="max-w-7xl mx-auto w-full space-y-6">
+        
+        {/* HEADER MODERNO */}
+        <header className="bg-[#08251B]/70 backdrop-blur-md rounded-2xl p-4 sm:px-6 flex flex-col md:flex-row justify-between items-center gap-4 border border-white/10 shadow-2xl">
           <div className="flex items-center gap-4">
             <img 
               src="/logo.png" 
               alt="Logo Arena Sinprovenfs" 
-              className="h-16 sm:h-20 w-auto object-contain rounded-xl bg-white p-1.5 shadow-md border border-emerald-700"
+              className="h-14 sm:h-16 w-auto object-contain rounded-xl bg-white/10 p-1.5 shadow-lg border border-emerald-500/20"
             />
             <div>
-              <h1 className="text-2xl sm:text-3xl font-black text-white tracking-wide flex items-center gap-2">
+              <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
                 ARENA SINPROVENFS
               </h1>
-              <p className="text-emerald-400 font-bold text-sm tracking-wider uppercase">Painel Oficial de Prêmios 2026</p>
+              <p className="text-emerald-400 font-bold text-xs tracking-wider uppercase mt-0.5">Painel Oficial de Prêmios 2026</p>
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-2 bg-emerald-900/80 p-1.5 rounded-xl border border-emerald-800">
+          <div className="flex flex-wrap gap-2 bg-[#03140E]/80 p-1.5 rounded-xl border border-emerald-500/20">
             <button 
               onClick={() => setAba('geral')}
-              className={`px-4 py-2 rounded-lg text-sm transition-all ${aba === 'geral' ? 'bg-emerald-500 text-slate-950 shadow-md font-bold' : 'text-emerald-200/70 hover:text-white'}`}
+              className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all ${aba === 'geral' ? 'bg-emerald-500 text-slate-950 shadow-md' : 'text-slate-300 hover:text-white'}`}
             >
               Visão Geral
             </button>
             <button 
               onClick={() => setAba('jogos')}
-              className={`px-4 py-2 rounded-lg text-sm transition-all ${aba === 'jogos' ? 'bg-teal-500 text-slate-950 shadow-md font-bold' : 'text-emerald-200/70 hover:text-white'}`}
+              className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all ${aba === 'jogos' ? 'bg-teal-500 text-slate-950 shadow-md' : 'text-slate-300 hover:text-white'}`}
             >
               ⚽ Jogos da Rodada
             </button>
             <button 
               onClick={() => setAba('mangabeira')}
-              className={`px-4 py-2 rounded-lg text-sm transition-all ${aba === 'mangabeira' ? 'bg-emerald-600 text-white shadow-md font-bold' : 'text-emerald-200/70 hover:text-white'}`}
+              className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all ${aba === 'mangabeira' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-300 hover:text-white'}`}
             >
               Craque (Mangabeira)
             </button>
             <button 
               onClick={() => setAba('brocador')}
-              className={`px-4 py-2 rounded-lg text-sm transition-all ${aba === 'brocador' ? 'bg-red-600 text-white shadow-md font-bold' : 'text-emerald-200/70 hover:text-white'}`}
+              className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all ${aba === 'brocador' ? 'bg-rose-600 text-white shadow-md' : 'text-slate-300 hover:text-white'}`}
             >
               Artilharia (Brocador)
             </button>
             <button 
               onClick={() => setAba('cesar')}
-              className={`px-4 py-2 rounded-lg text-sm transition-all ${aba === 'cesar' ? 'bg-amber-500 text-slate-950 shadow-md font-bold' : 'text-emerald-200/70 hover:text-white'}`}
+              className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all ${aba === 'cesar' ? 'bg-amber-500 text-slate-950 shadow-md' : 'text-slate-300 hover:text-white'}`}
             >
               Goleiros (César)
             </button>
             <button 
               onClick={() => { resetForm(); setAba('cadastrar'); }}
-              className={`px-4 py-2 rounded-lg text-sm transition-all ${aba === 'cadastrar' ? 'bg-amber-400 text-slate-950 shadow-md font-black' : 'bg-emerald-800/80 text-amber-300 hover:text-white border border-amber-500/40'}`}
+              className={`px-3.5 py-2 rounded-lg text-xs font-black transition-all ${aba === 'cadastrar' ? 'bg-amber-400 text-slate-950 shadow-md' : 'bg-emerald-950 text-amber-300 hover:text-white border border-amber-500/30'}`}
             >
               ➕ Cadastrar
             </button>
@@ -394,75 +393,75 @@ export default function App() {
         {aba === 'geral' && (
           <>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <div className="bg-emerald-900/50 p-6 rounded-2xl border border-emerald-500/30 shadow-lg relative overflow-hidden">
-                <span className="text-xs font-bold uppercase tracking-wider text-emerald-300 bg-emerald-500/20 px-2.5 py-1 rounded-md">Prêmio Mangabeira</span>
-                <p className="text-emerald-200/70 text-sm mt-3">Líder do Ranking</p>
+              <div className="bg-[#08251B]/70 backdrop-blur-md p-6 rounded-3xl border border-emerald-500/20 shadow-xl relative overflow-hidden">
+                <span className="text-xs font-extrabold uppercase tracking-wider text-emerald-300 bg-emerald-500/20 px-3 py-1 rounded-full border border-emerald-500/30">Prêmio Mangabeira</span>
+                <p className="text-slate-400 text-xs mt-4">Líder do Ranking</p>
                 <p className="text-3xl font-black text-white mt-1">{rankingMangabeira[0]?.nome}</p>
-                <p className="text-emerald-400 font-bold text-lg mt-1">{rankingMangabeira[0]?.pontos} <span className="text-sm font-normal text-emerald-200/60">pontos</span></p>
+                <p className="text-emerald-400 font-bold text-base mt-1">{rankingMangabeira[0]?.pontos} <span className="text-xs font-normal text-slate-400">pontos</span></p>
               </div>
 
-              <div className="bg-emerald-900/50 p-6 rounded-2xl border border-red-500/30 shadow-lg relative overflow-hidden">
-                <span className="text-xs font-bold uppercase tracking-wider text-red-400 bg-red-500/20 px-2.5 py-1 rounded-md">Prêmio Brocador</span>
-                <p className="text-emerald-200/70 text-sm mt-3">Artilheiro Máximo</p>
+              <div className="bg-[#08251B]/70 backdrop-blur-md p-6 rounded-3xl border border-rose-500/20 shadow-xl relative overflow-hidden">
+                <span className="text-xs font-extrabold uppercase tracking-wider text-rose-300 bg-rose-500/20 px-3 py-1 rounded-full border border-rose-500/30">Prêmio Brocador</span>
+                <p className="text-slate-400 text-xs mt-4">Artilheiro Máximo</p>
                 <p className="text-3xl font-black text-white mt-1">{rankingBrocador[0]?.nome}</p>
-                <p className="text-red-400 font-bold text-lg mt-1">{rankingBrocador[0]?.gols} <span className="text-sm font-normal text-emerald-200/60">gols</span></p>
+                <p className="text-rose-400 font-bold text-base mt-1">{rankingBrocador[0]?.gols} <span className="text-xs font-normal text-slate-400">gols</span></p>
               </div>
 
-              <div className="bg-emerald-900/50 p-6 rounded-2xl border border-amber-500/30 shadow-lg relative overflow-hidden">
-                <span className="text-xs font-bold uppercase tracking-wider text-amber-300 bg-amber-500/20 px-2.5 py-1 rounded-md">Prêmio César</span>
-                <p className="text-emerald-200/70 text-sm mt-3">Melhor Goleiro</p>
+              <div className="bg-[#08251B]/70 backdrop-blur-md p-6 rounded-3xl border border-amber-500/20 shadow-xl relative overflow-hidden">
+                <span className="text-xs font-extrabold uppercase tracking-wider text-amber-300 bg-amber-500/20 px-3 py-1 rounded-full border border-amber-500/30">Prêmio César</span>
+                <p className="text-slate-400 text-xs mt-4">Melhor Goleiro</p>
                 <p className="text-3xl font-black text-white mt-1">{rankingCesar[0]?.nome}</p>
-                <p className="text-amber-300 font-bold text-lg mt-1">{rankingCesar[0]?.pontos} <span className="text-sm font-normal text-emerald-200/60">pts ({rankingCesar[0]?.golsSofridos} GS)</span></p>
+                <p className="text-amber-300 font-bold text-base mt-1">{rankingCesar[0]?.pontos} <span className="text-xs font-normal text-slate-400">pts ({rankingCesar[0]?.golsSofridos} GS)</span></p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-              <div className="bg-emerald-900/40 p-6 rounded-2xl border border-emerald-800/80">
-                <h2 className="text-xl font-bold text-white mb-1">Top 10 - Prêmio Mangabeira (Craque)</h2>
-                <p className="text-emerald-200/60 text-xs mb-4">Primeiros 10 colocados na classificação geral</p>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+              <div className="bg-[#08251B]/70 backdrop-blur-md p-6 rounded-3xl border border-white/10 shadow-xl">
+                <h2 className="text-lg font-bold text-white mb-1">Top 10 - Prêmio Mangabeira (Craque)</h2>
+                <p className="text-slate-400 text-xs mb-4">Primeiros 10 colocados na classificação geral</p>
                 <div className="h-80 w-full mt-2">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={rankingMangabeira.slice(0, 10)}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#065f46" />
-                      <XAxis dataKey="nome" stroke="#a7f3d0" tick={{ fontSize: 11 }} interval={0} angle={-30} textAnchor="end" height={60} />
-                      <YAxis stroke="#a7f3d0" />
-                      <Tooltip contentStyle={{ backgroundColor: '#064e3b', borderColor: '#065f46', borderRadius: '8px', color: '#fff' }} />
-                      <Bar dataKey="pontos" name="Pontos" fill="#10b981" radius={[6, 6, 0, 0]} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.08)" />
+                      <XAxis dataKey="nome" stroke="#94a3b8" tick={{ fontSize: 11 }} interval={0} angle={-30} textAnchor="end" height={60} />
+                      <YAxis stroke="#94a3b8" />
+                      <Tooltip contentStyle={{ backgroundColor: '#03140E', borderColor: 'rgba(255, 255, 255, 0.1)', borderRadius: '12px', color: '#fff' }} />
+                      <Bar dataKey="pontos" name="Pontos" fill="#10b981" radius={[8, 8, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
               </div>
 
-              <div className="bg-emerald-900/40 p-6 rounded-2xl border border-emerald-800/80">
-                <h2 className="text-xl font-bold text-white mb-1">Top 10 - Prêmio Brocador (Artilharia)</h2>
-                <p className="text-emerald-200/60 text-xs mb-4">Primeiros 10 colocados em número de gols</p>
+              <div className="bg-[#08251B]/70 backdrop-blur-md p-6 rounded-3xl border border-white/10 shadow-xl">
+                <h2 className="text-lg font-bold text-white mb-1">Top 10 - Prêmio Brocador (Artilharia)</h2>
+                <p className="text-slate-400 text-xs mb-4">Primeiros 10 colocados em número de gols</p>
                 <div className="h-80 w-full mt-2">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={rankingBrocador.slice(0, 10)}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#065f46" />
-                      <XAxis dataKey="nome" stroke="#a7f3d0" tick={{ fontSize: 11 }} interval={0} angle={-30} textAnchor="end" height={60} />
-                      <YAxis stroke="#a7f3d0" />
-                      <Tooltip contentStyle={{ backgroundColor: '#064e3b', borderColor: '#065f46', borderRadius: '8px', color: '#fff' }} />
-                      <Bar dataKey="gols" name="Gols" fill="#ef4444" radius={[6, 6, 0, 0]} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.08)" />
+                      <XAxis dataKey="nome" stroke="#94a3b8" tick={{ fontSize: 11 }} interval={0} angle={-30} textAnchor="end" height={60} />
+                      <YAxis stroke="#94a3b8" />
+                      <Tooltip contentStyle={{ backgroundColor: '#03140E', borderColor: 'rgba(255, 255, 255, 0.1)', borderRadius: '12px', color: '#fff' }} />
+                      <Bar dataKey="gols" name="Gols" fill="#f43f5e" radius={[8, 8, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
               </div>
             </div>
 
-            <div className="bg-emerald-900/40 p-6 rounded-2xl border border-emerald-800/80 mb-8">
-              <h2 className="text-xl font-bold text-white mb-1">Prêmio César - Desempenho dos Goleiros</h2>
-              <p className="text-emerald-200/60 text-xs mb-4">Comparativo entre Pontos obtidos vs. Gols Sofridos</p>
+            <div className="bg-[#08251B]/70 backdrop-blur-md p-6 rounded-3xl border border-white/10 shadow-xl mb-8">
+              <h2 className="text-lg font-bold text-white mb-1">Prêmio César - Desempenho dos Goleiros</h2>
+              <p className="text-slate-400 text-xs mb-4">Comparativo entre Pontos obtidos vs. Gols Sofridos</p>
               <div className="h-72 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={rankingCesar}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#065f46" />
-                    <XAxis dataKey="nome" stroke="#a7f3d0" />
-                    <YAxis stroke="#a7f3d0" />
-                    <Tooltip contentStyle={{ backgroundColor: '#064e3b', borderColor: '#065f46', borderRadius: '8px', color: '#fff' }} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.08)" />
+                    <XAxis dataKey="nome" stroke="#94a3b8" />
+                    <YAxis stroke="#94a3b8" />
+                    <Tooltip contentStyle={{ backgroundColor: '#03140E', borderColor: 'rgba(255, 255, 255, 0.1)', borderRadius: '12px', color: '#fff' }} />
                     <Legend />
-                    <Bar dataKey="pontos" name="Pontos" fill="#f59e0b" radius={[6, 6, 0, 0]} />
-                    <Bar dataKey="golsSofridos" name="Gols Sofridos" fill="#ef4444" radius={[6, 6, 0, 0]} />
+                    <Bar dataKey="pontos" name="Pontos" fill="#f59e0b" radius={[8, 8, 0, 0]} />
+                    <Bar dataKey="golsSofridos" name="Gols Sofridos" fill="#f43f5e" radius={[8, 8, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -471,22 +470,22 @@ export default function App() {
         )}
 
         {aba === 'jogos' && (
-          <div className="bg-emerald-900/40 p-6 rounded-2xl border border-emerald-800/80">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 border-b border-emerald-800/60 pb-4">
+          <div className="bg-[#08251B]/70 backdrop-blur-md p-6 rounded-3xl border border-white/10 shadow-2xl">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 border-b border-white/10 pb-4">
               <div>
-                <h2 className="text-2xl font-bold text-teal-300 flex items-center gap-2">
+                <h2 className="text-xl font-bold text-teal-300 flex items-center gap-2">
                   ⚽ Súmula e Resultados das Partidas
                 </h2>
-                <p className="text-emerald-200/60 text-sm mt-1">Histórico completo de partidas em tempo real</p>
+                <p className="text-slate-400 text-xs mt-1">Histórico completo de partidas em tempo real</p>
               </div>
 
               {historico.length > 0 && (
-                <div className="flex items-center gap-2 bg-emerald-950 p-2 rounded-xl border border-emerald-700">
+                <div className="flex items-center gap-2 bg-[#03140E] p-2 rounded-xl border border-emerald-500/20">
                   <span className="text-xs font-bold text-emerald-400 uppercase">📅 Data da Rodada:</span>
                   <select 
                     value={dataSelecionada} 
                     onChange={(e) => setDataSelecionada(e.target.value)}
-                    className="bg-emerald-900 text-white font-bold text-sm px-3 py-1.5 rounded-lg border border-emerald-600 focus:outline-none"
+                    className="bg-[#08251B] text-white font-bold text-xs px-3 py-1.5 rounded-lg border border-emerald-500/30 focus:outline-none"
                   >
                     {historico.map(r => (
                       <option key={r.data} value={r.data}>
@@ -499,9 +498,9 @@ export default function App() {
             </div>
 
             {historico.length === 0 ? (
-              <div className="text-center py-12 bg-emerald-950/60 rounded-xl border border-emerald-800/60">
-                <p className="text-lg font-bold text-emerald-300">Nenhuma rodada cadastrada ainda!</p>
-                <p className="text-sm text-emerald-200/60 mt-1">Acesse a aba "➕ Cadastrar" no topo para inserir a primeira partida da temporada.</p>
+              <div className="text-center py-12 bg-[#03140E]/60 rounded-2xl border border-white/5">
+                <p className="text-base font-bold text-emerald-300">Nenhuma rodada cadastrada ainda!</p>
+                <p className="text-xs text-slate-400 mt-1">Acesse a aba "➕ Cadastrar" para inserir a primeira partida.</p>
               </div>
             ) : (
               <div className="space-y-6">
@@ -510,8 +509,8 @@ export default function App() {
                   const golsTimeB = j.golsMarcados ? j.golsMarcados.filter(g => j.jogadoresB.includes(g.jogador) || (j.substitutosB && j.substitutosB.includes(g.jogador)) || g.jogador.includes('Branco')) : [];
 
                   return (
-                    <div key={j.id} className="bg-emerald-950/90 p-5 rounded-2xl border border-emerald-800/80 shadow-lg">
-                      <div className="flex justify-between items-center mb-4 border-b border-emerald-800/60 pb-2 flex-wrap gap-2">
+                    <div key={j.id} className="bg-[#03140E]/90 p-6 rounded-3xl border border-white/10 shadow-xl relative overflow-hidden">
+                      <div className="flex justify-between items-center mb-6 border-b border-white/10 pb-3 flex-wrap gap-2">
                         <span className="text-xs font-black uppercase text-emerald-400 tracking-wider">
                           {j.partida} • {rodadaAtual.data}
                         </span>
@@ -519,145 +518,152 @@ export default function App() {
                         <div className="flex items-center gap-2">
                           <button 
                             onClick={() => handleEditarJogo(rodadaAtual.data, j)}
-                            className="bg-amber-500/20 text-amber-300 border border-amber-500/40 px-3 py-1 rounded-full text-xs font-bold hover:bg-amber-500 hover:text-slate-950 transition-all"
+                            className="bg-amber-500/20 text-amber-300 border border-amber-500/40 px-3.5 py-1.5 rounded-xl text-xs font-semibold hover:bg-amber-500 hover:text-slate-950 transition-all shadow-md"
                           >
                             ✏️ Editar Súmula
                           </button>
                           <button 
                             onClick={() => handleDeletarJogo(j.id)}
-                            className="bg-red-500/20 text-red-300 border border-red-500/40 px-3 py-1 rounded-full text-xs font-bold hover:bg-red-600 hover:text-white transition-all"
+                            className="bg-rose-950/40 text-rose-300 border border-rose-500/30 px-3.5 py-1.5 rounded-xl text-xs font-semibold hover:bg-rose-900/60 transition-all shadow-md"
                           >
                             🗑️ Excluir
                           </button>
-                          <span className="text-xs bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full font-bold border border-emerald-500/30">
-                            Súmula Finalizada
+                          <span className="text-xs bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 px-3 py-1.5 rounded-xl font-bold uppercase tracking-wider">
+                            Finalizada ✓
                           </span>
                         </div>
                       </div>
 
-                      <div className="flex justify-between items-center my-4">
-                        <div className="w-2/5 text-right">
-                          <p className="font-extrabold text-red-400 text-lg">Time Vermelho</p>
+                      {/* PLACAR NO ESTILO TRANSMISSÃO DE TV */}
+                      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center my-6">
+                        <div className="md:col-span-5 text-center md:text-right">
+                          <span className="text-[10px] font-extrabold text-rose-400 uppercase tracking-widest bg-rose-500/10 px-2 py-0.5 rounded-md border border-rose-500/20">Mandante</span>
+                          <h3 className="text-2xl font-black text-white mt-1">TIME VERMELHO</h3>
                         </div>
 
-                        <div className="bg-emerald-900 px-5 py-2.5 rounded-xl font-black text-amber-300 text-2xl border-2 border-emerald-600 shadow-inner">
-                          {j.golsA} x {j.golsB}
+                        <div className="md:col-span-2 flex justify-center items-center gap-2">
+                          <div className="w-16 h-20 bg-gradient-to-b from-slate-800 to-slate-950 text-amber-400 border-2 border-amber-400/60 rounded-2xl text-4xl font-black flex items-center justify-center shadow-2xl">
+                            {j.golsA}
+                          </div>
+                          <span className="text-xs font-black text-emerald-400 tracking-widest uppercase">VS</span>
+                          <div className="w-16 h-20 bg-gradient-to-b from-slate-800 to-slate-950 text-slate-100 border-2 border-slate-600/60 rounded-2xl text-4xl font-black flex items-center justify-center shadow-2xl">
+                            {j.golsB}
+                          </div>
                         </div>
 
-                        <div className="w-2/5 text-left">
-                          <p className="font-extrabold text-slate-100 text-lg">Time Branco</p>
+                        <div className="md:col-span-5 text-center md:text-left">
+                          <span className="text-[10px] font-extrabold text-slate-300 uppercase tracking-widest bg-slate-200/10 px-2 py-0.5 rounded-md border border-slate-200/20">Visitante</span>
+                          <h3 className="text-2xl font-black text-white mt-1">TIME BRANCO</h3>
                         </div>
                       </div>
 
-                      {/* GRAMADO TÁTICO DE FUTEBOL COM EFEITO EM PERSPECTIVA */}
-                      <div className="relative rounded-2xl p-4 my-6 border-2 border-emerald-600/80 bg-gradient-to-b from-emerald-900 via-emerald-800 to-emerald-900 shadow-2xl overflow-hidden min-h-[220px] flex items-center">
-                        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 border-t-2 border-dashed border-emerald-400/30"></div>
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 border-2 border-emerald-400/30 rounded-full"></div>
-                        <div className="absolute left-0 top-1/4 bottom-1/4 w-12 border-2 border-l-0 border-emerald-400/20 rounded-r-lg"></div>
-                        <div className="absolute right-0 top-1/4 bottom-1/4 w-12 border-2 border-r-0 border-emerald-400/20 rounded-l-lg"></div>
+                      {/* DETALHAMENTO DE ESCALAÇÃO E ARTILHARIA DOS TIMES */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                        {/* TIME VERMELHO CARD */}
+                        <div className="bg-[#08251B]/80 p-5 rounded-2xl border-t-4 border-t-rose-500/80 border-x border-b border-white/5 space-y-4 shadow-lg">
+                          <div className="flex items-center gap-2 border-b border-white/10 pb-2">
+                            <span className="w-3.5 h-3.5 rounded-full bg-rose-600 border border-rose-400 inline-block shadow-sm"></span>
+                            <h4 className="font-bold text-white text-sm">TIME VERMELHO</h4>
+                          </div>
 
-                        <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-                          {/* TIME A - VERMELHO */}
-                          <div className="bg-emerald-950/80 p-4 rounded-xl border border-red-900/50 backdrop-blur-sm">
-                            <p className="text-xs font-black text-red-400 mb-2 uppercase tracking-wide border-b border-emerald-800 pb-1">
-                              🎽 TIME VERMELHO
-                            </p>
-                            
-                            <p className="text-[11px] font-bold text-emerald-300 mb-1">⭐ Titulares:</p>
-                            <div className="flex flex-wrap gap-1.5 mb-3">
-                              {/* GOLEIRO NO INÍCIO DOS TITULARES */}
+                          <div>
+                            <p className="text-[11px] font-bold text-amber-400 uppercase tracking-wider mb-2">⭐ Atletas Titulares:</p>
+                            <div className="flex flex-wrap gap-2">
                               {j.goleiroA && (
-                                <span className="bg-amber-500/20 text-amber-300 text-xs px-2.5 py-1 rounded-full border border-amber-500/40 shadow font-bold flex items-center gap-1">
-                                  🧤 {j.goleiroA} (Goleiro)
+                                <span className="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs px-3 py-1 rounded-full font-semibold shadow-sm flex items-center gap-1.5">
+                                  🧤 {j.goleiroA} <span className="bg-amber-400/20 text-amber-200 text-[9px] uppercase font-extrabold px-1.5 rounded">Goleiro</span>
                                 </span>
                               )}
                               {j.jogadoresA.map(nome => (
-                                <span key={nome} className="bg-emerald-900/90 text-white text-xs px-2.5 py-1 rounded-full border border-emerald-500/50 shadow flex items-center gap-1">
+                                <span key={nome} className="bg-slate-800/80 text-slate-200 border border-slate-700/60 text-xs px-3 py-1 rounded-full font-medium flex items-center gap-1.5">
                                   <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
                                   {nome}
                                 </span>
                               ))}
                             </div>
-
-                            {j.substitutosA && j.substitutosA.length > 0 && (
-                              <>
-                                <p className="text-[11px] font-bold text-amber-400/80 mb-1">🔄 Substitutos:</p>
-                                <div className="flex flex-wrap gap-1.5 mb-3">
-                                  {j.substitutosA.map(nome => (
-                                    <span key={nome} className="bg-amber-950/60 text-amber-200 text-xs px-2 py-0.5 rounded-full border border-amber-700/50 flex items-center gap-1">
-                                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                                      {nome}
-                                    </span>
-                                  ))}
-                                </div>
-                              </>
-                            )}
-
-                            {golsTimeA.length > 0 && (
-                              <div className="mt-3 pt-2 border-t border-emerald-800/80">
-                                <p className="text-[11px] font-bold text-emerald-300 mb-1">⚽ Autores dos Gols (Time Vermelho):</p>
-                                <div className="flex flex-wrap gap-1.5">
-                                  {golsTimeA.map((g, idx) => (
-                                    <span key={idx} className={`text-xs px-2.5 py-1 rounded-lg border font-bold ${g.jogador.includes('Gol Contra') ? 'bg-red-950 text-red-300 border-red-700' : 'bg-amber-500/20 text-amber-300 border-amber-500/40'}`}>
-                                      {g.jogador} ({g.quantidade})
-                                    </span>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
                           </div>
 
-                          {/* TIME B - BRANCO */}
-                          <div className="bg-emerald-950/80 p-4 rounded-xl border border-slate-700/50 backdrop-blur-sm">
-                            <p className="text-xs font-black text-slate-200 mb-2 uppercase tracking-wide border-b border-emerald-800 pb-1">
-                              🎽 TIME BRANCO
-                            </p>
+                          {j.substitutosA && j.substitutosA.length > 0 && (
+                            <div>
+                              <p className="text-[11px] font-bold text-amber-400/80 uppercase tracking-wider mb-2">🔄 Substitutos:</p>
+                              <div className="flex flex-wrap gap-2">
+                                {j.substitutosA.map(nome => (
+                                  <span key={nome} className="bg-amber-950/40 text-amber-200 border border-amber-700/50 text-xs px-2.5 py-0.5 rounded-full font-medium">
+                                    {nome}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
 
-                            <p className="text-[11px] font-bold text-emerald-300 mb-1">⭐ Titulares:</p>
-                            <div className="flex flex-wrap gap-1.5 mb-3">
-                              {/* GOLEIRO NO INÍCIO DOS TITULARES */}
+                          {golsTimeA.length > 0 && (
+                            <div className="pt-3 border-t border-white/5">
+                              <p className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider mb-2">⚽ Artilheiros do Jogo:</p>
+                              <div className="flex flex-wrap gap-2">
+                                {golsTimeA.map((g, idx) => (
+                                  <div key={idx} className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500/20 to-amber-600/10 border border-amber-500/40 text-amber-200 px-3 py-1 rounded-xl text-xs font-bold">
+                                    <span>{g.jogador}</span>
+                                    <span className="bg-amber-400 text-slate-950 text-[10px] px-1.5 py-0.2 rounded font-extrabold">{g.quantidade} {g.quantidade > 1 ? 'gols' : 'gol'}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* TIME BRANCO CARD */}
+                        <div className="bg-[#08251B]/80 p-5 rounded-2xl border-t-4 border-t-slate-200/80 border-x border-b border-white/5 space-y-4 shadow-lg">
+                          <div className="flex items-center gap-2 border-b border-white/10 pb-2">
+                            <span className="w-3.5 h-3.5 rounded-full bg-slate-100 border border-slate-400 inline-block shadow-sm"></span>
+                            <h4 className="font-bold text-white text-sm">TIME BRANCO</h4>
+                          </div>
+
+                          <div>
+                            <p className="text-[11px] font-bold text-amber-400 uppercase tracking-wider mb-2">⭐ Atletas Titulares:</p>
+                            <div className="flex flex-wrap gap-2">
                               {j.goleiroB && (
-                                <span className="bg-amber-500/20 text-amber-300 text-xs px-2.5 py-1 rounded-full border border-amber-500/40 shadow font-bold flex items-center gap-1">
-                                  🧤 {j.goleiroB} (Goleiro)
+                                <span className="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs px-3 py-1 rounded-full font-semibold shadow-sm flex items-center gap-1.5">
+                                  🧤 {j.goleiroB} <span className="bg-amber-400/20 text-amber-200 text-[9px] uppercase font-extrabold px-1.5 rounded">Goleiro</span>
                                 </span>
                               )}
                               {j.jogadoresB.map(nome => (
-                                <span key={nome} className="bg-emerald-900/90 text-white text-xs px-2.5 py-1 rounded-full border border-emerald-500/50 shadow flex items-center gap-1">
+                                <span key={nome} className="bg-slate-800/80 text-slate-200 border border-slate-700/60 text-xs px-3 py-1 rounded-full font-medium flex items-center gap-1.5">
                                   <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
                                   {nome}
                                 </span>
                               ))}
                             </div>
-
-                            {j.substitutosB && j.substitutosB.length > 0 && (
-                              <>
-                                <p className="text-[11px] font-bold text-amber-400/80 mb-1">🔄 Substitutos:</p>
-                                <div className="flex flex-wrap gap-1.5 mb-3">
-                                  {j.substitutosB.map(nome => (
-                                    <span key={nome} className="bg-amber-950/60 text-amber-200 text-xs px-2 py-0.5 rounded-full border border-amber-700/50 flex items-center gap-1">
-                                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                                      {nome}
-                                    </span>
-                                  ))}
-                                </div>
-                              </>
-                            )}
-
-                            {golsTimeB.length > 0 && (
-                              <div className="mt-3 pt-2 border-t border-emerald-800/80">
-                                <p className="text-[11px] font-bold text-emerald-300 mb-1">⚽ Autores dos Gols (Time Branco):</p>
-                                <div className="flex flex-wrap gap-1.5">
-                                  {golsTimeB.map((g, idx) => (
-                                    <span key={idx} className={`text-xs px-2.5 py-1 rounded-lg border font-bold ${g.jogador.includes('Gol Contra') ? 'bg-red-950 text-red-300 border-red-700' : 'bg-amber-500/20 text-amber-300 border-amber-500/40'}`}>
-                                      {g.jogador} ({g.quantidade})
-                                    </span>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
                           </div>
+
+                          {j.substitutosB && j.substitutosB.length > 0 && (
+                            <div>
+                              <p className="text-[11px] font-bold text-amber-400/80 uppercase tracking-wider mb-2">🔄 Substitutos:</p>
+                              <div className="flex flex-wrap gap-2">
+                                {j.substitutosB.map(nome => (
+                                  <span key={nome} className="bg-amber-950/40 text-amber-200 border border-amber-700/50 text-xs px-2.5 py-0.5 rounded-full font-medium">
+                                    {nome}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {golsTimeB.length > 0 && (
+                            <div className="pt-3 border-t border-white/5">
+                              <p className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider mb-2">⚽ Artilheiros do Jogo:</p>
+                              <div className="flex flex-wrap gap-2">
+                                {golsTimeB.map((g, idx) => (
+                                  <div key={idx} className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500/20 to-amber-600/10 border border-amber-500/40 text-amber-200 px-3 py-1 rounded-xl text-xs font-bold">
+                                    <span>{g.jogador}</span>
+                                    <span className="bg-amber-400 text-slate-950 text-[10px] px-1.5 py-0.2 rounded font-extrabold">{g.quantidade} {g.quantidade > 1 ? 'gols' : 'gol'}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
+
                     </div>
                   );
                 })}
@@ -667,22 +673,22 @@ export default function App() {
         )}
 
         {aba === 'mangabeira' && (
-          <div className="bg-emerald-900/40 p-6 rounded-2xl border border-emerald-800/80">
+          <div className="bg-[#08251B]/70 backdrop-blur-md p-6 rounded-3xl border border-white/10 shadow-2xl">
             <h2 className="text-2xl font-bold text-emerald-300 mb-1">Prêmio Mangabeira - Craque do Campeonato</h2>
-            <p className="text-emerald-200/60 text-sm mb-6">Classificação geral baseada nos pontos conquistados por partida</p>
+            <p className="text-slate-400 text-xs mb-6">Classificação geral baseada nos pontos conquistados por partida</p>
             
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-emerald-800 text-xs font-black uppercase text-emerald-400 bg-emerald-950/80">
+                  <tr className="border-b border-white/10 text-xs font-black uppercase text-emerald-400 bg-[#03140E]">
                     <th className="p-3">Posição</th>
                     <th className="p-3">Atleta</th>
                     <th className="p-3 text-right">Pontos Totais</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-emerald-800/40 text-sm">
+                <tbody className="divide-y divide-white/5 text-sm">
                   {rankingMangabeira.map(item => (
-                    <tr key={item.nome} className="hover:bg-emerald-900/30 transition-colors">
+                    <tr key={item.nome} className="hover:bg-white/5 transition-colors">
                       <td className="p-3 font-bold">{item.pos <= 7 ? `⭐ #${item.pos} G7` : `#${item.pos}`}</td>
                       <td className="p-3 font-extrabold text-white">{item.nome}</td>
                       <td className="p-3 text-right font-black text-emerald-400">{item.pontos} pts</td>
@@ -695,25 +701,25 @@ export default function App() {
         )}
 
         {aba === 'brocador' && (
-          <div className="bg-emerald-900/40 p-6 rounded-2xl border border-emerald-800/80">
-            <h2 className="text-2xl font-bold text-red-400 mb-1">Prêmio Brocador - Artilharia</h2>
-            <p className="text-emerald-200/60 text-sm mb-6">Classificação geral de marcadores de gol</p>
+          <div className="bg-[#08251B]/70 backdrop-blur-md p-6 rounded-3xl border border-white/10 shadow-2xl">
+            <h2 className="text-2xl font-bold text-rose-400 mb-1">Prêmio Brocador - Artilharia</h2>
+            <p className="text-slate-400 text-xs mb-6">Classificação geral de marcadores de gol</p>
 
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-emerald-800 text-xs font-black uppercase text-red-400 bg-emerald-950/80">
+                  <tr className="border-b border-white/10 text-xs font-black uppercase text-rose-400 bg-[#03140E]">
                     <th className="p-3">Posição</th>
                     <th className="p-3">Atleta</th>
                     <th className="p-3 text-right">Gols Marcados</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-emerald-800/40 text-sm">
+                <tbody className="divide-y divide-white/5 text-sm">
                   {rankingBrocador.map(item => (
-                    <tr key={item.nome} className="hover:bg-emerald-900/30 transition-colors">
+                    <tr key={item.nome} className="hover:bg-white/5 transition-colors">
                       <td className="p-3 font-bold">{item.pos === 1 ? '🏆 #1º Lugar' : `#${item.pos}`}</td>
                       <td className="p-3 font-extrabold text-white">{item.nome}</td>
-                      <td className="p-3 text-right font-black text-red-400">{item.gols} gols</td>
+                      <td className="p-3 text-right font-black text-rose-400">{item.gols} gols</td>
                     </tr>
                   ))}
                 </tbody>
@@ -723,26 +729,26 @@ export default function App() {
         )}
 
         {aba === 'cesar' && (
-          <div className="bg-emerald-900/40 p-6 rounded-2xl border border-emerald-800/80">
+          <div className="bg-[#08251B]/70 backdrop-blur-md p-6 rounded-3xl border border-white/10 shadow-2xl">
             <h2 className="text-2xl font-bold text-amber-400 mb-1">Prêmio César - Desempenho de Goleiros</h2>
-            <p className="text-emerald-200/60 text-sm mb-6">Pontuação geral e total de gols sofridos</p>
+            <p className="text-slate-400 text-xs mb-6">Pontuação geral e total de gols sofridos</p>
 
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-emerald-800 text-xs font-black uppercase text-amber-400 bg-emerald-950/80">
+                  <tr className="border-b border-white/10 text-xs font-black uppercase text-amber-400 bg-[#03140E]">
                     <th className="p-3">Posição</th>
                     <th className="p-3">Goleiro</th>
                     <th className="p-3 text-center">Gols Sofridos</th>
                     <th className="p-3 text-right">Pontos</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-emerald-800/40 text-sm">
+                <tbody className="divide-y divide-white/5 text-sm">
                   {rankingCesar.map(item => (
-                    <tr key={item.nome} className="hover:bg-emerald-900/30 transition-colors">
+                    <tr key={item.nome} className="hover:bg-white/5 transition-colors">
                       <td className="p-3 font-bold">{item.pos === 1 ? '🏆 #1º Lugar' : `#${item.pos}`}</td>
                       <td className="p-3 font-extrabold text-white">{item.nome}</td>
-                      <td className="p-3 text-center text-red-300 font-bold">{item.golsSofridos}</td>
+                      <td className="p-3 text-center text-rose-300 font-bold">{item.golsSofridos}</td>
                       <td className="p-3 text-right font-black text-amber-400">{item.pontos} pts</td>
                     </tr>
                   ))}
@@ -753,30 +759,30 @@ export default function App() {
         )}
 
         {aba === 'cadastrar' && (
-          <div className="bg-emerald-900/40 p-6 rounded-2xl border border-emerald-800/80 max-w-4xl mx-auto">
+          <div className="bg-[#08251B]/70 backdrop-blur-md p-6 rounded-3xl border border-white/10 shadow-2xl max-w-4xl mx-auto">
             {!autenticado ? (
-              <form onSubmit={handleLogin} className="bg-emerald-950/80 p-6 rounded-2xl border border-amber-500/30 text-center space-y-4">
+              <form onSubmit={handleLogin} className="bg-[#03140E]/80 p-8 rounded-3xl border border-amber-500/30 text-center space-y-4">
                 <h3 className="text-xl font-black text-amber-300">🔐 Área Restrita do Administrador</h3>
-                <p className="text-emerald-200/70 text-sm">Digite a senha para cadastrar ou editar partidas da liga.</p>
+                <p className="text-slate-300 text-xs">Digite a senha para cadastrar ou editar partidas da liga.</p>
                 <input 
                   type="password" 
                   value={senhaInput} 
                   onChange={(e) => setSenhaInput(e.target.value)} 
                   placeholder="Senha de acesso..." 
-                  className="bg-emerald-900 border border-emerald-700 text-white p-2.5 rounded-lg text-center w-full max-w-xs block mx-auto focus:outline-none"
+                  className="bg-slate-800 border border-slate-700 text-white p-2.5 rounded-xl text-center w-full max-w-xs block mx-auto focus:outline-none focus:border-emerald-500"
                 />
-                <button type="submit" className="bg-amber-400 text-slate-950 font-black px-6 py-2.5 rounded-lg shadow-lg hover:bg-amber-300 transition-all">
+                <button type="submit" className="bg-amber-400 text-slate-950 font-black px-6 py-2.5 rounded-xl shadow-lg hover:bg-amber-300 transition-all text-sm">
                   Entrar no Painel
                 </button>
               </form>
             ) : (
               <form onSubmit={handleSalvarJogo} className="space-y-6">
-                <div className="flex justify-between items-center border-b border-emerald-800 pb-4">
+                <div className="flex justify-between items-center border-b border-white/10 pb-4">
                   <h3 className="text-xl font-black text-amber-300">
                     {jogoEditandoId ? '✏️ Editar Partida Existente' : '➕ Cadastrar Nova Partida'}
                   </h3>
                   {jogoEditandoId && (
-                    <button type="button" onClick={resetForm} className="text-xs bg-red-500/20 text-red-300 border border-red-500/40 px-3 py-1 rounded-lg">
+                    <button type="button" onClick={resetForm} className="text-xs bg-rose-500/20 text-rose-300 border border-rose-500/40 px-3 py-1 rounded-lg">
                       Cancelar Edição
                     </button>
                   )}
@@ -788,21 +794,21 @@ export default function App() {
                     type="date" 
                     value={dataJogo} 
                     onChange={(e) => setDataJogo(e.target.value)} 
-                    className="bg-emerald-950 border border-emerald-700 text-white p-2.5 rounded-lg font-bold" 
+                    className="bg-[#03140E] border border-slate-700 text-white p-2.5 rounded-xl font-bold text-sm" 
                     required 
                   />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* CONFIGURAÇÃO TIME VERMELHO */}
-                  <div className="bg-emerald-950/60 p-4 rounded-xl border border-red-900/60 space-y-4">
-                    <p className="font-extrabold text-red-400 text-center uppercase tracking-wide">Time Vermelho</p>
+                  <div className="bg-[#03140E]/60 p-4 rounded-2xl border border-rose-900/60 space-y-4">
+                    <p className="font-extrabold text-rose-400 text-center uppercase tracking-wide text-xs">Time Vermelho</p>
                     <div>
                       <label className="block text-xs font-bold text-emerald-400 mb-1">🧤 Goleiro (Time Vermelho):</label>
                       <select 
                         value={goleiroA} 
                         onChange={(e) => setGoleiroA(e.target.value)} 
-                        className="bg-emerald-900 text-white font-bold text-sm p-2 rounded-lg border border-emerald-700 w-full"
+                        className="bg-[#08251B] text-white font-bold text-xs p-2 rounded-xl border border-slate-700 w-full"
                       >
                         {GOLEIROS_OPCOES.map(g => <option key={g} value={g}>{g}</option>)}
                       </select>
@@ -810,13 +816,13 @@ export default function App() {
 
                     <div>
                       <label className="block text-xs font-bold text-emerald-400 mb-2">⭐ Jogadores Titulares:</label>
-                      <div className="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto p-2 bg-emerald-900/40 rounded-lg border border-emerald-800">
+                      <div className="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto p-2 bg-[#08251B]/40 rounded-xl border border-white/5">
                         {ASSOCIADOS_OPCOES.map(nome => (
                           <button 
                             type="button" 
                             key={nome} 
                             onClick={() => toggleJogador('A', nome)} 
-                            className={`text-xs px-2.5 py-1 rounded-full border transition-all ${jogadoresA.includes(nome) ? 'bg-red-600 text-white font-bold border-red-500' : 'bg-emerald-950/60 text-emerald-200 border-emerald-800'}`}
+                            className={`text-xs px-2.5 py-1 rounded-full border transition-all ${jogadoresA.includes(nome) ? 'bg-rose-600 text-white font-bold border-rose-500' : 'bg-slate-800/80 text-slate-300 border-slate-700/60'}`}
                           >
                             {nome}
                           </button>
@@ -826,13 +832,13 @@ export default function App() {
 
                     <div>
                       <label className="block text-xs font-bold text-amber-400 mb-2">🔄 Substitutos:</label>
-                      <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-2 bg-emerald-900/40 rounded-lg border border-emerald-800">
+                      <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-2 bg-[#08251B]/40 rounded-xl border border-white/5">
                         {ASSOCIADOS_OPCOES.map(nome => (
                           <button 
                             type="button" 
                             key={nome} 
                             onClick={() => toggleSubstituto('A', nome)} 
-                            className={`text-xs px-2 py-0.5 rounded-full border transition-all ${substitutosA.includes(nome) ? 'bg-amber-400 text-slate-950 font-bold border-amber-300' : 'bg-emerald-950/60 text-emerald-200/60 border-emerald-800'}`}
+                            className={`text-xs px-2 py-0.5 rounded-full border transition-all ${substitutosA.includes(nome) ? 'bg-amber-400 text-slate-950 font-bold border-amber-300' : 'bg-slate-800/40 text-slate-400 border-slate-700/40'}`}
                           >
                             {nome}
                           </button>
@@ -842,14 +848,14 @@ export default function App() {
                   </div>
 
                   {/* CONFIGURAÇÃO TIME BRANCO */}
-                  <div className="bg-emerald-950/60 p-4 rounded-xl border border-slate-700 space-y-4">
-                    <p className="font-extrabold text-slate-100 text-center uppercase tracking-wide">Time Branco</p>
+                  <div className="bg-[#03140E]/60 p-4 rounded-2xl border border-slate-700 space-y-4">
+                    <p className="font-extrabold text-slate-100 text-center uppercase tracking-wide text-xs">Time Branco</p>
                     <div>
                       <label className="block text-xs font-bold text-emerald-400 mb-1">🧤 Goleiro (Time Branco):</label>
                       <select 
                         value={goleiroB} 
                         onChange={(e) => setGoleiroB(e.target.value)} 
-                        className="bg-emerald-900 text-white font-bold text-sm p-2 rounded-lg border border-emerald-700 w-full"
+                        className="bg-[#08251B] text-white font-bold text-xs p-2 rounded-xl border border-slate-700 w-full"
                       >
                         {GOLEIROS_OPCOES.map(g => <option key={g} value={g}>{g}</option>)}
                       </select>
@@ -857,13 +863,13 @@ export default function App() {
 
                     <div>
                       <label className="block text-xs font-bold text-emerald-400 mb-2">⭐ Jogadores Titulares:</label>
-                      <div className="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto p-2 bg-emerald-900/40 rounded-lg border border-emerald-800">
+                      <div className="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto p-2 bg-[#08251B]/40 rounded-xl border border-white/5">
                         {ASSOCIADOS_OPCOES.map(nome => (
                           <button 
                             type="button" 
                             key={nome} 
                             onClick={() => toggleJogador('B', nome)} 
-                            className={`text-xs px-2.5 py-1 rounded-full border transition-all ${jogadoresB.includes(nome) ? 'bg-slate-200 text-slate-950 font-bold border-white' : 'bg-emerald-950/60 text-emerald-200 border-emerald-800'}`}
+                            className={`text-xs px-2.5 py-1 rounded-full border transition-all ${jogadoresB.includes(nome) ? 'bg-slate-100 text-slate-950 font-bold border-white' : 'bg-slate-800/80 text-slate-300 border-slate-700/60'}`}
                           >
                             {nome}
                           </button>
@@ -873,13 +879,13 @@ export default function App() {
 
                     <div>
                       <label className="block text-xs font-bold text-amber-400 mb-2">🔄 Substitutos:</label>
-                      <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-2 bg-emerald-900/40 rounded-lg border border-emerald-800">
+                      <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-2 bg-[#08251B]/40 rounded-xl border border-white/5">
                         {ASSOCIADOS_OPCOES.map(nome => (
                           <button 
                             type="button" 
                             key={nome} 
                             onClick={() => toggleSubstituto('B', nome)} 
-                            className={`text-xs px-2 py-0.5 rounded-full border transition-all ${substitutosB.includes(nome) ? 'bg-amber-400 text-slate-950 font-bold border-amber-300' : 'bg-emerald-950/60 text-emerald-200/60 border-emerald-800'}`}
+                            className={`text-xs px-2 py-0.5 rounded-full border transition-all ${substitutosB.includes(nome) ? 'bg-amber-400 text-slate-950 font-bold border-amber-300' : 'bg-slate-800/40 text-slate-400 border-slate-700/40'}`}
                           >
                             {nome}
                           </button>
@@ -890,18 +896,18 @@ export default function App() {
                 </div>
 
                 {/* MARCAÇÃO DE GOLS */}
-                <div className="bg-emerald-950/80 p-4 rounded-xl border border-emerald-700 space-y-3">
-                  <p className="font-extrabold text-amber-300 text-center uppercase tracking-wide text-sm">⚽ Lançamento de Gols Marcados</p>
+                <div className="bg-[#03140E]/80 p-4 rounded-2xl border border-white/10 space-y-3">
+                  <p className="font-extrabold text-amber-300 text-center uppercase tracking-wide text-xs">⚽ Lançamento de Gols Marcados</p>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <p className="text-xs font-bold text-red-400 mb-2">Atletas do Time Vermelho:</p>
+                      <p className="text-xs font-bold text-rose-400 mb-2">Atletas do Time Vermelho:</p>
                       <div className="space-y-1.5 max-h-40 overflow-y-auto">
                         {[...jogadoresA, ...(substitutosA || []), `⚠️ Gol Contra (Time Vermelho)`].map(nome => (
-                          <div key={nome} className="flex justify-between items-center bg-emerald-900/60 p-2 rounded-lg text-xs">
+                          <div key={nome} className="flex justify-between items-center bg-[#08251B]/60 p-2 rounded-xl text-xs">
                             <span className="font-bold text-white">{nome}</span>
                             <div className="flex items-center gap-2">
-                              <button type="button" onClick={() => handleGolsJogador(nome, -1)} className="bg-emerald-950 text-white font-black w-6 h-6 rounded flex items-center justify-center">-</button>
+                              <button type="button" onClick={() => handleGolsJogador(nome, -1)} className="bg-[#03140E] text-white font-black w-6 h-6 rounded flex items-center justify-center">-</button>
                               <span className="font-black text-amber-300 w-4 text-center">{golsDetalhados[nome] || 0}</span>
                               <button type="button" onClick={() => handleGolsJogador(nome, 1)} className="bg-emerald-500 text-slate-950 font-black w-6 h-6 rounded flex items-center justify-center">+</button>
                             </div>
@@ -914,10 +920,10 @@ export default function App() {
                       <p className="text-xs font-bold text-slate-200 mb-2">Atletas do Time Branco:</p>
                       <div className="space-y-1.5 max-h-40 overflow-y-auto">
                         {[...jogadoresB, ...(substitutosB || []), `⚠️ Gol Contra (Time Branco)`].map(nome => (
-                          <div key={nome} className="flex justify-between items-center bg-emerald-900/60 p-2 rounded-lg text-xs">
+                          <div key={nome} className="flex justify-between items-center bg-[#08251B]/60 p-2 rounded-lg text-xs">
                             <span className="font-bold text-white">{nome}</span>
                             <div className="flex items-center gap-2">
-                              <button type="button" onClick={() => handleGolsJogador(nome, -1)} className="bg-emerald-950 text-white font-black w-6 h-6 rounded flex items-center justify-center">-</button>
+                              <button type="button" onClick={() => handleGolsJogador(nome, -1)} className="bg-[#03140E] text-white font-black w-6 h-6 rounded flex items-center justify-center">-</button>
                               <span className="font-black text-amber-300 w-4 text-center">{golsDetalhados[nome] || 0}</span>
                               <button type="button" onClick={() => handleGolsJogador(nome, 1)} className="bg-emerald-500 text-slate-950 font-black w-6 h-6 rounded flex items-center justify-center">+</button>
                             </div>
@@ -928,8 +934,8 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="flex justify-end gap-3 pt-4 border-t border-emerald-800">
-                  <button type="submit" className="bg-emerald-500 text-slate-950 font-black px-6 py-3 rounded-xl shadow-lg hover:bg-emerald-400 transition-all text-sm">
+                <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
+                  <button type="submit" className="bg-emerald-500 text-slate-950 font-black px-6 py-3 rounded-xl shadow-lg hover:bg-emerald-400 transition-all text-xs">
                     💾 Salvar Súmula
                   </button>
                 </div>
@@ -937,9 +943,11 @@ export default function App() {
             )}
           </div>
         )}
+
       </div>
 
-      <footer className="mt-12 text-center text-xs text-emerald-400/60 border-t border-emerald-800/40 pt-4">
+      {/* RODAPÉ MANTIDO */}
+      <footer className="mt-12 text-center text-xs text-slate-400 border-t border-white/10 pt-4">
         Aplicativo <span className="text-amber-300 font-extrabold">Olho no Lance</span> • Desenvolvido por <span className="text-emerald-300 font-bold">{NOME_DESENVOLVEDOR}</span>
       </footer>
     </div>
