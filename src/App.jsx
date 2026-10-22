@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 import { db } from './firebase';
@@ -552,12 +551,12 @@ export default function App() {
                       <div className="rounded-xl overflow-hidden shadow-2xl border border-emerald-800 bg-[#02130e]">
                         {/* BARRA SUPERIOR DO PLACAR */}
                         <div className="relative bg-emerald-950 border-b-2 border-emerald-700 flex items-center justify-between px-2 sm:px-4 py-1.5">
-                          {/* TIME VERMELHO */}
+                          {/* TIME VERMELHO COM NOME EM VERMELHO DESTAQUE */}
                           <div className="flex items-center gap-1.5 w-5/12">
                             <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-red-600 flex-shrink-0 flex items-center justify-center font-black text-white text-[10px] border border-white shadow">
                               VER
                             </div>
-                            <span className="font-black text-white text-xs sm:text-sm tracking-wide uppercase truncate">
+                            <span className="font-black text-red-500 text-xs sm:text-sm tracking-wide uppercase truncate">
                               VERMELHO
                             </span>
                           </div>
