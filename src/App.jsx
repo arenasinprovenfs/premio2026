@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 import { db } from './firebase';
@@ -331,9 +332,9 @@ export default function App() {
   const rodadaAtual = historico.find(r => r.data === dataSelecionada) || historico[0];
 
   return (
-    <div className="min-h-screen bg-emerald-950 text-emerald-50 p-2 sm:p-6 font-sans flex flex-col justify-between">
+    <div className="min-h-screen bg-[#031d15] text-emerald-50 p-2 sm:p-6 font-sans flex flex-col justify-between">
       <div>
-        <header className="mb-6 border-b border-emerald-800/60 pb-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+        <header className="mb-6 border-b border-emerald-900/80 pb-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
           <div className="flex items-center gap-3">
             <img 
               src="/logo.png" 
@@ -348,7 +349,8 @@ export default function App() {
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-1.5 bg-emerald-900/80 p-1 rounded-xl border border-emerald-800 text-xs sm:text-sm">
+          {/* ABAS COM NOMES COMPLETO E ORIGINAIS */}
+          <div className="flex flex-wrap gap-1.5 bg-emerald-950/90 p-1 rounded-xl border border-emerald-800 text-xs sm:text-sm">
             <button 
               onClick={() => setAba('geral')}
               className={`px-3 py-1.5 rounded-lg transition-all ${aba === 'geral' ? 'bg-emerald-500 text-slate-950 shadow-md font-bold' : 'text-emerald-200/70 hover:text-white'}`}
@@ -359,29 +361,29 @@ export default function App() {
               onClick={() => setAba('jogos')}
               className={`px-3 py-1.5 rounded-lg transition-all ${aba === 'jogos' ? 'bg-teal-500 text-slate-950 shadow-md font-bold' : 'text-emerald-200/70 hover:text-white'}`}
             >
-              ⚽ Jogos
+              ⚽ Jogos da Rodada
             </button>
             <button 
               onClick={() => setAba('mangabeira')}
               className={`px-3 py-1.5 rounded-lg transition-all ${aba === 'mangabeira' ? 'bg-emerald-600 text-white shadow-md font-bold' : 'text-emerald-200/70 hover:text-white'}`}
             >
-              Craque
+              Craque (Mangabeira)
             </button>
             <button 
               onClick={() => setAba('brocador')}
               className={`px-3 py-1.5 rounded-lg transition-all ${aba === 'brocador' ? 'bg-red-600 text-white shadow-md font-bold' : 'text-emerald-200/70 hover:text-white'}`}
             >
-              Artilharia
+              Artilharia (Brocador)
             </button>
             <button 
               onClick={() => setAba('cesar')}
               className={`px-3 py-1.5 rounded-lg transition-all ${aba === 'cesar' ? 'bg-amber-500 text-slate-950 shadow-md font-bold' : 'text-emerald-200/70 hover:text-white'}`}
             >
-              Goleiros
+              Goleiros (César)
             </button>
             <button 
               onClick={() => { resetForm(); setAba('cadastrar'); }}
-              className={`px-3 py-1.5 rounded-lg transition-all ${aba === 'cadastrar' ? 'bg-amber-400 text-slate-950 shadow-md font-black' : 'bg-emerald-800/80 text-amber-300 hover:text-white border border-amber-500/40'}`}
+              className={`px-3 py-1.5 rounded-lg transition-all ${aba === 'cadastrar' ? 'bg-amber-400 text-slate-950 shadow-md font-black' : 'bg-emerald-900/80 text-amber-300 hover:text-white border border-amber-500/40'}`}
             >
               ➕ Cadastrar
             </button>
@@ -391,21 +393,21 @@ export default function App() {
         {aba === 'geral' && (
           <>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              <div className="bg-emerald-900/50 p-4 rounded-2xl border border-emerald-500/30 shadow-lg relative overflow-hidden">
+              <div className="bg-emerald-950/70 p-4 rounded-2xl border border-emerald-600/30 shadow-lg relative overflow-hidden">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded">Prêmio Mangabeira</span>
                 <p className="text-emerald-200/70 text-xs mt-2">Líder do Ranking</p>
                 <p className="text-2xl font-black text-white mt-0.5">{rankingMangabeira[0]?.nome}</p>
                 <p className="text-emerald-400 font-bold text-base mt-0.5">{rankingMangabeira[0]?.pontos} <span className="text-xs font-normal text-emerald-200/60">pontos</span></p>
               </div>
 
-              <div className="bg-emerald-900/50 p-4 rounded-2xl border border-red-500/30 shadow-lg relative overflow-hidden">
+              <div className="bg-emerald-950/70 p-4 rounded-2xl border border-red-500/30 shadow-lg relative overflow-hidden">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-red-400 bg-red-500/20 px-2 py-0.5 rounded">Prêmio Brocador</span>
                 <p className="text-emerald-200/70 text-xs mt-2">Artilheiro Máximo</p>
                 <p className="text-2xl font-black text-white mt-0.5">{rankingBrocador[0]?.nome}</p>
                 <p className="text-red-400 font-bold text-base mt-0.5">{rankingBrocador[0]?.gols} <span className="text-xs font-normal text-emerald-200/60">gols</span></p>
               </div>
 
-              <div className="bg-emerald-900/50 p-4 rounded-2xl border border-amber-500/30 shadow-lg relative overflow-hidden">
+              <div className="bg-emerald-950/70 p-4 rounded-2xl border border-amber-500/30 shadow-lg relative overflow-hidden">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded">Prêmio César</span>
                 <p className="text-emerald-200/70 text-xs mt-2">Melhor Goleiro</p>
                 <p className="text-2xl font-black text-white mt-0.5">{rankingCesar[0]?.nome}</p>
@@ -414,32 +416,32 @@ export default function App() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-              <div className="bg-emerald-900/40 p-4 rounded-2xl border border-emerald-800/80">
+              <div className="bg-emerald-950/60 p-4 rounded-2xl border border-emerald-900/80">
                 <h2 className="text-lg font-bold text-white mb-1">Top 10 - Prêmio Mangabeira (Craque)</h2>
                 <p className="text-emerald-200/60 text-xs mb-3">Primeiros 10 colocados na classificação geral</p>
                 <div className="h-72 w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={rankingMangabeira.slice(0, 10)}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#065f46" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#064e3b" />
                       <XAxis dataKey="nome" stroke="#a7f3d0" tick={{ fontSize: 10 }} interval={0} angle={-30} textAnchor="end" height={50} />
                       <YAxis stroke="#a7f3d0" />
-                      <Tooltip contentStyle={{ backgroundColor: '#064e3b', borderColor: '#065f46', borderRadius: '8px', color: '#fff' }} />
+                      <Tooltip contentStyle={{ backgroundColor: '#022c22', borderColor: '#065f46', borderRadius: '8px', color: '#fff' }} />
                       <Bar dataKey="pontos" name="Pontos" fill="#10b981" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
               </div>
 
-              <div className="bg-emerald-900/40 p-4 rounded-2xl border border-emerald-800/80">
+              <div className="bg-emerald-950/60 p-4 rounded-2xl border border-emerald-900/80">
                 <h2 className="text-lg font-bold text-white mb-1">Top 10 - Prêmio Brocador (Artilharia)</h2>
                 <p className="text-emerald-200/60 text-xs mb-3">Primeiros 10 colocados em número de gols</p>
                 <div className="h-72 w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={rankingBrocador.slice(0, 10)}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#065f46" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#064e3b" />
                       <XAxis dataKey="nome" stroke="#a7f3d0" tick={{ fontSize: 10 }} interval={0} angle={-30} textAnchor="end" height={50} />
                       <YAxis stroke="#a7f3d0" />
-                      <Tooltip contentStyle={{ backgroundColor: '#064e3b', borderColor: '#065f46', borderRadius: '8px', color: '#fff' }} />
+                      <Tooltip contentStyle={{ backgroundColor: '#022c22', borderColor: '#065f46', borderRadius: '8px', color: '#fff' }} />
                       <Bar dataKey="gols" name="Gols" fill="#ef4444" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
@@ -447,16 +449,16 @@ export default function App() {
               </div>
             </div>
 
-            <div className="bg-emerald-900/40 p-4 rounded-2xl border border-emerald-800/80 mb-6">
+            <div className="bg-emerald-950/60 p-4 rounded-2xl border border-emerald-900/80 mb-6">
               <h2 className="text-lg font-bold text-white mb-1">Prêmio César - Desempenho dos Goleiros</h2>
               <p className="text-emerald-200/60 text-xs mb-3">Comparativo entre Pontos obtidos vs. Gols Sofridos</p>
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={rankingCesar}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#065f46" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#064e3b" />
                     <XAxis dataKey="nome" stroke="#a7f3d0" tick={{ fontSize: 11 }} />
                     <YAxis stroke="#a7f3d0" />
-                    <Tooltip contentStyle={{ backgroundColor: '#064e3b', borderColor: '#065f46', borderRadius: '8px', color: '#fff' }} />
+                    <Tooltip contentStyle={{ backgroundColor: '#022c22', borderColor: '#065f46', borderRadius: '8px', color: '#fff' }} />
                     <Legend />
                     <Bar dataKey="pontos" name="Pontos" fill="#f59e0b" radius={[4, 4, 0, 0]} />
                     <Bar dataKey="golsSofridos" name="Gols Sofridos" fill="#ef4444" radius={[4, 4, 0, 0]} />
@@ -468,26 +470,26 @@ export default function App() {
         )}
 
         {aba === 'jogos' && (
-          <div className="bg-emerald-900/40 p-2 sm:p-4 rounded-2xl border border-emerald-800/80">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4 border-b border-emerald-800/60 pb-3">
+          <div className="bg-emerald-950/60 p-2 sm:p-4 rounded-2xl border border-emerald-900/80">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4 border-b border-emerald-900/60 pb-3">
               <div>
                 <h2 className="text-xl font-bold text-teal-300 flex items-center gap-1.5">
-                  ⚽ Súmula das Partidas
+                  ⚽ Súmula e Resultados das Partidas
                 </h2>
-                <p className="text-emerald-200/60 text-xs">Histórico completo em tempo real</p>
+                <p className="text-emerald-200/60 text-xs">Histórico completo de partidas em tempo real</p>
               </div>
 
               {historico.length > 0 && (
-                <div className="flex items-center gap-1.5 bg-emerald-950 p-1.5 rounded-xl border border-emerald-700">
+                <div className="flex items-center gap-1.5 bg-[#02130e] p-1.5 rounded-xl border border-emerald-800">
                   <span className="text-[10px] font-bold text-emerald-400 uppercase">📅 Data:</span>
                   <select 
                     value={dataSelecionada} 
                     onChange={(e) => setDataSelecionada(e.target.value)}
-                    className="bg-emerald-900 text-white font-bold text-xs px-2 py-1 rounded-lg border border-emerald-600 focus:outline-none"
+                    className="bg-emerald-950 text-white font-bold text-xs px-2 py-1 rounded-lg border border-emerald-700 focus:outline-none"
                   >
                     {historico.map(r => (
                       <option key={r.data} value={r.data}>
-                        {r.data} ({r.jogos.length} {r.jogos.length > 1 ? 'jogos' : 'jogo'})
+                        {r.data} ({r.jogos.length} {r.jogos.length > 1 ? 'partidas' : 'partida'})
                       </option>
                     ))}
                   </select>
@@ -496,7 +498,7 @@ export default function App() {
             </div>
 
             {historico.length === 0 ? (
-              <div className="text-center py-8 bg-emerald-950/60 rounded-xl border border-emerald-800/60">
+              <div className="text-center py-8 bg-[#02130e]/80 rounded-xl border border-emerald-900/60">
                 <p className="text-base font-bold text-emerald-300">Nenhuma rodada cadastrada ainda!</p>
                 <p className="text-xs text-emerald-200/60 mt-1">Acesse a aba "➕ Cadastrar" para inserir a primeira partida.</p>
               </div>
@@ -546,10 +548,10 @@ export default function App() {
                         </div>
                       </div>
 
-                      {/* DESIGN ESTILO COMPACTO - CORES DA ARENA SINPROVENFS */}
-                      <div className="rounded-xl overflow-hidden shadow-2xl border border-emerald-700/80 bg-emerald-950">
+                      {/* DESIGN ESTILO COMPACTO - VERDE MAIS ESCURO */}
+                      <div className="rounded-xl overflow-hidden shadow-2xl border border-emerald-800 bg-[#02130e]">
                         {/* BARRA SUPERIOR DO PLACAR */}
-                        <div className="relative bg-emerald-900/90 border-b-2 border-emerald-600 flex items-center justify-between px-2 sm:px-4 py-1.5">
+                        <div className="relative bg-emerald-950 border-b-2 border-emerald-700 flex items-center justify-between px-2 sm:px-4 py-1.5">
                           {/* TIME VERMELHO */}
                           <div className="flex items-center gap-1.5 w-5/12">
                             <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-red-600 flex-shrink-0 flex items-center justify-center font-black text-white text-[10px] border border-white shadow">
@@ -562,13 +564,13 @@ export default function App() {
 
                           {/* CENTRO: PLACAR E "X" */}
                           <div className="flex items-center justify-center gap-1.5 z-10 w-2/12">
-                            <span className="font-black text-lg sm:text-2xl text-white bg-emerald-950 px-2 py-0.5 rounded border border-emerald-700 shadow-inner">
+                            <span className="font-black text-lg sm:text-2xl text-white bg-[#010a07] px-2 py-0.5 rounded border border-emerald-800 shadow-inner">
                               {j.golsA}
                             </span>
                             <span className="font-extrabold text-xs text-amber-400 uppercase">
                               X
                             </span>
-                            <span className="font-black text-lg sm:text-2xl text-white bg-emerald-950 px-2 py-0.5 rounded border border-emerald-700 shadow-inner">
+                            <span className="font-black text-lg sm:text-2xl text-white bg-[#010a07] px-2 py-0.5 rounded border border-emerald-800 shadow-inner">
                               {j.golsB}
                             </span>
                           </div>
@@ -584,8 +586,8 @@ export default function App() {
                           </div>
                         </div>
 
-                        {/* TABELA DE JOGADORES (CORES VERDE ESMERALDA / CAMPO) */}
-                        <div className="divide-y divide-emerald-800/40 bg-emerald-950">
+                        {/* TABELA DE JOGADORES */}
+                        <div className="divide-y divide-emerald-900/50 bg-[#02130e]">
                           {Array.from({ length: maxLinhas }).map((_, idx) => {
                             const pA = listaEscalacaoA[idx];
                             const pB = listaEscalacaoB[idx];
@@ -598,7 +600,7 @@ export default function App() {
                               <div 
                                 key={idx} 
                                 className={`flex justify-between items-center px-2.5 sm:px-4 py-1 text-[11px] sm:text-xs transition-colors ${
-                                  isEven ? 'bg-emerald-950' : 'bg-emerald-900/40'
+                                  isEven ? 'bg-[#02130e]' : 'bg-[#042118]'
                                 }`}
                               >
                                 {/* LADO ESQUERDO: TIME VERMELHO */}
@@ -658,20 +660,20 @@ export default function App() {
         )}
 
         {aba === 'mangabeira' && (
-          <div className="bg-emerald-900/40 p-4 rounded-2xl border border-emerald-800/80">
+          <div className="bg-emerald-950/60 p-4 rounded-2xl border border-emerald-900/80">
             <h2 className="text-xl font-bold text-emerald-300 mb-1">Prêmio Mangabeira - Craque do Campeonato</h2>
             <p className="text-emerald-200/60 text-xs mb-4">Classificação geral baseada nos pontos conquistados por partida</p>
             
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-emerald-800 text-[11px] font-black uppercase text-emerald-400 bg-emerald-950/80">
+                  <tr className="border-b border-emerald-800 text-[11px] font-black uppercase text-emerald-400 bg-[#02130e]">
                     <th className="p-2.5">Posição</th>
                     <th className="p-2.5">Atleta</th>
                     <th className="p-2.5 text-right">Pontos Totais</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-emerald-800/40 text-xs sm:text-sm">
+                <tbody className="divide-y divide-emerald-900/50 text-xs sm:text-sm">
                   {rankingMangabeira.map(item => (
                     <tr key={item.nome} className="hover:bg-emerald-900/30 transition-colors">
                       <td className="p-2.5 font-bold">{item.pos <= 7 ? `⭐ #${item.pos} G7` : `#${item.pos}`}</td>
@@ -686,20 +688,20 @@ export default function App() {
         )}
 
         {aba === 'brocador' && (
-          <div className="bg-emerald-900/40 p-4 rounded-2xl border border-emerald-800/80">
+          <div className="bg-emerald-950/60 p-4 rounded-2xl border border-emerald-900/80">
             <h2 className="text-xl font-bold text-red-400 mb-1">Prêmio Brocador - Artilharia</h2>
             <p className="text-emerald-200/60 text-xs mb-4">Classificação geral de marcadores de gol</p>
 
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-emerald-800 text-[11px] font-black uppercase text-red-400 bg-emerald-950/80">
+                  <tr className="border-b border-emerald-800 text-[11px] font-black uppercase text-red-400 bg-[#02130e]">
                     <th className="p-2.5">Posição</th>
                     <th className="p-2.5">Atleta</th>
                     <th className="p-2.5 text-right">Gols Marcados</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-emerald-800/40 text-xs sm:text-sm">
+                <tbody className="divide-y divide-emerald-900/50 text-xs sm:text-sm">
                   {rankingBrocador.map(item => (
                     <tr key={item.nome} className="hover:bg-emerald-900/30 transition-colors">
                       <td className="p-2.5 font-bold">{item.pos === 1 ? '🏆 #1º Lugar' : `#${item.pos}`}</td>
@@ -714,21 +716,21 @@ export default function App() {
         )}
 
         {aba === 'cesar' && (
-          <div className="bg-emerald-900/40 p-4 rounded-2xl border border-emerald-800/80">
+          <div className="bg-emerald-950/60 p-4 rounded-2xl border border-emerald-900/80">
             <h2 className="text-xl font-bold text-amber-400 mb-1">Prêmio César - Desempenho de Goleiros</h2>
             <p className="text-emerald-200/60 text-xs mb-4">Pontuação geral e total de gols sofridos</p>
 
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-emerald-800 text-[11px] font-black uppercase text-amber-400 bg-emerald-950/80">
+                  <tr className="border-b border-emerald-800 text-[11px] font-black uppercase text-amber-400 bg-[#02130e]">
                     <th className="p-2.5">Posição</th>
                     <th className="p-2.5">Goleiro</th>
                     <th className="p-2.5 text-center">Gols Sofridos</th>
                     <th className="p-2.5 text-right">Pontos</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-emerald-800/40 text-xs sm:text-sm">
+                <tbody className="divide-y divide-emerald-900/50 text-xs sm:text-sm">
                   {rankingCesar.map(item => (
                     <tr key={item.nome} className="hover:bg-emerald-900/30 transition-colors">
                       <td className="p-2.5 font-bold">{item.pos === 1 ? '🏆 #1º Lugar' : `#${item.pos}`}</td>
@@ -744,9 +746,9 @@ export default function App() {
         )}
 
         {aba === 'cadastrar' && (
-          <div className="bg-emerald-900/40 p-4 sm:p-6 rounded-2xl border border-emerald-800/80 max-w-4xl mx-auto">
+          <div className="bg-emerald-950/60 p-4 sm:p-6 rounded-2xl border border-emerald-900/80 max-w-4xl mx-auto">
             {!autenticado ? (
-              <form onSubmit={handleLogin} className="bg-emerald-950/80 p-6 rounded-2xl border border-amber-500/30 text-center space-y-4">
+              <form onSubmit={handleLogin} className="bg-[#02130e] p-6 rounded-2xl border border-amber-500/30 text-center space-y-4">
                 <h3 className="text-lg font-black text-amber-300">🔐 Área Restrita do Administrador</h3>
                 <p className="text-emerald-200/70 text-xs">Digite a senha para cadastrar ou editar partidas da liga.</p>
                 <input 
@@ -754,7 +756,7 @@ export default function App() {
                   value={senhaInput} 
                   onChange={(e) => setSenhaInput(e.target.value)} 
                   placeholder="Senha de acesso..." 
-                  className="bg-emerald-900 border border-emerald-700 text-white p-2 rounded-lg text-center w-full max-w-xs block mx-auto text-sm focus:outline-none"
+                  className="bg-emerald-950 border border-emerald-700 text-white p-2 rounded-lg text-center w-full max-w-xs block mx-auto text-sm focus:outline-none"
                 />
                 <button type="submit" className="bg-amber-400 text-slate-950 font-black px-5 py-2 rounded-lg shadow-lg hover:bg-amber-300 transition-all text-sm">
                   Entrar no Painel
@@ -779,21 +781,21 @@ export default function App() {
                     type="date" 
                     value={dataJogo} 
                     onChange={(e) => setDataJogo(e.target.value)} 
-                    className="bg-emerald-950 border border-emerald-700 text-white p-2 rounded-lg font-bold text-xs" 
+                    className="bg-[#02130e] border border-emerald-700 text-white p-2 rounded-lg font-bold text-xs" 
                     required 
                   />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* CONFIGURAÇÃO TIME VERMELHO */}
-                  <div className="bg-emerald-950/60 p-3 rounded-xl border border-red-900/60 space-y-3">
+                  <div className="bg-[#02130e] p-3 rounded-xl border border-red-900/60 space-y-3">
                     <p className="font-extrabold text-red-400 text-center uppercase tracking-wide text-xs">Time Vermelho</p>
                     <div>
                       <label className="block text-[11px] font-bold text-emerald-400 mb-1">🧤 Goleiro (Time Vermelho):</label>
                       <select 
                         value={goleiroA} 
                         onChange={(e) => setGoleiroA(e.target.value)} 
-                        className="bg-emerald-900 text-white font-bold text-xs p-1.5 rounded-lg border border-emerald-700 w-full"
+                        className="bg-emerald-950 text-white font-bold text-xs p-1.5 rounded-lg border border-emerald-700 w-full"
                       >
                         {GOLEIROS_OPCOES.map(g => <option key={g} value={g}>{g}</option>)}
                       </select>
@@ -801,13 +803,13 @@ export default function App() {
 
                     <div>
                       <label className="block text-[11px] font-bold text-emerald-400 mb-1.5">⭐ Jogadores Titulares:</label>
-                      <div className="flex flex-wrap gap-1 max-h-40 overflow-y-auto p-1.5 bg-emerald-900/40 rounded-lg border border-emerald-800">
+                      <div className="flex flex-wrap gap-1 max-h-40 overflow-y-auto p-1.5 bg-emerald-950/60 rounded-lg border border-emerald-800">
                         {ASSOCIADOS_OPCOES.map(nome => (
                           <button 
                             type="button" 
                             key={nome} 
                             onClick={() => toggleJogador('A', nome)} 
-                            className={`text-[10px] px-2 py-0.5 rounded-full border transition-all ${jogadoresA.includes(nome) ? 'bg-red-600 text-white font-bold border-red-500' : 'bg-emerald-950/60 text-emerald-200 border-emerald-800'}`}
+                            className={`text-[10px] px-2 py-0.5 rounded-full border transition-all ${jogadoresA.includes(nome) ? 'bg-red-600 text-white font-bold border-red-500' : 'bg-[#02130e] text-emerald-200 border-emerald-800'}`}
                           >
                             {nome}
                           </button>
@@ -817,13 +819,13 @@ export default function App() {
 
                     <div>
                       <label className="block text-[11px] font-bold text-amber-400 mb-1.5">🔄 Substitutos:</label>
-                      <div className="flex flex-wrap gap-1 max-h-32 overflow-y-auto p-1.5 bg-emerald-900/40 rounded-lg border border-emerald-800">
+                      <div className="flex flex-wrap gap-1 max-h-32 overflow-y-auto p-1.5 bg-emerald-950/60 rounded-lg border border-emerald-800">
                         {ASSOCIADOS_OPCOES.map(nome => (
                           <button 
                             type="button" 
                             key={nome} 
                             onClick={() => toggleSubstituto('A', nome)} 
-                            className={`text-[10px] px-2 py-0.5 rounded-full border transition-all ${substitutosA.includes(nome) ? 'bg-amber-400 text-slate-950 font-bold border-amber-300' : 'bg-emerald-950/60 text-emerald-200/60 border-emerald-800'}`}
+                            className={`text-[10px] px-2 py-0.5 rounded-full border transition-all ${substitutosA.includes(nome) ? 'bg-amber-400 text-slate-950 font-bold border-amber-300' : 'bg-[#02130e] text-emerald-200/60 border-emerald-800'}`}
                           >
                             {nome}
                           </button>
@@ -833,14 +835,14 @@ export default function App() {
                   </div>
 
                   {/* CONFIGURAÇÃO TIME BRANCO */}
-                  <div className="bg-emerald-950/60 p-3 rounded-xl border border-slate-700 space-y-3">
+                  <div className="bg-[#02130e] p-3 rounded-xl border border-slate-700 space-y-3">
                     <p className="font-extrabold text-slate-100 text-center uppercase tracking-wide text-xs">Time Branco</p>
                     <div>
                       <label className="block text-[11px] font-bold text-emerald-400 mb-1">🧤 Goleiro (Time Branco):</label>
                       <select 
                         value={goleiroB} 
                         onChange={(e) => setGoleiroB(e.target.value)} 
-                        className="bg-emerald-900 text-white font-bold text-xs p-1.5 rounded-lg border border-emerald-700 w-full"
+                        className="bg-emerald-950 text-white font-bold text-xs p-1.5 rounded-lg border border-emerald-700 w-full"
                       >
                         {GOLEIROS_OPCOES.map(g => <option key={g} value={g}>{g}</option>)}
                       </select>
@@ -848,13 +850,13 @@ export default function App() {
 
                     <div>
                       <label className="block text-[11px] font-bold text-emerald-400 mb-1.5">⭐ Jogadores Titulares:</label>
-                      <div className="flex flex-wrap gap-1 max-h-40 overflow-y-auto p-1.5 bg-emerald-900/40 rounded-lg border border-emerald-800">
+                      <div className="flex flex-wrap gap-1 max-h-40 overflow-y-auto p-1.5 bg-emerald-950/60 rounded-lg border border-emerald-800">
                         {ASSOCIADOS_OPCOES.map(nome => (
                           <button 
                             type="button" 
                             key={nome} 
                             onClick={() => toggleJogador('B', nome)} 
-                            className={`text-[10px] px-2 py-0.5 rounded-full border transition-all ${jogadoresB.includes(nome) ? 'bg-slate-200 text-slate-950 font-bold border-white' : 'bg-emerald-950/60 text-emerald-200 border-emerald-800'}`}
+                            className={`text-[10px] px-2 py-0.5 rounded-full border transition-all ${jogadoresB.includes(nome) ? 'bg-slate-200 text-slate-950 font-bold border-white' : 'bg-[#02130e] text-emerald-200 border-emerald-800'}`}
                           >
                             {nome}
                           </button>
@@ -864,13 +866,13 @@ export default function App() {
 
                     <div>
                       <label className="block text-[11px] font-bold text-amber-400 mb-1.5">🔄 Substitutos:</label>
-                      <div className="flex flex-wrap gap-1 max-h-32 overflow-y-auto p-1.5 bg-emerald-900/40 rounded-lg border border-emerald-800">
+                      <div className="flex flex-wrap gap-1 max-h-32 overflow-y-auto p-1.5 bg-emerald-950/60 rounded-lg border border-emerald-800">
                         {ASSOCIADOS_OPCOES.map(nome => (
                           <button 
                             type="button" 
                             key={nome} 
                             onClick={() => toggleSubstituto('B', nome)} 
-                            className={`text-[10px] px-2 py-0.5 rounded-full border transition-all ${substitutosB.includes(nome) ? 'bg-amber-400 text-slate-950 font-bold border-amber-300' : 'bg-emerald-950/60 text-emerald-200/60 border-emerald-800'}`}
+                            className={`text-[10px] px-2 py-0.5 rounded-full border transition-all ${substitutosB.includes(nome) ? 'bg-amber-400 text-slate-950 font-bold border-amber-300' : 'bg-[#02130e] text-emerald-200/60 border-emerald-800'}`}
                           >
                             {nome}
                           </button>
@@ -881,7 +883,7 @@ export default function App() {
                 </div>
 
                 {/* MARCAÇÃO DE GOLS */}
-                <div className="bg-emerald-950/80 p-3 rounded-xl border border-emerald-700 space-y-2">
+                <div className="bg-[#02130e] p-3 rounded-xl border border-emerald-700 space-y-2">
                   <p className="font-extrabold text-amber-300 text-center uppercase tracking-wide text-xs">⚽ Lançamento de Gols Marcados</p>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -889,10 +891,10 @@ export default function App() {
                       <p className="text-[11px] font-bold text-red-400 mb-1.5">Atletas do Time Vermelho:</p>
                       <div className="space-y-1 max-h-36 overflow-y-auto">
                         {[...jogadoresA, ...(substitutosA || []), `⚠️ Gol Contra (Time Vermelho)`].map(nome => (
-                          <div key={nome} className="flex justify-between items-center bg-emerald-900/60 p-1.5 rounded-lg text-xs">
+                          <div key={nome} className="flex justify-between items-center bg-emerald-950/80 p-1.5 rounded-lg text-xs">
                             <span className="font-bold text-white text-[11px]">{nome}</span>
                             <div className="flex items-center gap-1.5">
-                              <button type="button" onClick={() => handleGolsJogador(nome, -1)} className="bg-emerald-950 text-white font-black w-5 h-5 rounded flex items-center justify-center text-xs">-</button>
+                              <button type="button" onClick={() => handleGolsJogador(nome, -1)} className="bg-[#010a07] text-white font-black w-5 h-5 rounded flex items-center justify-center text-xs">-</button>
                               <span className="font-black text-amber-300 w-3 text-center text-xs">{golsDetalhados[nome] || 0}</span>
                               <button type="button" onClick={() => handleGolsJogador(nome, 1)} className="bg-emerald-500 text-slate-950 font-black w-5 h-5 rounded flex items-center justify-center text-xs">+</button>
                             </div>
@@ -905,10 +907,10 @@ export default function App() {
                       <p className="text-[11px] font-bold text-slate-200 mb-1.5">Atletas do Time Branco:</p>
                       <div className="space-y-1 max-h-36 overflow-y-auto">
                         {[...jogadoresB, ...(substitutosB || []), `⚠️ Gol Contra (Time Branco)`].map(nome => (
-                          <div key={nome} className="flex justify-between items-center bg-emerald-900/60 p-1.5 rounded-lg text-xs">
+                          <div key={nome} className="flex justify-between items-center bg-emerald-950/80 p-1.5 rounded-lg text-xs">
                             <span className="font-bold text-white text-[11px]">{nome}</span>
                             <div className="flex items-center gap-1.5">
-                              <button type="button" onClick={() => handleGolsJogador(nome, -1)} className="bg-emerald-950 text-white font-black w-5 h-5 rounded flex items-center justify-center text-xs">-</button>
+                              <button type="button" onClick={() => handleGolsJogador(nome, -1)} className="bg-[#010a07] text-white font-black w-5 h-5 rounded flex items-center justify-center text-xs">-</button>
                               <span className="font-black text-amber-300 w-3 text-center text-xs">{golsDetalhados[nome] || 0}</span>
                               <button type="button" onClick={() => handleGolsJogador(nome, 1)} className="bg-emerald-500 text-slate-950 font-black w-5 h-5 rounded flex items-center justify-center text-xs">+</button>
                             </div>
@@ -930,7 +932,7 @@ export default function App() {
         )}
       </div>
 
-      <footer className="mt-8 text-center text-xs text-emerald-400/60 border-t border-emerald-800/40 pt-3">
+      <footer className="mt-8 text-center text-xs text-emerald-400/60 border-t border-emerald-900/80 pt-3">
         Aplicativo <span className="text-amber-300 font-extrabold">Olho no Lance</span> • Desenvolvido por <span className="text-emerald-300 font-bold">{NOME_DESENVOLVEDOR}</span>
       </footer>
     </div>
