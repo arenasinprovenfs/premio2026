@@ -74,6 +74,7 @@ export default function App() {
   const [historico, setHistorico] = useState([]);
   const [dataSelecionada, setDataSelecionada] = useState('');
 
+  // Escuta o Firestore em Tempo Real
   useEffect(() => {
     const unsub = onSnapshot(collection(db, "partidas"), (snapshot) => {
       const docsData = snapshot.docs.map(doc => doc.data());
@@ -332,13 +333,6 @@ export default function App() {
   const { mangabeira: rankingMangabeira, brocador: rankingBrocador, cesar: rankingCesar } = calcularRankings();
   const rodadaAtual = historico.find(r => r.data === dataSelecionada) || historico[0];
 
-  // Helper para buscar a quantidade de gols de um jogador específico na partida
-  const getGolsDoJogador = (jogo, nomeJogador) => {
-    if (!jogo.golsMarcados) return 0;
-    const registro = jogo.golsMarcados.find(g => g.jogador === nomeJogador);
-    return registro ? registro.quantidade : 0;
-  };
-
   return (
     <div className="min-h-screen bg-emerald-950 text-emerald-50 p-4 md:p-8 font-sans flex flex-col justify-between">
       <div>
@@ -512,8 +506,8 @@ export default function App() {
             ) : (
               <div className="space-y-6">
                 {rodadaAtual?.jogos.map((j) => {
-                  const gcVermelho = getGolsDoJogador(j, "⚠️ Gol Contra (Time Vermelho)");
-                  const gcBranco = getGolsDoJogador(j, "⚠️ Gol Contra (Time Branco)");
+                  const golsTimeA = j.golsMarcados ? j.golsMarcados.filter(g => j.jogadoresA.includes(g.jogador) || (j.substitutosA && j.substitutosA.includes(g.jogador)) || g.jogador.includes('Vermelho')) : [];
+                  const golsTimeB = j.golsMarcados ? j.golsMarcados.filter(g => j.jogadoresB.includes(g.jogador) || (j.substitutosB && j.substitutosB.includes(g.jogador)) || g.jogador.includes('Branco')) : [];
 
                   return (
                     <div key={j.id} className="bg-emerald-950/90 p-5 rounded-2xl border border-emerald-800/80 shadow-lg">
@@ -571,58 +565,44 @@ export default function App() {
                             
                             <p className="text-[11px] font-bold text-emerald-300 mb-1">⭐ Titulares:</p>
                             <div className="flex flex-wrap gap-1.5 mb-3">
-                              {/* GOLEIRO */}
+                              {/* GOLEIRO NO INÍCIO DOS TITULARES */}
                               {j.goleiroA && (
                                 <span className="bg-amber-500/20 text-amber-300 text-xs px-2.5 py-1 rounded-full border border-amber-500/40 shadow font-bold flex items-center gap-1">
                                   🧤 {j.goleiroA} (Goleiro)
                                 </span>
                               )}
-                              {/* JOGADORES TITULARES COM GOLS AO LADO DO NOME */}
-                              {j.jogadoresA.map(nome => {
-                                const qtes = getGolsDoJogador(j, nome);
-                                return (
-                                  <span key={nome} className="bg-emerald-900/90 text-white text-xs px-2.5 py-1 rounded-full border border-emerald-500/50 shadow flex items-center gap-1">
-                                    <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-                                    {nome}
-                                    {qtes > 0 && (
-                                      <span className="bg-amber-400 text-slate-950 px-1.5 py-0.2 text-[10px] rounded-full font-black ml-1">
-                                        ⚽ {qtes}
-                                      </span>
-                                    )}
-                                  </span>
-                                );
-                              })}
+                              {j.jogadoresA.map(nome => (
+                                <span key={nome} className="bg-emerald-900/90 text-white text-xs px-2.5 py-1 rounded-full border border-emerald-500/50 shadow flex items-center gap-1">
+                                  <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                                  {nome}
+                                </span>
+                              ))}
                             </div>
 
-                            {/* SUBSTITUTOS COM GOLS AO LADO DO NOME */}
                             {j.substitutosA && j.substitutosA.length > 0 && (
                               <>
                                 <p className="text-[11px] font-bold text-amber-400/80 mb-1">🔄 Substitutos:</p>
                                 <div className="flex flex-wrap gap-1.5 mb-3">
-                                  {j.substitutosA.map(nome => {
-                                    const qtes = getGolsDoJogador(j, nome);
-                                    return (
-                                      <span key={nome} className="bg-amber-950/60 text-amber-200 text-xs px-2 py-0.5 rounded-full border border-amber-700/50 flex items-center gap-1">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                                        {nome}
-                                        {qtes > 0 && (
-                                          <span className="bg-amber-400 text-slate-950 px-1.5 py-0.2 text-[10px] rounded-full font-black ml-1">
-                                            ⚽ {qtes}
-                                          </span>
-                                        )}
-                                      </span>
-                                    );
-                                  })}
+                                  {j.substitutosA.map(nome => (
+                                    <span key={nome} className="bg-amber-950/60 text-amber-200 text-xs px-2 py-0.5 rounded-full border border-amber-700/50 flex items-center gap-1">
+                                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                                      {nome}
+                                    </span>
+                                  ))}
                                 </div>
                               </>
                             )}
 
-                            {/* GOL CONTRA SE HOUVER */}
-                            {gcVermelho > 0 && (
-                              <div className="mt-2 pt-1 border-t border-emerald-800/60">
-                                <span className="bg-red-950 text-red-300 text-xs px-2 py-0.5 rounded-md border border-red-700 font-bold inline-block">
-                                  ⚠️ Gol Contra favorável: {gcVermelho}
-                                </span>
+                            {golsTimeA.length > 0 && (
+                              <div className="mt-3 pt-2 border-t border-emerald-800/80">
+                                <p className="text-[11px] font-bold text-emerald-300 mb-1">⚽ Autores dos Gols (Time Vermelho):</p>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {golsTimeA.map((g, idx) => (
+                                    <span key={idx} className={`text-xs px-2.5 py-1 rounded-lg border font-bold ${g.jogador.includes('Gol Contra') ? 'bg-red-950 text-red-300 border-red-700' : 'bg-amber-500/20 text-amber-300 border-amber-500/40'}`}>
+                                      {g.jogador} ({g.quantidade})
+                                    </span>
+                                  ))}
+                                </div>
                               </div>
                             )}
                           </div>
@@ -635,58 +615,44 @@ export default function App() {
 
                             <p className="text-[11px] font-bold text-emerald-300 mb-1">⭐ Titulares:</p>
                             <div className="flex flex-wrap gap-1.5 mb-3">
-                              {/* GOLEIRO */}
+                              {/* GOLEIRO NO INÍCIO DOS TITULARES */}
                               {j.goleiroB && (
                                 <span className="bg-amber-500/20 text-amber-300 text-xs px-2.5 py-1 rounded-full border border-amber-500/40 shadow font-bold flex items-center gap-1">
                                   🧤 {j.goleiroB} (Goleiro)
                                 </span>
                               )}
-                              {/* JOGADORES TITULARES COM GOLS AO LADO DO NOME */}
-                              {j.jogadoresB.map(nome => {
-                                const qtes = getGolsDoJogador(j, nome);
-                                return (
-                                  <span key={nome} className="bg-emerald-900/90 text-white text-xs px-2.5 py-1 rounded-full border border-emerald-500/50 shadow flex items-center gap-1">
-                                    <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-                                    {nome}
-                                    {qtes > 0 && (
-                                      <span className="bg-amber-400 text-slate-950 px-1.5 py-0.2 text-[10px] rounded-full font-black ml-1">
-                                        ⚽ {qtes}
-                                      </span>
-                                    )}
-                                  </span>
-                                );
-                              })}
+                              {j.jogadoresB.map(nome => (
+                                <span key={nome} className="bg-emerald-900/90 text-white text-xs px-2.5 py-1 rounded-full border border-emerald-500/50 shadow flex items-center gap-1">
+                                  <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                                  {nome}
+                                </span>
+                              ))}
                             </div>
 
-                            {/* SUBSTITUTOS COM GOLS AO LADO DO NOME */}
                             {j.substitutosB && j.substitutosB.length > 0 && (
                               <>
                                 <p className="text-[11px] font-bold text-amber-400/80 mb-1">🔄 Substitutos:</p>
                                 <div className="flex flex-wrap gap-1.5 mb-3">
-                                  {j.substitutosB.map(nome => {
-                                    const qtes = getGolsDoJogador(j, nome);
-                                    return (
-                                      <span key={nome} className="bg-amber-950/60 text-amber-200 text-xs px-2 py-0.5 rounded-full border border-amber-700/50 flex items-center gap-1">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                                        {nome}
-                                        {qtes > 0 && (
-                                          <span className="bg-amber-400 text-slate-950 px-1.5 py-0.2 text-[10px] rounded-full font-black ml-1">
-                                            ⚽ {qtes}
-                                          </span>
-                                        )}
-                                      </span>
-                                    );
-                                  })}
+                                  {j.substitutosB.map(nome => (
+                                    <span key={nome} className="bg-amber-950/60 text-amber-200 text-xs px-2 py-0.5 rounded-full border border-amber-700/50 flex items-center gap-1">
+                                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                                      {nome}
+                                    </span>
+                                  ))}
                                 </div>
                               </>
                             )}
 
-                            {/* GOL CONTRA SE HOUVER */}
-                            {gcBranco > 0 && (
-                              <div className="mt-2 pt-1 border-t border-emerald-800/60">
-                                <span className="bg-red-950 text-red-300 text-xs px-2 py-0.5 rounded-md border border-red-700 font-bold inline-block">
-                                  ⚠️ Gol Contra favorável: {gcBranco}
-                                </span>
+                            {golsTimeB.length > 0 && (
+                              <div className="mt-3 pt-2 border-t border-emerald-800/80">
+                                <p className="text-[11px] font-bold text-emerald-300 mb-1">⚽ Autores dos Gols (Time Branco):</p>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {golsTimeB.map((g, idx) => (
+                                    <span key={idx} className={`text-xs px-2.5 py-1 rounded-lg border font-bold ${g.jogador.includes('Gol Contra') ? 'bg-red-950 text-red-300 border-red-700' : 'bg-amber-500/20 text-amber-300 border-amber-500/40'}`}>
+                                      {g.jogador} ({g.quantidade})
+                                    </span>
+                                  ))}
+                                </div>
                               </div>
                             )}
                           </div>
