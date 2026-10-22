@@ -526,25 +526,28 @@ export default function App() {
 
                   return (
                     <div key={j.id} className="w-full max-w-lg mx-auto my-3 font-sans">
-                      {/* BOTÕES DE AÇÃO ADMINISTRATIVA E DATA */}
+                      {/* BOTÕES DE AÇÃO ADMINISTRATIVA EXIBIDOS APENAS QUANDO AUTENTICADO */}
                       <div className="flex justify-between items-center mb-1.5 px-1">
                         <span className="text-[11px] font-black uppercase text-emerald-400 tracking-wider">
                           {j.partida} • {rodadaAtual.data}
                         </span>
-                        <div className="flex items-center gap-1.5">
-                          <button 
-                            onClick={() => handleEditarJogo(rodadaAtual.data, j)}
-                            className="bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded-full text-[10px] font-bold hover:bg-amber-500 hover:text-slate-950 transition-all"
-                          >
-                            ✏️ Editar
-                          </button>
-                          <button 
-                            onClick={() => handleDeletarJogo(j.id)}
-                            className="bg-red-500/20 text-red-300 border border-red-500/40 px-2 py-0.5 rounded-full text-[10px] font-bold hover:bg-red-600 hover:text-white transition-all"
-                          >
-                            🗑️ Excluir
-                          </button>
-                        </div>
+                        
+                        {autenticado && (
+                          <div className="flex items-center gap-1.5">
+                            <button 
+                              onClick={() => handleEditarJogo(rodadaAtual.data, j)}
+                              className="bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded-full text-[10px] font-bold hover:bg-amber-500 hover:text-slate-950 transition-all"
+                            >
+                              ✏️ Editar
+                            </button>
+                            <button 
+                              onClick={() => handleDeletarJogo(j.id)}
+                              className="bg-red-500/20 text-red-300 border border-red-500/40 px-2 py-0.5 rounded-full text-[10px] font-bold hover:bg-red-600 hover:text-white transition-all"
+                            >
+                              🗑️ Excluir
+                            </button>
+                          </div>
+                        )}
                       </div>
 
                       {/* DESIGN ESTILO COMPACTO - VERDE MAIS ESCURO */}
