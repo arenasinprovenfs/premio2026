@@ -538,7 +538,6 @@ export default function App() {
                       <div className="flex justify-between items-center my-4">
                         <div className="w-2/5 text-right">
                           <p className="font-extrabold text-red-400 text-lg">Time Vermelho</p>
-                          <p className="text-xs text-amber-300 font-semibold mt-1">🧤 Goleiro: {j.goleiroA}</p>
                         </div>
 
                         <div className="bg-emerald-900 px-5 py-2.5 rounded-xl font-black text-amber-300 text-2xl border-2 border-emerald-600 shadow-inner">
@@ -547,7 +546,6 @@ export default function App() {
 
                         <div className="w-2/5 text-left">
                           <p className="font-extrabold text-slate-100 text-lg">Time Branco</p>
-                          <p className="text-xs text-amber-300 font-semibold mt-1">🧤 Goleiro: {j.goleiroB}</p>
                         </div>
                       </div>
 
@@ -562,11 +560,17 @@ export default function App() {
                           {/* TIME A - VERMELHO */}
                           <div className="bg-emerald-950/80 p-4 rounded-xl border border-red-900/50 backdrop-blur-sm">
                             <p className="text-xs font-black text-red-400 mb-2 uppercase tracking-wide border-b border-emerald-800 pb-1">
-                              ⚽ ESCALAÇÃO TIME VERMELHO
+                              🎽 TIME VERMELHO
                             </p>
                             
                             <p className="text-[11px] font-bold text-emerald-300 mb-1">⭐ Titulares:</p>
                             <div className="flex flex-wrap gap-1.5 mb-3">
+                              {/* GOLEIRO NO INÍCIO DOS TITULARES */}
+                              {j.goleiroA && (
+                                <span className="bg-amber-500/20 text-amber-300 text-xs px-2.5 py-1 rounded-full border border-amber-500/40 shadow font-bold flex items-center gap-1">
+                                  🧤 {j.goleiroA} (Goleiro)
+                                </span>
+                              )}
                               {j.jogadoresA.map(nome => (
                                 <span key={nome} className="bg-emerald-900/90 text-white text-xs px-2.5 py-1 rounded-full border border-emerald-500/50 shadow flex items-center gap-1">
                                   <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
@@ -606,11 +610,17 @@ export default function App() {
                           {/* TIME B - BRANCO */}
                           <div className="bg-emerald-950/80 p-4 rounded-xl border border-slate-700/50 backdrop-blur-sm">
                             <p className="text-xs font-black text-slate-200 mb-2 uppercase tracking-wide border-b border-emerald-800 pb-1">
-                              ⚽ ESCALAÇÃO TIME BRANCO
+                              🎽 TIME BRANCO
                             </p>
 
                             <p className="text-[11px] font-bold text-emerald-300 mb-1">⭐ Titulares:</p>
                             <div className="flex flex-wrap gap-1.5 mb-3">
+                              {/* GOLEIRO NO INÍCIO DOS TITULARES */}
+                              {j.goleiroB && (
+                                <span className="bg-amber-500/20 text-amber-300 text-xs px-2.5 py-1 rounded-full border border-amber-500/40 shadow font-bold flex items-center gap-1">
+                                  🧤 {j.goleiroB} (Goleiro)
+                                </span>
+                              )}
                               {j.jogadoresB.map(nome => (
                                 <span key={nome} className="bg-emerald-900/90 text-white text-xs px-2.5 py-1 rounded-full border border-emerald-500/50 shadow flex items-center gap-1">
                                   <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
