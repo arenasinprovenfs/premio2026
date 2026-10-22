@@ -17,8 +17,6 @@ export const ASSOCIADOS_OPCOES = [
 
 export const GOLEIROS_OPCOES = ["Tellê", "Baianinho", "Roberto", "Rogério", "Adriel"];
 
-const historicoRodadasInicial = [];
-
 const dadosMangabeiraBase = [
   { nome: "Adriano", pontos: 65 }, { nome: "Rodrigo", pontos: 56 }, { nome: "Jandir", pontos: 56 },
   { nome: "Ballet", pontos: 55 }, { nome: "Robério", pontos: 54 }, { nome: "Lucas", pontos: 51 },
@@ -74,7 +72,6 @@ export default function App() {
   const [historico, setHistorico] = useState([]);
   const [dataSelecionada, setDataSelecionada] = useState('');
 
-  // Escuta o Firestore em Tempo Real
   useEffect(() => {
     const unsub = onSnapshot(collection(db, "partidas"), (snapshot) => {
       const docsData = snapshot.docs.map(doc => doc.data());
@@ -334,7 +331,7 @@ export default function App() {
   const rodadaAtual = historico.find(r => r.data === dataSelecionada) || historico[0];
 
   return (
-    <div className="min-h-screen bg-emerald-950 text-emerald-50 p-4 md:p-8 font-sans flex flex-col justify-between">
+    <div className="min-h-screen bg-slate-950 text-emerald-50 p-4 md:p-8 font-sans flex flex-col justify-between">
       <div>
         <header className="mb-8 border-b border-emerald-800/60 pb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="flex items-center gap-4">
@@ -504,24 +501,41 @@ export default function App() {
                 <p className="text-sm text-emerald-200/60 mt-1">Acesse a aba "➕ Cadastrar" no topo para inserir a primeira partida da temporada.</p>
               </div>
             ) : (
-              <div className="space-y-6">
+              <div className="space-y-12">
                 {rodadaAtual?.jogos.map((j) => {
-                  const golsTimeA = j.golsMarcados ? j.golsMarcados.filter(g => j.jogadoresA.includes(g.jogador) || (j.substitutosA && j.substitutosA.includes(g.jogador)) || g.jogador.includes('Vermelho')) : [];
-                  const golsTimeB = j.golsMarcados ? j.golsMarcados.filter(g => j.jogadoresB.includes(g.jogador) || (j.substitutosB && j.substitutosB.includes(g.jogador)) || g.jogador.includes('Branco')) : [];
+                  const listaEscalacaoA = [
+                    { nome: j.goleiroA, tipo: 'goleiro' },
+                    ...j.jogadoresA.map(n => ({ nome: n, tipo: 'titular' })),
+                    ...(j.substitutosA || []).map(n => ({ nome: n, tipo: 'substituto' }))
+                  ];
+
+                  const listaEscalacaoB = [
+                    { nome: j.goleiroB, tipo: 'goleiro' },
+                    ...j.jogadoresB.map(n => ({ nome: n, tipo: 'titular' })),
+                    ...(j.substitutosB || []).map(n => ({ nome: n, tipo: 'substituto' }))
+                  ];
+
+                  const maxLinhas = Math.max(listaEscalacaoA.length, listaEscalacaoB.length, 1);
+
+                  const getGols = (nome) => {
+                    if (!j.golsMarcados) return 0;
+                    const item = j.golsMarcados.find(g => g.jogador === nome);
+                    return item ? item.quantidade : 0;
+                  };
 
                   return (
-                    <div key={j.id} className="bg-emerald-950/90 p-5 rounded-2xl border border-emerald-800/80 shadow-lg">
-                      <div className="flex justify-between items-center mb-4 border-b border-emerald-800/60 pb-2 flex-wrap gap-2">
+                    <div key={j.id} className="max-w-3xl mx-auto my-6 font-sans">
+                      {/* BOTÕES DE AÇÃO ADMINISTRATIVA */}
+                      <div className="flex justify-between items-center mb-2 px-1">
                         <span className="text-xs font-black uppercase text-emerald-400 tracking-wider">
                           {j.partida} • {rodadaAtual.data}
                         </span>
-                        
                         <div className="flex items-center gap-2">
                           <button 
                             onClick={() => handleEditarJogo(rodadaAtual.data, j)}
                             className="bg-amber-500/20 text-amber-300 border border-amber-500/40 px-3 py-1 rounded-full text-xs font-bold hover:bg-amber-500 hover:text-slate-950 transition-all"
                           >
-                            ✏️ Editar Súmula
+                            ✏️ Editar
                           </button>
                           <button 
                             onClick={() => handleDeletarJogo(j.id)}
@@ -529,133 +543,110 @@ export default function App() {
                           >
                             🗑️ Excluir
                           </button>
-                          <span className="text-xs bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full font-bold border border-emerald-500/30">
-                            Súmula Finalizada
-                          </span>
                         </div>
                       </div>
 
-                      <div className="flex justify-between items-center my-4">
-                        <div className="w-2/5 text-right">
-                          <p className="font-extrabold text-red-400 text-lg">Time Vermelho</p>
-                        </div>
-
-                        <div className="bg-emerald-900 px-5 py-2.5 rounded-xl font-black text-amber-300 text-2xl border-2 border-emerald-600 shadow-inner">
-                          {j.golsA} x {j.golsB}
-                        </div>
-
-                        <div className="w-2/5 text-left">
-                          <p className="font-extrabold text-slate-100 text-lg">Time Branco</p>
-                        </div>
-                      </div>
-
-                      {/* GRAMADO TÁTICO DE FUTEBOL COM EFEITO EM PERSPECTIVA */}
-                      <div className="relative rounded-2xl p-4 my-6 border-2 border-emerald-600/80 bg-gradient-to-b from-emerald-900 via-emerald-800 to-emerald-900 shadow-2xl overflow-hidden min-h-[220px] flex items-center">
-                        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 border-t-2 border-dashed border-emerald-400/30"></div>
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 border-2 border-emerald-400/30 rounded-full"></div>
-                        <div className="absolute left-0 top-1/4 bottom-1/4 w-12 border-2 border-l-0 border-emerald-400/20 rounded-r-lg"></div>
-                        <div className="absolute right-0 top-1/4 bottom-1/4 w-12 border-2 border-r-0 border-emerald-400/20 rounded-l-lg"></div>
-
-                        <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-                          {/* TIME A - VERMELHO */}
-                          <div className="bg-emerald-950/80 p-4 rounded-xl border border-red-900/50 backdrop-blur-sm">
-                            <p className="text-xs font-black text-red-400 mb-2 uppercase tracking-wide border-b border-emerald-800 pb-1">
-                              🎽 TIME VERMELHO
-                            </p>
-                            
-                            <p className="text-[11px] font-bold text-emerald-300 mb-1">⭐ Titulares:</p>
-                            <div className="flex flex-wrap gap-1.5 mb-3">
-                              {/* GOLEIRO NO INÍCIO DOS TITULARES */}
-                              {j.goleiroA && (
-                                <span className="bg-amber-500/20 text-amber-300 text-xs px-2.5 py-1 rounded-full border border-amber-500/40 shadow font-bold flex items-center gap-1">
-                                  🧤 {j.goleiroA} (Goleiro)
-                                </span>
-                              )}
-                              {j.jogadoresA.map(nome => (
-                                <span key={nome} className="bg-emerald-900/90 text-white text-xs px-2.5 py-1 rounded-full border border-emerald-500/50 shadow flex items-center gap-1">
-                                  <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-                                  {nome}
-                                </span>
-                              ))}
+                      {/* DESIGN ESTILO BROADCAST / PLACAR TV */}
+                      <div className="rounded-xl overflow-hidden shadow-2xl border border-cyan-500/30 bg-slate-900">
+                        {/* BARRA SUPERIOR DO PLACAR */}
+                        <div className="relative bg-slate-950 border-b-2 border-cyan-500 flex items-center justify-between px-3 sm:px-6 py-2">
+                          {/* TIME VERMELHO */}
+                          <div className="flex items-center gap-2 sm:gap-3 w-1/3">
+                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-600 flex items-center justify-center font-black text-white text-xs border-2 border-white shadow">
+                              VER
                             </div>
-
-                            {j.substitutosA && j.substitutosA.length > 0 && (
-                              <>
-                                <p className="text-[11px] font-bold text-amber-400/80 mb-1">🔄 Substitutos:</p>
-                                <div className="flex flex-wrap gap-1.5 mb-3">
-                                  {j.substitutosA.map(nome => (
-                                    <span key={nome} className="bg-amber-950/60 text-amber-200 text-xs px-2 py-0.5 rounded-full border border-amber-700/50 flex items-center gap-1">
-                                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                                      {nome}
-                                    </span>
-                                  ))}
-                                </div>
-                              </>
-                            )}
-
-                            {golsTimeA.length > 0 && (
-                              <div className="mt-3 pt-2 border-t border-emerald-800/80">
-                                <p className="text-[11px] font-bold text-emerald-300 mb-1">⚽ Autores dos Gols (Time Vermelho):</p>
-                                <div className="flex flex-wrap gap-1.5">
-                                  {golsTimeA.map((g, idx) => (
-                                    <span key={idx} className={`text-xs px-2.5 py-1 rounded-lg border font-bold ${g.jogador.includes('Gol Contra') ? 'bg-red-950 text-red-300 border-red-700' : 'bg-amber-500/20 text-amber-300 border-amber-500/40'}`}>
-                                      {g.jogador} ({g.quantidade})
-                                    </span>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
+                            <span className="font-black text-white text-xs sm:text-base tracking-wider uppercase truncate">
+                              TIME VERMELHO
+                            </span>
                           </div>
 
-                          {/* TIME B - BRANCO */}
-                          <div className="bg-emerald-950/80 p-4 rounded-xl border border-slate-700/50 backdrop-blur-sm">
-                            <p className="text-xs font-black text-slate-200 mb-2 uppercase tracking-wide border-b border-emerald-800 pb-1">
-                              🎽 TIME BRANCO
-                            </p>
-
-                            <p className="text-[11px] font-bold text-emerald-300 mb-1">⭐ Titulares:</p>
-                            <div className="flex flex-wrap gap-1.5 mb-3">
-                              {/* GOLEIRO NO INÍCIO DOS TITULARES */}
-                              {j.goleiroB && (
-                                <span className="bg-amber-500/20 text-amber-300 text-xs px-2.5 py-1 rounded-full border border-amber-500/40 shadow font-bold flex items-center gap-1">
-                                  🧤 {j.goleiroB} (Goleiro)
-                                </span>
-                              )}
-                              {j.jogadoresB.map(nome => (
-                                <span key={nome} className="bg-emerald-900/90 text-white text-xs px-2.5 py-1 rounded-full border border-emerald-500/50 shadow flex items-center gap-1">
-                                  <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-                                  {nome}
-                                </span>
-                              ))}
+                          {/* CENTRO: PLACAR E CRONÔMETRO */}
+                          <div className="flex items-center gap-2 sm:gap-4 z-10">
+                            <span className="font-black text-2xl sm:text-4xl text-white tracking-widest bg-slate-800/80 px-3 py-1 rounded-lg border border-slate-700">
+                              {j.golsA}
+                            </span>
+                            <div className="bg-blue-600 text-white font-black text-xs sm:text-sm px-3 py-1.5 rounded-md tracking-wider shadow-inner uppercase">
+                              FIM
                             </div>
+                            <span className="font-black text-2xl sm:text-4xl text-white tracking-widest bg-slate-800/80 px-3 py-1 rounded-lg border border-slate-700">
+                              {j.golsB}
+                            </span>
+                          </div>
 
-                            {j.substitutosB && j.substitutosB.length > 0 && (
-                              <>
-                                <p className="text-[11px] font-bold text-amber-400/80 mb-1">🔄 Substitutos:</p>
-                                <div className="flex flex-wrap gap-1.5 mb-3">
-                                  {j.substitutosB.map(nome => (
-                                    <span key={nome} className="bg-amber-950/60 text-amber-200 text-xs px-2 py-0.5 rounded-full border border-amber-700/50 flex items-center gap-1">
-                                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                                      {nome}
-                                    </span>
-                                  ))}
+                          {/* TIME BRANCO */}
+                          <div className="flex items-center justify-end gap-2 sm:gap-3 w-1/3 text-right">
+                            <span className="font-black text-white text-xs sm:text-base tracking-wider uppercase truncate">
+                              TIME BRANCO
+                            </span>
+                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-100 flex items-center justify-center font-black text-slate-900 text-xs border-2 border-slate-400 shadow">
+                              BRA
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* TABELA DE JOGADORES (LINHAS ALTERNADAS AZUL / CIANO) */}
+                        <div className="divide-y divide-cyan-900/40 bg-gradient-to-b from-cyan-950/80 to-slate-950">
+                          {Array.from({ length: maxLinhas }).map((_, idx) => {
+                            const pA = listaEscalacaoA[idx];
+                            const pB = listaEscalacaoB[idx];
+                            const isEven = idx % 2 === 0;
+
+                            const colsA = pA ? getGols(pA.nome) : 0;
+                            const colsB = pB ? getGols(pB.nome) : 0;
+
+                            return (
+                              <div 
+                                key={idx} 
+                                className={`flex justify-between items-center px-4 sm:px-8 py-2 text-xs sm:text-sm transition-colors ${
+                                  isEven ? 'bg-cyan-950/40' : 'bg-sky-900/30'
+                                }`}
+                              >
+                                {/* LADO ESQUERDO: TIME VERMELHO */}
+                                <div className="flex items-center gap-2 w-1/2 pr-2">
+                                  {pA ? (
+                                    <>
+                                      <span className={`font-extrabold uppercase tracking-wide truncate ${
+                                        pA.tipo === 'goleiro' ? 'text-amber-300' : pA.tipo === 'substituto' ? 'text-cyan-300/70' : 'text-cyan-100'
+                                      }`}>
+                                        {pA.tipo === 'goleiro' && '🧤 '}
+                                        {pA.nome}
+                                        {pA.tipo === 'substituto' && ' (Sub)'}
+                                      </span>
+                                      {colsA > 0 && (
+                                        <span className="bg-red-600 text-white font-black text-[10px] px-1.5 py-0.5 rounded-full shadow">
+                                          ⚽ {colsA}
+                                        </span>
+                                      )}
+                                    </>
+                                  ) : (
+                                    <span className="text-transparent">-</span>
+                                  )}
                                 </div>
-                              </>
-                            )}
 
-                            {golsTimeB.length > 0 && (
-                              <div className="mt-3 pt-2 border-t border-emerald-800/80">
-                                <p className="text-[11px] font-bold text-emerald-300 mb-1">⚽ Autores dos Gols (Time Branco):</p>
-                                <div className="flex flex-wrap gap-1.5">
-                                  {golsTimeB.map((g, idx) => (
-                                    <span key={idx} className={`text-xs px-2.5 py-1 rounded-lg border font-bold ${g.jogador.includes('Gol Contra') ? 'bg-red-950 text-red-300 border-red-700' : 'bg-amber-500/20 text-amber-300 border-amber-500/40'}`}>
-                                      {g.jogador} ({g.quantidade})
-                                    </span>
-                                  ))}
+                                {/* LADO DIREITO: TIME BRANCO */}
+                                <div className="flex items-center justify-end gap-2 w-1/2 pl-2 text-right">
+                                  {pB ? (
+                                    <>
+                                      {colsB > 0 && (
+                                        <span className="bg-slate-200 text-slate-950 font-black text-[10px] px-1.5 py-0.5 rounded-full shadow">
+                                          ⚽ {colsB}
+                                        </span>
+                                      )}
+                                      <span className={`font-extrabold uppercase tracking-wide truncate ${
+                                        pB.tipo === 'goleiro' ? 'text-amber-300' : pB.tipo === 'substituto' ? 'text-cyan-300/70' : 'text-cyan-100'
+                                      }`}>
+                                        {pB.tipo === 'substituto' && '(Sub) '}
+                                        {pB.nome}
+                                        {pB.tipo === 'goleiro' && ' 🧤'}
+                                      </span>
+                                    </>
+                                  ) : (
+                                    <span className="text-transparent">-</span>
+                                  )}
                                 </div>
                               </div>
-                            )}
-                          </div>
+                            );
+                          })}
                         </div>
                       </div>
                     </div>
