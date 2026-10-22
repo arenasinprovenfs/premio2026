@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 import { db } from './firebase';
-import { collection, onSnapshot, doc, setDoc } from 'firebase/firestore';
+import { collection, onSnapshot, doc, setDoc, deleteDoc } from 'firebase/firestore';
 
 const NOME_DESENVOLVEDOR = "Prof. Me. Ícaro Galvão";
 
@@ -220,6 +220,24 @@ export default function App() {
     setGolsDetalhados(mapGols);
 
     setAba('cadastrar');
+  };
+
+  const handleDeletarJogo = async (idJogo) => {
+    if (!autenticado) {
+      setAba('cadastrar');
+      alert('Por favor, faça login como administrador na aba Cadastrar para excluir partidas.');
+      return;
+    }
+
+    if (window.confirm('Tem certeza de que deseja excluir esta súmula permanentemente?')) {
+      try {
+        await deleteDoc(doc(db, "partidas", idJogo));
+        alert('Súmula excluída com sucesso!');
+      } catch (err) {
+        console.error(err);
+        alert('Erro ao excluir a súmula no Firestore.');
+      }
+    }
   };
 
   const handleSalvarJogo = async (e) => {
@@ -505,6 +523,12 @@ export default function App() {
                           >
                             ✏️ Editar Súmula
                           </button>
+                          <button 
+                            onClick={() => handleDeletarJogo(j.id)}
+                            className="bg-red-500/20 text-red-300 border border-red-500/40 px-3 py-1 rounded-full text-xs font-bold hover:bg-red-600 hover:text-white transition-all"
+                          >
+                            🗑️ Excluir
+                          </button>
                           <span className="text-xs bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full font-bold border border-emerald-500/30">
                             Súmula Finalizada
                           </span>
@@ -527,10 +551,16 @@ export default function App() {
                         </div>
                       </div>
 
-                      <div className="relative rounded-2xl p-4 my-6 border-2 border-emerald-700/80 bg-gradient-to-b from-emerald-900/90 via-emerald-800/80 to-emerald-900/90 shadow-2xl overflow-hidden">
-                        <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* GRAMADO TÁTICO DE FUTEBOL COM EFEITO EM PERSPECTIVA */}
+                      <div className="relative rounded-2xl p-4 my-6 border-2 border-emerald-600/80 bg-gradient-to-b from-emerald-900 via-emerald-800 to-emerald-900 shadow-2xl overflow-hidden min-h-[220px] flex items-center">
+                        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 border-t-2 border-dashed border-emerald-400/30"></div>
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 border-2 border-emerald-400/30 rounded-full"></div>
+                        <div className="absolute left-0 top-1/4 bottom-1/4 w-12 border-2 border-l-0 border-emerald-400/20 rounded-r-lg"></div>
+                        <div className="absolute right-0 top-1/4 bottom-1/4 w-12 border-2 border-r-0 border-emerald-400/20 rounded-l-lg"></div>
+
+                        <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
                           {/* TIME A - VERMELHO */}
-                          <div className="bg-emerald-950/70 p-4 rounded-xl border border-emerald-700/60 backdrop-blur-sm">
+                          <div className="bg-emerald-950/80 p-4 rounded-xl border border-red-900/50 backdrop-blur-sm">
                             <p className="text-xs font-black text-red-400 mb-2 uppercase tracking-wide border-b border-emerald-800 pb-1">
                               ⚽ ESCALAÇÃO TIME VERMELHO
                             </p>
@@ -574,7 +604,7 @@ export default function App() {
                           </div>
 
                           {/* TIME B - BRANCO */}
-                          <div className="bg-emerald-950/70 p-4 rounded-xl border border-emerald-700/60 backdrop-blur-sm">
+                          <div className="bg-emerald-950/80 p-4 rounded-xl border border-slate-700/50 backdrop-blur-sm">
                             <p className="text-xs font-black text-slate-200 mb-2 uppercase tracking-wide border-b border-emerald-800 pb-1">
                               ⚽ ESCALAÇÃO TIME BRANCO
                             </p>
@@ -900,7 +930,7 @@ export default function App() {
       </div>
 
       <footer className="mt-12 text-center text-xs text-emerald-400/60 border-t border-emerald-800/40 pt-4">
-        Desenvolvido por <span className="text-emerald-300 font-bold">{NOME_DESENVOLVEDOR}</span>
+        Aplicativo <span className="text-amber-300 font-extrabold">Olho no Lance</span> • Desenvolvido por <span className="text-emerald-300 font-bold">{NOME_DESENVOLVEDOR}</span>
       </footer>
     </div>
   );
