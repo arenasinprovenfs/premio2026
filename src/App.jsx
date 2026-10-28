@@ -15,7 +15,6 @@ export const ASSOCIADOS_OPCOES = [
   "Ricardo", "Robério", "Rodrigo", "Talisca", "Vanderson", "Vini HC", "Vitinho", "Zé Paulo"
 ];
 
-// ADICIONADO "Convidado" NAS OPÇÕES DE GOLEIROS
 export const GOLEIROS_OPCOES = ["Tellê", "Baianinho", "Roberto", "Rogério", "Adriel", "Convidado"];
 
 const dadosMangabeiraBase = [
@@ -36,7 +35,8 @@ const dadosMangabeiraBase = [
   { nome: "Carioca", pontos: 18 }, { nome: "Zé Paulo", pontos: 16 }, { nome: "Juracy", pontos: 13 },
   { nome: "Kiko", pontos: 13 }, { nome: "PH", pontos: 11 }, { nome: "Babinha", pontos: 8 },
   { nome: "Marcola", pontos: 8 }, { nome: "Guga", pontos: 7 }, { nome: "Miskinis", pontos: 6 },
-  { nome: "Dai", pontos: 4 }, { nome: "Gilberto", pontos: 3 }, { nome: "Jefinho", pontos: 3 }
+  { nome: "Dai", pontos: 4 }, { nome: "Gilberto", pontos: 3 }, { nome: "Jefinho", pontos: 3 },
+  { nome: "Vitinho", pontos: 0 }
 ];
 
 const dadosBrocadorBase = [
@@ -57,7 +57,8 @@ const dadosBrocadorBase = [
   { nome: "Dyeggo", gols: 1 }, { nome: "Babinha", gols: 1 }, { nome: "Garcia", gols: 1 },
   { nome: "M. Galvão", gols: 1 }, { nome: "Amaury", gols: 1 }, { nome: "Ivamário", gols: 1 },
   { nome: "Rafha Santana", gols: 1 }, { nome: "Oliveira", gols: 1 }, { nome: "Marcola", gols: 1 },
-  { nome: "Beradeiro", gols: 1 }
+  { nome: "Beradeiro", gols: 1 },
+  { nome: "Vitinho", gols: 0 }
 ];
 
 const dadosCesarBase = [
@@ -293,7 +294,6 @@ export default function App() {
         const ptsA = j.golsA > j.golsB ? 3 : (j.golsA === j.golsB ? 1 : 0);
         const ptsB = j.golsB > j.golsA ? 3 : (j.golsA === j.golsB ? 1 : 0);
 
-        // IGNORA "Convidado" NO CRAQUE (MANGABEIRA)
         j.jogadoresA.forEach(nome => {
           if (nome !== "Convidado") {
             let p = mangabeira.find(x => x.nome === nome);
@@ -308,7 +308,6 @@ export default function App() {
           }
         });
 
-        // IGNORA "Convidado" NA ARTILHARIA (BROCADOR)
         j.golsMarcados.forEach(g => {
           if (g.jogador !== "Convidado" && !g.jogador.includes("Gol Contra")) {
             let p = brocador.find(x => x.nome === g.jogador);
@@ -316,7 +315,6 @@ export default function App() {
           }
         });
 
-        // IGNORA "Convidado" NO PRÊMIO CÉSAR (GOLEIROS)
         if (j.goleiroA !== "Convidado") {
           let golA = cesar.find(x => x.nome === j.goleiroA);
           if (golA) {
