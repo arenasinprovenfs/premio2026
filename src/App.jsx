@@ -84,10 +84,14 @@ export default function App() {
           rodadasMap[jogo.dataRodada].push(jogo);
         });
 
-        const historicoFormatado = Object.keys(rodadasMap).map(data => ({
-          data,
-          jogos: rodadasMap[data]
-        }));
+        // ORDENA AS DATAS DAS MAIS RECENTES PARA AS MAIS ANTIGAS (DD/MM/YYYY)
+        const historicoFormatado = Object.keys(rodadasMap)
+          .map(data => ({ data, jogos: rodadasMap[data] }))
+          .sort((a, b) => {
+            const [diaA, mesA, anoA] = a.data.split('/').map(Number);
+            const [diaB, mesB, anoB] = b.data.split('/').map(Number);
+            return new Date(anoB, mesB - 1, diaB) - new Date(anoA, mesA - 1, diaA);
+          });
 
         setHistorico(historicoFormatado);
       } else {
@@ -289,7 +293,6 @@ export default function App() {
         const ptsA = j.golsA > j.golsB ? 3 : (j.golsA === j.golsB ? 1 : 0);
         const ptsB = j.golsB > j.golsA ? 3 : (j.golsA === j.golsB ? 1 : 0);
 
-        // IGNORA "Convidado" NA CONTABILIZAÇÃO DO CRAQUE (MANGABEIRA)
         j.jogadoresA.forEach(nome => {
           if (nome !== "Convidado") {
             let p = mangabeira.find(x => x.nome === nome);
@@ -304,7 +307,6 @@ export default function App() {
           }
         });
 
-        // IGNORA "Convidado" E "Gol Contra" NA ARTILHARIA (BROCADOR)
         j.golsMarcados.forEach(g => {
           if (g.jogador !== "Convidado" && !g.jogador.includes("Gol Contra")) {
             let p = brocador.find(x => x.nome === g.jogador);
