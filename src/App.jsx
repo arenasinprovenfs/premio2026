@@ -15,7 +15,8 @@ export const ASSOCIADOS_OPCOES = [
   "Ricardo", "Robério", "Rodrigo", "Talisca", "Vanderson", "Vini HC", "Vitinho", "Zé Paulo"
 ];
 
-export const GOLEIROS_OPCOES = ["Tellê", "Baianinho", "Roberto", "Rogério", "Adriel"];
+// ADICIONADO "Convidado" NAS OPÇÕES DE GOLEIROS
+export const GOLEIROS_OPCOES = ["Tellê", "Baianinho", "Roberto", "Rogério", "Adriel", "Convidado"];
 
 const dadosMangabeiraBase = [
   { nome: "Adriano", pontos: 65 }, { nome: "Rodrigo", pontos: 56 }, { nome: "Jandir", pontos: 56 },
@@ -84,7 +85,6 @@ export default function App() {
           rodadasMap[jogo.dataRodada].push(jogo);
         });
 
-        // ORDENA AS DATAS DAS MAIS RECENTES PARA AS MAIS ANTIGAS (DD/MM/YYYY)
         const historicoFormatado = Object.keys(rodadasMap)
           .map(data => ({ data, jogos: rodadasMap[data] }))
           .sort((a, b) => {
@@ -293,6 +293,7 @@ export default function App() {
         const ptsA = j.golsA > j.golsB ? 3 : (j.golsA === j.golsB ? 1 : 0);
         const ptsB = j.golsB > j.golsA ? 3 : (j.golsA === j.golsB ? 1 : 0);
 
+        // IGNORA "Convidado" NO CRAQUE (MANGABEIRA)
         j.jogadoresA.forEach(nome => {
           if (nome !== "Convidado") {
             let p = mangabeira.find(x => x.nome === nome);
@@ -307,6 +308,7 @@ export default function App() {
           }
         });
 
+        // IGNORA "Convidado" NA ARTILHARIA (BROCADOR)
         j.golsMarcados.forEach(g => {
           if (g.jogador !== "Convidado" && !g.jogador.includes("Gol Contra")) {
             let p = brocador.find(x => x.nome === g.jogador);
@@ -314,16 +316,21 @@ export default function App() {
           }
         });
 
-        let golA = cesar.find(x => x.nome === j.goleiroA);
-        if (golA) {
-          golA.golsSofridos += j.golsB;
-          golA.pontos += ptsA;
+        // IGNORA "Convidado" NO PRÊMIO CÉSAR (GOLEIROS)
+        if (j.goleiroA !== "Convidado") {
+          let golA = cesar.find(x => x.nome === j.goleiroA);
+          if (golA) {
+            golA.golsSofridos += j.golsB;
+            golA.pontos += ptsA;
+          }
         }
 
-        let golB = cesar.find(x => x.nome === j.goleiroB);
-        if (golB) {
-          golB.golsSofridos += j.golsA;
-          golB.pontos += ptsB;
+        if (j.goleiroB !== "Convidado") {
+          let golB = cesar.find(x => x.nome === j.goleiroB);
+          if (golB) {
+            golB.golsSofridos += j.golsB;
+            golB.pontos += ptsB;
+          }
         }
       });
     });
