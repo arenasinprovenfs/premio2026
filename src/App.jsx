@@ -7,12 +7,12 @@ const NOME_DESENVOLVEDOR = "Prof. Me. Ícaro Galvão";
 
 export const ASSOCIADOS_OPCOES = [
   "Adriano", "Albino", "Amaury", "André", "Babinha", "Ballet", "Beradeiro", "Canário", 
-  "Capela", "Carioca", "Dai", "Diniz", "Dyeggo", "Filipinho", "Gamarra", "Garcia", 
+  "Capela", "Carioca", "Convidado", "Dai", "Diniz", "Dyeggo", "Filipinho", "Gamarra", "Garcia", 
   "Guga", "Gusta", "Gutto", "Harley", "I. Galvão", "Jandir", "Jefinho", "Juracy", 
   "Kiko", "Lucas", "M. Galvão", "M. Yuri", "Marcola", "Marcelinho", "Michel", "Minuano", 
   "Miskinis", "Morais", "Murilo", "Nando", "Oliveira", "Otaner", "PH", "PJ", 
   "R. Mateus", "Rafa", "Rafael Santana", "Rapha Diniz", "Raul", "Reinaldo", "Remi", 
-  "Ricardo", "Robério", "Rodrigo", "Talisca", "Vanderson", "Vini HC", "Zé Paulo"
+  "Ricardo", "Robério", "Rodrigo", "Talisca", "Vanderson", "Vini HC", "Vitinho", "Zé Paulo"
 ];
 
 export const GOLEIROS_OPCOES = ["Tellê", "Baianinho", "Roberto", "Rogério", "Adriel"];
@@ -289,18 +289,24 @@ export default function App() {
         const ptsA = j.golsA > j.golsB ? 3 : (j.golsA === j.golsB ? 1 : 0);
         const ptsB = j.golsB > j.golsA ? 3 : (j.golsA === j.golsB ? 1 : 0);
 
+        // IGNORA "Convidado" NA CONTABILIZAÇÃO DO CRAQUE (MANGABEIRA)
         j.jogadoresA.forEach(nome => {
-          let p = mangabeira.find(x => x.nome === nome);
-          if (p) p.pontos += ptsA;
+          if (nome !== "Convidado") {
+            let p = mangabeira.find(x => x.nome === nome);
+            if (p) p.pontos += ptsA;
+          }
         });
 
         j.jogadoresB.forEach(nome => {
-          let p = mangabeira.find(x => x.nome === nome);
-          if (p) p.pontos += ptsB;
+          if (nome !== "Convidado") {
+            let p = mangabeira.find(x => x.nome === nome);
+            if (p) p.pontos += ptsB;
+          }
         });
 
+        // IGNORA "Convidado" E "Gol Contra" NA ARTILHARIA (BROCADOR)
         j.golsMarcados.forEach(g => {
-          if (!g.jogador.includes("Gol Contra")) {
+          if (g.jogador !== "Convidado" && !g.jogador.includes("Gol Contra")) {
             let p = brocador.find(x => x.nome === g.jogador);
             if (p) p.gols += g.quantidade;
           }
@@ -348,7 +354,6 @@ export default function App() {
             </div>
           </div>
 
-          {/* ABAS COM NOMES COMPLETO E ORIGINAIS */}
           <div className="flex flex-wrap gap-1.5 bg-emerald-950/90 p-1 rounded-xl border border-emerald-800 text-xs sm:text-sm">
             <button 
               onClick={() => setAba('geral')}
@@ -526,7 +531,6 @@ export default function App() {
 
                   return (
                     <div key={j.id} className="w-full max-w-lg mx-auto my-3 font-sans">
-                      {/* BOTÕES DE AÇÃO ADMINISTRATIVA E DATA */}
                       <div className="flex justify-between items-center mb-1.5 px-1">
                         <span className="text-[11px] font-black uppercase text-emerald-400 tracking-wider">
                           {j.partida} • {rodadaAtual.data}
@@ -547,11 +551,8 @@ export default function App() {
                         </div>
                       </div>
 
-                      {/* DESIGN ESTILO COMPACTO - VERDE MAIS ESCURO */}
                       <div className="rounded-xl overflow-hidden shadow-2xl border border-emerald-800 bg-[#02130e]">
-                        {/* BARRA SUPERIOR DO PLACAR */}
                         <div className="relative bg-emerald-950 border-b-2 border-emerald-700 flex items-center justify-between px-2 sm:px-4 py-1.5">
-                          {/* TIME VERMELHO COM NOME EM VERMELHO DESTAQUE */}
                           <div className="flex items-center gap-1.5 w-5/12">
                             <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-red-600 flex-shrink-0 flex items-center justify-center font-black text-white text-[10px] border border-white shadow">
                               VER
@@ -561,7 +562,6 @@ export default function App() {
                             </span>
                           </div>
 
-                          {/* CENTRO: PLACAR E "X" */}
                           <div className="flex items-center justify-center gap-1.5 z-10 w-2/12">
                             <span className="font-black text-lg sm:text-2xl text-white bg-[#010a07] px-2 py-0.5 rounded border border-emerald-800 shadow-inner">
                               {j.golsA}
@@ -574,7 +574,6 @@ export default function App() {
                             </span>
                           </div>
 
-                          {/* TIME BRANCO */}
                           <div className="flex items-center justify-end gap-1.5 w-5/12 text-right">
                             <span className="font-black text-white text-xs sm:text-sm tracking-wide uppercase truncate">
                               BRANCO
@@ -585,7 +584,6 @@ export default function App() {
                           </div>
                         </div>
 
-                        {/* TABELA DE JOGADORES */}
                         <div className="divide-y divide-emerald-900/50 bg-[#02130e]">
                           {Array.from({ length: maxLinhas }).map((_, idx) => {
                             const pA = listaEscalacaoA[idx];
@@ -602,7 +600,6 @@ export default function App() {
                                   isEven ? 'bg-[#02130e]' : 'bg-[#042118]'
                                 }`}
                               >
-                                {/* LADO ESQUERDO: TIME VERMELHO */}
                                 <div className="flex items-center gap-1 w-1/2 pr-1 min-w-0">
                                   {pA ? (
                                     <>
@@ -624,7 +621,6 @@ export default function App() {
                                   )}
                                 </div>
 
-                                {/* LADO DIREITO: TIME BRANCO */}
                                 <div className="flex items-center justify-end gap-1 w-1/2 pl-1 text-right min-w-0">
                                   {pB ? (
                                     <>
@@ -786,7 +782,6 @@ export default function App() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* CONFIGURAÇÃO TIME VERMELHO */}
                   <div className="bg-[#02130e] p-3 rounded-xl border border-red-900/60 space-y-3">
                     <p className="font-extrabold text-red-400 text-center uppercase tracking-wide text-xs">Time Vermelho</p>
                     <div>
@@ -833,7 +828,6 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* CONFIGURAÇÃO TIME BRANCO */}
                   <div className="bg-[#02130e] p-3 rounded-xl border border-slate-700 space-y-3">
                     <p className="font-extrabold text-slate-100 text-center uppercase tracking-wide text-xs">Time Branco</p>
                     <div>
@@ -881,7 +875,6 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* MARCAÇÃO DE GOLS */}
                 <div className="bg-[#02130e] p-3 rounded-xl border border-emerald-700 space-y-2">
                   <p className="font-extrabold text-amber-300 text-center uppercase tracking-wide text-xs">⚽ Lançamento de Gols Marcados</p>
 
