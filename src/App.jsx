@@ -69,6 +69,54 @@ const dadosCesarBase = [
   { nome: 'Adriel', pontos: 1, golsSofridos: 2 }
 ];
 
+const historicoCampeoes = [
+  {
+    ano: 2025,
+    mangabeira: "Rodrigo (107 pts)",
+    brocador: "Michel Yuri (57 Gols)",
+    cesar: "Tellê (109 pts)",
+    timeCampeaoNome: "Cabo Verde",
+    timeCampeaoElenco: "Tellê, Albino, Dyeggo, Oliveira, Gusta, PJ, Raul, Nando, Rodrigo",
+    selecao: "Tellê, Marcelinho, Ballet, Robério, Michel, Oliveira, Rodrigo, Ricardo"
+  },
+  {
+    ano: 2024,
+    mangabeira: "Talisca (90 pts)",
+    brocador: "Michel Yuri (66 Gols)",
+    cesar: "Baianinho (95 pts)",
+    timeCampeaoNome: "Clonazepan",
+    timeCampeaoElenco: "Baianinho, Ballet, Albino, Leandro Lyra, Dyeggo, Tairon, Xinha, Amaury, Minuano, Nando, Michel Yuri, Galindo",
+    selecao: "Baianinho, Ícaro Galvão, Talisca, Marcelinho, Minuano, Michel Yuri, Vanderson, Ballet"
+  },
+  {
+    ano: 2023,
+    mangabeira: "Jandir (98 pts)",
+    brocador: "Raul (47 Gols)",
+    cesar: "Baianinho (86 pts)",
+    timeCampeaoNome: "Al Shabab",
+    timeCampeaoElenco: "Tellê, Albino, Reinaldo, Lucivan, Zé Paulo, Gamarra, Rodrigo, João Alexandre, Beradeiro, Ian, Vinicius",
+    selecao: "Baianinho, Ícaro Galvão, Jura, Marcelinho, Oliveira, Michel, Jandir, Gamarra"
+  },
+  {
+    ano: 2022,
+    mangabeira: "Ícaro Galvão (91 pts)",
+    brocador: "Michel Yuri (76 Gols)",
+    cesar: "Não Houve",
+    timeCampeaoNome: "Brasil Azivis",
+    timeCampeaoElenco: "Baianinho, Babinha, Ícaro Galvão, Yure, Paraguai, Marcelo Barata, Michel Yuri, Ricardo, PJ, Michel",
+    selecao: "Baianinho, Ícaro Galvão, Robério, Kiko, Michel, Michel Yuri, Rodrigo, Gamarra"
+  },
+  {
+    ano: 2021,
+    mangabeira: "Não Houve",
+    brocador: "Não Houve",
+    cesar: "Não Houve",
+    timeCampeaoNome: "Caracu",
+    timeCampeaoElenco: "Matheus Silva, Ícaro Galvão, Mangabeira, Oliveira, Ivamário, PJ, Morais, Filipinho, Nando, Clóvis Júnior",
+    selecao: "Não Houve"
+  }
+];
+
 export default function App() {
   const [aba, setAba] = useState('geral');
   const [historico, setHistorico] = useState([]);
@@ -391,6 +439,12 @@ export default function App() {
               className={`px-3 py-1.5 rounded-lg transition-all ${aba === 'cesar' ? 'bg-amber-500 text-slate-950 shadow-md font-bold' : 'text-emerald-200/70 hover:text-white'}`}
             >
               Goleiros (César)
+            </button>
+            <button 
+              onClick={() => setAba('historico')}
+              className={`px-3 py-1.5 rounded-lg transition-all ${aba === 'historico' ? 'bg-purple-600 text-white shadow-md font-bold' : 'text-emerald-200/70 hover:text-white'}`}
+            >
+              🏆 Histórico
             </button>
             <button 
               onClick={() => { resetForm(); setAba('cadastrar'); }}
@@ -743,6 +797,61 @@ export default function App() {
                   ))}
                 </tbody>
               </table>
+            </div>
+          </div>
+        )}
+
+        {/* ABA HISTÓRICO DE CAMPEÕES (2021 A 2025) */}
+        {aba === 'historico' && (
+          <div className="bg-emerald-950/60 p-4 sm:p-6 rounded-2xl border border-emerald-900/80">
+            <h2 className="text-xl font-bold text-purple-300 mb-1 flex items-center gap-2">
+              🏆 Galeria de Campeões (Histórico)
+            </h2>
+            <p className="text-emerald-200/60 text-xs mb-6">Registro histórico dos premiados, seleções e equipes campeãs desde 2021</p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {historicoCampeoes.map((item) => (
+                <div key={item.ano} className="bg-[#02130e] p-4 rounded-xl border border-purple-900/50 shadow-lg space-y-3">
+                  <div className="flex justify-between items-center border-b border-purple-800/40 pb-2">
+                    <span className="text-lg font-black text-purple-400 tracking-wider">Edição {item.ano}</span>
+                    <span className="text-[10px] font-bold uppercase bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded">Histórico</span>
+                  </div>
+
+                  <div className="space-y-2 text-xs sm:text-sm">
+                    <div className="flex justify-between items-center bg-emerald-950/50 p-2 rounded-lg">
+                      <span className="text-emerald-300 font-bold">⭐ Prêmio Mangabeira:</span>
+                      <span className="font-extrabold text-white">{item.mangabeira}</span>
+                    </div>
+
+                    <div className="flex justify-between items-center bg-emerald-950/50 p-2 rounded-lg">
+                      <span className="text-red-400 font-bold">⚽ Prêmio Brocador:</span>
+                      <span className="font-extrabold text-white">{item.brocador}</span>
+                    </div>
+
+                    <div className="flex justify-between items-center bg-emerald-950/50 p-2 rounded-lg">
+                      <span className="text-amber-400 font-bold">🧤 Prêmio César:</span>
+                      <span className="font-extrabold text-white">{item.cesar}</span>
+                    </div>
+
+                    <div className="bg-purple-950/40 p-2.5 rounded-lg border border-purple-700/30 space-y-1">
+                      <div className="flex justify-between items-center">
+                        <span className="text-purple-300 font-black">🏆 Time Campeão:</span>
+                        <span className="font-black text-amber-300 text-sm">{item.timeCampeaoNome}</span>
+                      </div>
+                      <p className="text-[11px] text-emerald-200/80 leading-relaxed pt-1 border-t border-purple-800/30">
+                        <span className="font-bold text-emerald-400">Elenco:</span> {item.timeCampeaoElenco}
+                      </p>
+                    </div>
+
+                    <div className="bg-emerald-950/40 p-2.5 rounded-lg border border-emerald-800/50 space-y-1">
+                      <span className="text-teal-300 font-black block text-xs">🌟 Seleção do Ano:</span>
+                      <p className="text-[11px] text-emerald-100/90 leading-relaxed">
+                        {item.selecao}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
