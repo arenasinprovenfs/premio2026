@@ -73,7 +73,7 @@ const historicoCampeoes = [
   {
     ano: 2025,
     mangabeira: "Rodrigo (107 pts)",
-    brocador: "Michel Yuri (57 Gols)",
+    brocador: "Rodrigo (57 Gols)", // 👈 CORRIGIDO AQUI PARA RODRIGO
     cesar: "Tellê (109 pts)",
     timeCampeaoNome: "Cabo Verde",
     timeCampeaoElenco: "Tellê, Albino, Dyeggo, Oliveira, Gusta, PJ, Raul, Nando, Rodrigo",
