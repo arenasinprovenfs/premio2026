@@ -73,7 +73,7 @@ const historicoCampeoes = [
   {
     ano: 2025,
     mangabeira: "Rodrigo (107 pts)",
-    brocador: "Rodrigo (57 Gols)", // 👈 CORRIGIDO AQUI PARA RODRIGO
+    brocador: "Rodrigo (57 Gols)",
     cesar: "Tellê (109 pts)",
     timeCampeaoNome: "Cabo Verde",
     timeCampeaoElenco: "Tellê, Albino, Dyeggo, Oliveira, Gusta, PJ, Raul, Nando, Rodrigo",
@@ -103,7 +103,7 @@ const historicoCampeoes = [
     brocador: "Michel Yuri (76 Gols)",
     cesar: "Não Houve",
     timeCampeaoNome: "Brasil Azivis",
-    timeCampeaoElenco: "Baianinho, Babinha, Ícaro Galvão, Yure, Paraguai, Marcelo Barata, Michel Yuri, Ricardo, PJ, Michel",
+    timeCampeaoElenco: "Baianinho, Babinha, Ícaro Galvão, Yure, Paraguai, Marcelo Barata, Michel Yuri, Ricardo, PJ, Michel, Atanael",
     selecao: "Baianinho, Ícaro Galvão, Robério, Kiko, Michel, Michel Yuri, Rodrigo, Gamarra"
   },
   {
