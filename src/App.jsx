@@ -12,7 +12,7 @@ export const ASSOCIADOS_OPCOES = [
   "Kiko", "Lucas", "M. Galvão", "M. Yuri", "Marcola", "Marcelinho", "Michel", "Minuano", 
   "Miskinis", "Morais", "Murilo", "Nando", "Oliveira", "Otaner", "PH", "PJ", 
   "R. Mateus", "Rafa", "Rafael Santana", "Rapha Diniz", "Raul", "Reinaldo", "Remi", 
-  "Ricardo", "Robério", "Rodrigo", "Talisca", "Vanderson", "Vini HC", "Vitinho", "Zé Paulo"
+  "Ricardo", "Robério", "Rodrigo", "Talisca", "Vanderson", "Vini HC", "Vitinho", "Xinha", "Zé Paulo"
 ];
 
 export const GOLEIROS_OPCOES = ["Tellê", "Baianinho", "Roberto", "Rogério", "Adriel", "Convidado"];
@@ -36,7 +36,7 @@ const dadosMangabeiraBase = [
   { nome: "Kiko", pontos: 13 }, { nome: "PH", pontos: 11 }, { nome: "Babinha", pontos: 8 },
   { nome: "Marcola", pontos: 8 }, { nome: "Guga", pontos: 7 }, { nome: "Miskinis", pontos: 6 },
   { nome: "Dai", pontos: 4 }, { nome: "Gilberto", pontos: 3 }, { nome: "Jefinho", pontos: 3 },
-  { nome: "Vitinho", pontos: 0 }
+  { nome: "Vitinho", pontos: 0 }, { nome: "Xinha", pontos: 0 }
 ];
 
 const dadosBrocadorBase = [
@@ -57,8 +57,7 @@ const dadosBrocadorBase = [
   { nome: "Dyeggo", gols: 1 }, { nome: "Babinha", gols: 1 }, { nome: "Garcia", gols: 1 },
   { nome: "M. Galvão", gols: 1 }, { nome: "Amaury", gols: 1 }, { nome: "Ivamário", gols: 1 },
   { nome: "Rafha Santana", gols: 1 }, { nome: "Oliveira", gols: 1 }, { nome: "Marcola", gols: 1 },
-  { nome: "Beradeiro", gols: 1 },
-  { nome: "Vitinho", gols: 0 }
+  { nome: "Beradeiro", gols: 1 }, { nome: "Vitinho", gols: 0 }, { nome: "Xinha", gols: 0 }
 ];
 
 const dadosCesarBase = [
