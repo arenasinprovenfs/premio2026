@@ -15,7 +15,7 @@ export const ASSOCIADOS_OPCOES = [
   "Ricardo", "Robério", "Rodrigo", "Talisca", "Vanderson", "Vini HC", "Vitinho", "Xinha", "Zé Paulo"
 ];
 
-export const GOLEIROS_OPCOES = ["Tellê", "Baianinho", "Roberto", "Rogério", "Adriel", "Convidado"];
+export const GOLEIROS_OPCOES = ["Tellê", "Baianinho", "Roberto", "Rogério", "Adriel", "Gol. Convidado"];
 
 const dadosMangabeiraBase = [
   { nome: "Adriano", pontos: 65 }, { nome: "Rodrigo", pontos: 56 }, { nome: "Jandir", pontos: 56 },
@@ -57,7 +57,9 @@ const dadosBrocadorBase = [
   { nome: "Dyeggo", gols: 1 }, { nome: "Babinha", gols: 1 }, { nome: "Garcia", gols: 1 },
   { nome: "M. Galvão", gols: 1 }, { nome: "Amaury", gols: 1 }, { nome: "Ivamário", gols: 1 },
   { nome: "Rafha Santana", gols: 1 }, { nome: "Oliveira", gols: 1 }, { nome: "Marcola", gols: 1 },
-  { nome: "Beradeiro", gols: 1 }, { nome: "Vitinho", gols: 0 }, { nome: "Xinha", gols: 0 }
+  { nome: "Beradeiro", gols: 1 }, { nome: "Vitinho", gols: 0 }, { nome: "Xinha", gols: 0 },
+  { nome: "Tellê", gols: 0 }, { nome: "Baianinho", gols: 0 }, { nome: "Roberto", gols: 0 },
+  { nome: "Rogério", gols: 0 }, { nome: "Adriel", gols: 0 }
 ];
 
 const dadosCesarBase = [
@@ -172,8 +174,8 @@ export default function App() {
   const [golsDetalhados, setGolsDetalhados] = useState({});
 
   useEffect(() => {
-    const listaTimeA = [...jogadoresA, ...(substitutosA || []), `⚠️ Gol Contra (Time Vermelho)`];
-    const listaTimeB = [...jogadoresB, ...(substitutosB || []), `⚠️ Gol Contra (Time Branco)`];
+    const listaTimeA = Array.from(new Set([goleiroA, ...jogadoresA, ...(substitutosA || []), `⚠️ Gol Contra (Time Vermelho)`]));
+    const listaTimeB = Array.from(new Set([goleiroB, ...jogadoresB, ...(substitutosB || []), `⚠️ Gol Contra (Time Branco)`]));
 
     let totalA = 0;
     let totalB = 0;
@@ -188,7 +190,7 @@ export default function App() {
 
     setGolsA(totalA);
     setGolsB(totalB);
-  }, [golsDetalhados, jogadoresA, jogadoresB, substitutosA, substitutosB]);
+  }, [golsDetalhados, goleiroA, goleiroB, jogadoresA, jogadoresB, substitutosA, substitutosB]);
 
   const resetForm = () => {
     setJogoEditandoId(null);
@@ -251,8 +253,8 @@ export default function App() {
     }
 
     setJogoEditandoId(jogo.id);
-    setGoleiroA(jogo.goleiroA);
-    setGoleiroB(jogo.goleiroB);
+    setGoleiroA(jogo.goleiroA === "Convidado" ? "Gol. Convidado" : jogo.goleiroA);
+    setGoleiroB(jogo.goleiroB === "Convidado" ? "Gol. Convidado" : jogo.goleiroB);
     setJogadoresA(jogo.jogadoresA || []);
     setJogadoresB(jogo.jogadoresB || []);
     setSubstitutosA(jogo.substitutosA || []);
@@ -356,13 +358,21 @@ export default function App() {
         });
 
         j.golsMarcados.forEach(g => {
-          if (g.jogador !== "Convidado" && !g.jogador.includes("Gol Contra")) {
+          if (
+            g.jogador !== "Convidado" && 
+            g.jogador !== "Gol. Convidado" && 
+            !g.jogador.includes("Gol Contra")
+          ) {
             let p = brocador.find(x => x.nome === g.jogador);
-            if (p) p.gols += g.quantidade;
+            if (p) {
+              p.gols += g.quantidade;
+            } else {
+              brocador.push({ nome: g.jogador, gols: g.quantidade });
+            }
           }
         });
 
-        if (j.goleiroA !== "Convidado") {
+        if (j.goleiroA !== "Convidado" && j.goleiroA !== "Gol. Convidado") {
           let golA = cesar.find(x => x.nome === j.goleiroA);
           if (golA) {
             golA.golsSofridos += j.golsB;
@@ -370,10 +380,10 @@ export default function App() {
           }
         }
 
-        if (j.goleiroB !== "Convidado") {
+        if (j.goleiroB !== "Convidado" && j.goleiroB !== "Gol. Convidado") {
           let golB = cesar.find(x => x.nome === j.goleiroB);
           if (golB) {
-            golB.golsSofridos += j.golsB;
+            golB.golsSofridos += j.golsA;
             golB.pontos += ptsB;
           }
         }
@@ -389,6 +399,20 @@ export default function App() {
 
   const { mangabeira: rankingMangabeira, brocador: rankingBrocador, cesar: rankingCesar } = calcularRankings();
   const rodadaAtual = historico.find(r => r.data === dataSelecionada) || historico[0];
+
+  const listaGolsTimeA = Array.from(new Set([
+    ...(goleiroA ? [goleiroA] : []),
+    ...jogadoresA,
+    ...(substitutosA || []),
+    `⚠️ Gol Contra (Time Vermelho)`
+  ]));
+
+  const listaGolsTimeB = Array.from(new Set([
+    ...(goleiroB ? [goleiroB] : []),
+    ...jogadoresB,
+    ...(substitutosB || []),
+    `⚠️ Gol Contra (Time Branco)`
+  ]));
 
   return (
     <div className="min-h-screen bg-[#031d15] text-emerald-50 p-2 sm:p-6 font-sans flex flex-col justify-between">
@@ -569,23 +593,26 @@ export default function App() {
             ) : (
               <div className="space-y-6">
                 {rodadaAtual?.jogos.map((j) => {
+                  const nomeGolA = j.goleiroA === "Convidado" ? "Gol. Convidado" : j.goleiroA;
+                  const nomeGolB = j.goleiroB === "Convidado" ? "Gol. Convidado" : j.goleiroB;
+
                   const listaEscalacaoA = [
-                    { nome: j.goleiroA, tipo: 'goleiro' },
+                    { nome: nomeGolA, tipo: 'goleiro' },
                     ...j.jogadoresA.map(n => ({ nome: n, tipo: 'titular' })),
                     ...(j.substitutosA || []).map(n => ({ nome: n, tipo: 'substituto' }))
                   ];
 
                   const listaEscalacaoB = [
-                    { nome: j.goleiroB, tipo: 'goleiro' },
+                    { nome: nomeGolB, tipo: 'goleiro' },
                     ...j.jogadoresB.map(n => ({ nome: n, tipo: 'titular' })),
                     ...(j.substitutosB || []).map(n => ({ nome: n, tipo: 'substituto' }))
                   ];
 
                   const maxLinhas = Math.max(listaEscalacaoA.length, listaEscalacaoB.length, 1);
 
-                  const getGols = (nome) => {
-                    if (!j.golsMarcados) return 0;
-                    const item = j.golsMarcados.find(g => g.jogador === nome);
+                  const getGols = (jogadorObj) => {
+                    if (!jogadorObj || !j.golsMarcados) return 0;
+                    const item = j.golsMarcados.find(g => g.jogador === jogadorObj.nome);
                     return item ? item.quantidade : 0;
                   };
 
@@ -650,8 +677,8 @@ export default function App() {
                             const pB = listaEscalacaoB[idx];
                             const isEven = idx % 2 === 0;
 
-                            const colsA = pA ? getGols(pA.nome) : 0;
-                            const colsB = pB ? getGols(pB.nome) : 0;
+                            const colsA = getGols(pA);
+                            const colsB = getGols(pB);
 
                             return (
                               <div 
@@ -800,7 +827,6 @@ export default function App() {
           </div>
         )}
 
-        {/* ABA HISTÓRICO DE CAMPEÕES (2021 A 2025) */}
         {aba === 'historico' && (
           <div className="bg-emerald-950/60 p-4 sm:p-6 rounded-2xl border border-emerald-900/80">
             <h2 className="text-xl font-bold text-purple-300 mb-1 flex items-center gap-2">
@@ -991,15 +1017,17 @@ export default function App() {
                 </div>
 
                 <div className="bg-[#02130e] p-3 rounded-xl border border-emerald-700 space-y-2">
-                  <p className="font-extrabold text-amber-300 text-center uppercase tracking-wide text-xs">⚽ Lançamento de Gols Marcados</p>
+                  <p className="font-extrabold text-amber-300 text-center uppercase tracking-wide text-xs">⚽ Lançamento de Gols Marcados (Incluindo Goleiros)</p>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                       <p className="text-[11px] font-bold text-red-400 mb-1.5">Atletas do Time Vermelho:</p>
-                      <div className="space-y-1 max-h-36 overflow-y-auto">
-                        {[...jogadoresA, ...(substitutosA || []), `⚠️ Gol Contra (Time Vermelho)`].map(nome => (
+                      <div className="space-y-1 max-h-44 overflow-y-auto">
+                        {listaGolsTimeA.map(nome => (
                           <div key={nome} className="flex justify-between items-center bg-emerald-950/80 p-1.5 rounded-lg text-xs">
-                            <span className="font-bold text-white text-[11px]">{nome}</span>
+                            <span className={`font-bold text-[11px] ${nome === goleiroA ? 'text-amber-300' : 'text-white'}`}>
+                              {nome === goleiroA ? `🧤 ${nome}` : nome}
+                            </span>
                             <div className="flex items-center gap-1.5">
                               <button type="button" onClick={() => handleGolsJogador(nome, -1)} className="bg-[#010a07] text-white font-black w-5 h-5 rounded flex items-center justify-center text-xs">-</button>
                               <span className="font-black text-amber-300 w-3 text-center text-xs">{golsDetalhados[nome] || 0}</span>
@@ -1012,10 +1040,12 @@ export default function App() {
 
                     <div>
                       <p className="text-[11px] font-bold text-slate-200 mb-1.5">Atletas do Time Branco:</p>
-                      <div className="space-y-1 max-h-36 overflow-y-auto">
-                        {[...jogadoresB, ...(substitutosB || []), `⚠️ Gol Contra (Time Branco)`].map(nome => (
+                      <div className="space-y-1 max-h-44 overflow-y-auto">
+                        {listaGolsTimeB.map(nome => (
                           <div key={nome} className="flex justify-between items-center bg-emerald-950/80 p-1.5 rounded-lg text-xs">
-                            <span className="font-bold text-white text-[11px]">{nome}</span>
+                            <span className={`font-bold text-[11px] ${nome === goleiroB ? 'text-amber-300' : 'text-white'}`}>
+                              {nome === goleiroB ? `🧤 ${nome}` : nome}
+                            </span>
                             <div className="flex items-center gap-1.5">
                               <button type="button" onClick={() => handleGolsJogador(nome, -1)} className="bg-[#010a07] text-white font-black w-5 h-5 rounded flex items-center justify-center text-xs">-</button>
                               <span className="font-black text-amber-300 w-3 text-center text-xs">{golsDetalhados[nome] || 0}</span>
